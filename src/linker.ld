@@ -1,25 +1,22 @@
 ENTRY(start)
+OUTPUT_FORMAT(elf32-i386)
 
 SECTIONS {
-    /* Definiere den Text-Segment, der den Code enthält */
+    . = 0x00100000;
+
     .text  ALIGN(4K) : {
-        KEEP(*(.multiboot_header))
-        *(.text)
-        *(.rodata)
+        KEEP(*(.multiboot_header));
+        *(.text);
+        *(.rodata);
     }
-
-    /* Definiere den Daten-Segment */
     .data  ALIGN(4K) : {
-        *(.data)
+        *(.data);
     }
-
-    /* Definiere den BSS-Segment */
     .bss  ALIGN(4K) : {
-        *(.bss)
-        *(COMMON)
+        *(.bss);
+        *(COMMON);
     }
 
-    /* Definiere die End-Adresse */
     . = ALIGN(4K);
     end = .;
 }

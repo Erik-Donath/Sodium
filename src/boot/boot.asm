@@ -1,4 +1,5 @@
 section .text
+    bits 32
     global start
     extern kernel_main
 

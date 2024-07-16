@@ -17,7 +17,7 @@ ISO = $(DIST_DIR)/Sodium.iso
 CC = gcc
 LD = ld
 ASM = nasm
-CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra -I$(INCLUDE_DIR)
+CFLAGS = -m32 -ffreestanding -nostartfiles -nodefaultlibs -O2 -Wall -Wextra -I$(INCLUDE_DIR)
 LDFLAGS = -m elf_i386
 ASFLAGS = -f elf
 
@@ -25,6 +25,7 @@ ASFLAGS = -f elf
 BOOT_OBJ = $(patsubst $(BOOT_DIR)/%.asm, $(BUILD_DIR)/%.o, $(wildcard $(BOOT_DIR)/*.asm))
 KERNEL_OBJS = $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/%.o, $(wildcard $(KERNEL_DIR)/*.c))
 KERNEL_OBJS += $(patsubst $(KERNEL_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(wildcard $(KERNEL_DIR)/*.cpp))
+KERNEL_OBJS += $(patsubst $(KERNEL_DIR)/%.asm, $(BUILD_DIR)/%.o, $(wildcard $(KERNEL_DIR)/*.asm))
 
 # Regeln
 all: $(ISO)
@@ -46,7 +47,11 @@ $(BUILD_DIR)/%.o: $(BOOT_DIR)/%.asm
 	mkdir -p $(BUILD_DIR)
 	$(ASM) $(ASFLAGS) -o $@ $<
 
-# Kompiliere Kernel-Dateien
+# Assemblierung und Kompiliere Kernel-Dateien
+$(BUILD_DIR)/%.o: $(KERNEL_DIR)/%.asm
+	mkdir -p $(BUILD_DIR)
+	$(ASM) $(ASFLAGS) -o $@ $<
+
 $(BUILD_DIR)/%.o: $(KERNEL_DIR)/%.c
 	mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
