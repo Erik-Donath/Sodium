@@ -24,6 +24,7 @@ ASFLAGS = -f elf
 # Boot-Dateien
 BOOT_OBJ = $(patsubst $(BOOT_DIR)/%.asm, $(BUILD_DIR)/%.o, $(wildcard $(BOOT_DIR)/*.asm))
 KERNEL_OBJS = $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/%.o, $(wildcard $(KERNEL_DIR)/*.c))
+KERNEL_OBJS += $(patsubst $(KERNEL_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(wildcard $(KERNEL_DIR)/*.cpp))
 
 # Regeln
 all: $(ISO)
