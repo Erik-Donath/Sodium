@@ -10,4 +10,4 @@ VOLUME /root/env
 WORKDIR /root/env
 
 # Will build the Project automatikly
-ENTRYPOINT [ "make", "build-iso" ]
+ENTRYPOINT [ "make", "all" ]
