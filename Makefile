@@ -50,6 +50,10 @@ $(BUILD_DIR)/%.o: $(KERNEL_DIR)/%.c
 	mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+$(BUILD_DIR)/%.o: $(KERNEL_DIR)/%.cpp
+	mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
 # Aufräumen
 clean:
 	rm -rf $(BUILD_DIR) $(DIST_DIR)

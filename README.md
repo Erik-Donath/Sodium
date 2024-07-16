@@ -11,7 +11,7 @@ After building the Sodium you can emulate the system with qemu. Simply run 'qemu
 
 ## Architekture
 Here is an overview of the current project Architekture
-'
+<br>
 Sodium/<br>
 ├── build<br>
 ├── src<br>
@@ -30,4 +30,3 @@ Sodium/<br>
 │   ├── Sodium.iso<br>
 │   └── kernel.bin<br>
 └── Makefile<br>
-'
