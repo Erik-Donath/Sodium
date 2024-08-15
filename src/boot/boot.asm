@@ -1,32 +1,30 @@
+bits 32
+
 section .text
-    bits 32
     global start
     extern kernel_main
 
 start:
+    ; Deaktivate Interrupts
     cli
+
+    ; Creating Stack of 8KB
     mov esp, stack_top
     mov ebp, esp
 
-    ; Überprüfe die Multiboot-Magic-Number
+    ; Check Multiboot-Magic-Number
     cmp eax, 0x36d76289
     jne .error
 
-    ; In den C-Kernel springen
-    push ebx ; Multiboot Information Structure Pointer
+    ; Jump in the C-Kernel with the first parameter being the mb_info struct pointer (32bit pointer)
+    push ebx
     call kernel_main
 .error:
     cli
-
-    ; print 'ERROR'
-    mov dword [0xb8000], 0x04520445
-    mov dword [0xb8004], 0x044F0452
-    mov dword [0xb8008], 0x00000452
-
-    ; Stop execution
     hlt
-    jmp .error
 
 section .bss
-    resb 8192             ; Reserviere 8 KB für den Stack
+    stack_bottom: ; Reserviere 8 KB für den Stack
+    align 16
+    resb 8192
     stack_top:
