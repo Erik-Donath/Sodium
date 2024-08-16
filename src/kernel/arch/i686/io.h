@@ -4,6 +4,7 @@
 /*
     Port Belegung:
     See also: https://bochs.sourceforge.io/techspec/PORTS.LST
+    See also: https://wiki.osdev.org/I/O_Ports
 
     0x0000-0x001F	The first legacy DMA controller, often used for transfers to floppies.
     0x0020-0x0021	The first Programmable Interrupt Controller

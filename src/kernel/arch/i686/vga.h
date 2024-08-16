@@ -44,3 +44,5 @@ void VGA_setcolor(uint8_t color);
 uint8_t VGA_getcurcolor();
 uint8_t VGA_getcursorx();
 uint8_t VGA_getcursory();
+
+// See also: https://wiki.osdev.org/VGA_Hardware
