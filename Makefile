@@ -23,10 +23,10 @@ ASFLAGS   = -f elf
 GRUBFLAGS = --product-version="Sodium 0.1"
 
 # Source + Headers
-ASM_HEADER := $(wildcard $(SRC_DIR)/**/*.inc)
-ASM_SOURCE := $(wildcard $(SRC_DIR)/**/*.asm)
-C_HEADER   := $(wildcard $(SRC_DIR)/**/*.h)
-C_SOURCE   := $(wildcard $(SRC_DIR)/**/*.c)
+ASM_HEADER := $(shell find $(SRC_DIR) -name '*.inc')
+ASM_SOURCE := $(shell find $(SRC_DIR) -name '*.asm')
+C_HEADER   := $(shell find $(SRC_DIR) -name '*.h')
+C_SOURCE   := $(shell find $(SRC_DIR) -name '*.c')
 
 # Objects
 ASM_OBJECTS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/obj/asm/%.obj, $(ASM_SOURCE))
@@ -61,6 +61,14 @@ $(BUILD_DIR)/obj/asm/%.obj: $(SRC_DIR)/%.asm $(ASM_HEADER)
 	$(ASM) $(ASFLAGS) -o $@ $<
 	@echo "--> Assembled: " $<
 
+info:
+	@echo "Info: "
+	@echo "C Header: " $(C_HEADER)
+	@echo "C Source: " $(C_SOURCE)
+	@echo "ASM Header: " $(ASM_HEADER)
+	@echo "ASM Source: " $(ASM_SOURCE)
+	@echo ""
+
 # Final Build Rules
 all: $(ISO)
 	@echo "--> DONE"
@@ -69,4 +77,4 @@ clean:
 	@rm -rf $(BUILD_DIR) $(DIST_DIR)
 	@echo "--> CLEANED"
 
-.PHONY: all clean always
+.PHONY: info all clean

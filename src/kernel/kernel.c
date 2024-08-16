@@ -1,7 +1,11 @@
 #include "kernel.h"
+#include "arch/i686/vga.h"
 
-static uint32_t* VideoMemory = (uint32_t*)0xb8000;
 void __attribute__((cdecl)) kernel_main(void* multiboot_info_ptr) {
-    VideoMemory[0] = 0x0f4b0f4f;
-    while (1) ;
+    VGA_setcolor(VGA_BACK(VGA_COLOR_BLACK) | VGA_FRONT(VGA_COLOR_BRIGHT_CYAN));
+    VGA_clrscr();
+    VGA_puts("Welcome to Sodium!\n");
+    VGA_setcolor(VGA_DEFAULT_COLOR);
+
+    while(1);
 }
