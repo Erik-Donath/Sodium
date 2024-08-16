@@ -1,3 +1,4 @@
+#include "io.h"
 #include "vga.h"
 
 static uint16_t* ScreenBuffer = (uint16_t*)VGA_SCREEN_BUFFER_ADDRESS;
@@ -21,6 +22,7 @@ void VGA_clrscr() {
             VGA_setchr(x, y, '\0', currentColor);
         }
     }
+    VGA_setcursor(0, 0);
 }
 
 void VGA_scrollback(uint8_t lines) {
@@ -41,13 +43,12 @@ void VGA_setcursor(uint8_t x, uint8_t y) {
     cursorX = x;
     cursorY = y;
     
-    /*
+    // Update Screem Cursor
     uint16_t pos = y * VGA_SCREEN_WIDTH + x;
-    i686_outb(0x3D4, 0x0F);
-    i686_outb(0x3D5, (uint8_t)(pos & 0xFF));
-    i686_outb(0x3D4, 0x0E);
-    i686_outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
-    */
+    outb(VGA_CRTC_INDEX_PORT, 0x0F);
+    outb(VGA_CRTC_DATA_PORT, (uint8_t)(pos & 0xFF));
+    outb(VGA_CRTC_INDEX_PORT, 0x0E);
+    outb(VGA_CRTC_DATA_PORT, (uint8_t)((pos >> 8) & 0xFF));
 }
 
 void VGA_advancecursor() {
