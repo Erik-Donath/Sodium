@@ -19,3 +19,5 @@ mb_header_start:
     mb_flags dw 0
     mb_size  dd 0
 mb_header_end:
+
+section .note.GNU-stack noalloc noexec nowrite progbits

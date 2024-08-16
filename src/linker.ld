@@ -4,12 +4,12 @@ OUTPUT_FORMAT(elf32-i386)
 SECTIONS {
     . = 0x00100000;
 
-    .text  ALIGN(4K) : {
-        KEEP(*(.multiboot_header));
+    .text ALIGN(4K) : {
+        KEEP(*(.multiboot_header)); /* Sicherstellen, dass der Multiboot-Header erhalten bleibt */
         *(.text);
         *(.rodata);
     }
-    .data  ALIGN(4K) : {
+    .data ALIGN(4K) : {
         *(.data);
     }
     .bss  ALIGN(4K) : {

@@ -16,9 +16,11 @@ ISO           = $(DIST_DIR)/Sodium.iso
 CC  = gcc
 LD  = ld
 ASM = nasm
-CFLAGS  = -m32 -ffreestanding -nostartfiles -nodefaultlibs -O2 -Wall -Wextra -I$(SRC_DIR)
-LDFLAGS = -m elf_i386
-ASFLAGS = -f elf
+
+CFLAGS    = -m32 -ffreestanding -nostartfiles -nodefaultlibs -O2 -Wall -Wextra -I$(SRC_DIR)
+LDFLAGS   = -m elf_i386
+ASFLAGS   = -f elf
+GRUBFLAGS = --product-version="Sodium 0.1"
 
 # Source + Headers
 ASM_HEADER := $(wildcard $(SRC_DIR)/**/*.inc)
@@ -38,7 +40,7 @@ $(ISO): $(KERNEL_BIN) $(GRUB_DIR)/grub.cfg
 	cp $(KERNEL_BIN) $(BUILD_DIR)/iso/boot/kernel.bin
 	cp $(GRUB_DIR)/grub.cfg $(BUILD_DIR)/iso/boot/grub
 
-	grub-mkrescue -o $(ISO) $(BUILD_DIR)/iso
+	grub-mkrescue $(GRUBFLAGS) -o $(ISO) $(BUILD_DIR)/iso
 	@echo "--> Created: " $@
 
 # Link Objects into dist/kernel.bin
