@@ -1,3 +1,4 @@
+/* WARNING: This driver does not implement any Graphis yet. It is still in development */
 #pragma once
 #include <stdint.h>
 

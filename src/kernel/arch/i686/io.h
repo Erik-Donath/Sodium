@@ -30,8 +30,6 @@
 #define VGA_CRTC_INDEX_PORT   0x3D4  // CRT Controller Index Port
 #define VGA_CRTC_DATA_PORT    0x3D5  // CRT Controller Data Port
 
-
-
 // User by: iowait
 #define IO_UNUSED_PORT         0x0080
 
