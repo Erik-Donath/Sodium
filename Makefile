@@ -74,7 +74,7 @@ all: $(ISO)
 	@echo "--> DONE"
 
 clean:
-	@rm -rf $(BUILD_DIR) $(DIST_DIR)
+	@rm -rf $(BUILD_DIR)
 	@echo "--> CLEANED"
 
 .PHONY: info all clean
