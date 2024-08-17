@@ -34,10 +34,11 @@ C_OBJECTS   := $(patsubst $(SRC_DIR)/%.c,   $(BUILD_DIR)/obj/c/%.obj,   $(C_SOUR
 
 # Create ISO -> dist/Sodium.iso
 $(ISO): $(KERNEL_BIN) $(GRUB_DIR)/grub.cfg
+	@mkdir -p $(BUILD_DIR)/iso/bin
 	@mkdir -p $(BUILD_DIR)/iso/boot/grub
 	@mkdir -p $(DIST_DIR)
 
-	cp $(KERNEL_BIN) $(BUILD_DIR)/iso/boot/kernel.bin
+	cp $(KERNEL_BIN) $(BUILD_DIR)/iso/bin/kernel.bin
 	cp $(GRUB_DIR)/grub.cfg $(BUILD_DIR)/iso/boot/grub
 
 	grub-mkrescue $(GRUBFLAGS) -o $(ISO) $(BUILD_DIR)/iso
