@@ -12,10 +12,13 @@ After building the Sodium you can emulate the system with qemu. Simply run 'qemu
 ## Architekture
 Here is an overview of the current project Architekture
 <br>
-Sodium/<br>
+Sodium<br>
 ├── build<br>
 ├── src<br>
 │   ├── kernel<br>
+│   │   ├── arch<br>
+│   │   │   ├── i686<br>
+│   │   │   │   └── / i686 Driver and Systems /<br>
 │   │   ├── kernel.c<br>
 │   │   └── ...<br>
 │   ├── boot<br>
@@ -23,10 +26,9 @@ Sodium/<br>
 │   │   ├── multiboot.asm<br>
 │   │   └── grub<br>
 │   │       └── grub.cfg<br>
-├── include<br>
-│   ├── kernel.h<br>
-│   └── ...<br>
+│   └── linker.ld
 ├── dist<br>
 │   ├── Sodium.iso<br>
 │   └── kernel.bin<br>
+├── Readme.md
 └── Makefile<br>
