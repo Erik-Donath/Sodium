@@ -20,14 +20,14 @@ void puts(const char* str) {
 void print_signed(int32_t value, uint8_t radix) {
     if(value < 0) {
         putc('-');
-        print_unsigned(-value, radix);
+        print_unsigned((uint32_t)(-value), radix);
     }
     else 
         print_unsigned((uint32_t)value, radix);
 }
 
 void print_unsigned(uint32_t value, uint8_t radix) {
-    if(!radix || radix > 16) radix = 10;
+    if(radix < 2 || radix > 16) radix = 10;
     char buffer[32];
     int32_t pos = 0;
 

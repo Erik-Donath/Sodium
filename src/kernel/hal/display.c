@@ -1,7 +1,7 @@
 #include <kernel/arch/i686/vga.h>
 #include "display.h"
 
-static color    DISPLAY_color = 0;
+static color    DISPLAY_Color = 0;
 
 static uint8_t  DISPLAY_Screen_Height = 0,
                 DISPLAY_Screen_Width  = 0;
@@ -17,29 +17,29 @@ void DISPLAY_init() {
     DISPLAY_Screen_Height = VGA_getScreenHeight();
     DISPLAY_Screen_Width  = VGA_getScreenWidth();
 
-    DISPLAY_color = DEFAULT_COLOR;
+    DISPLAY_Color = DEFAULT_COLOR;
     DISPLAY_clear();
 }
 
 void DISPLAY_clear() {
     for(uint8_t y = 0; y < DISPLAY_Screen_Height; y++) {
         for(uint8_t x = 0; x < DISPLAY_Screen_Width; x++) {
-            DISPLAY_setc(x, y, CCHR('\0', DISPLAY_color));
+            DISPLAY_setc(x, y, CCHR('\0', DISPLAY_Color));
         }
     }
     DISPLAY_setcursor(0, 0);
 }
 
 void DISPLAY_setcolor(color c) {
-    DISPLAY_color = c;
+    DISPLAY_Color = c;
 }
 
 color DISPLAY_getcolor() {
-    return DISPLAY_color;
+    return DISPLAY_Color;
 }
 
 void DISPLAY_nextc(char c) {
-    DISPLAY_setc(DISPLAY_Cursor_X, DISPLAY_Cursor_Y, CCHR(c, DISPLAY_color));
+    DISPLAY_setc(DISPLAY_Cursor_X, DISPLAY_Cursor_Y, CCHR(c, DISPLAY_Color));
 
     // Advance Cursor by 1 Step
     uint8_t x = DISPLAY_Cursor_X,
@@ -109,7 +109,7 @@ void DISPLAY_scroll(uint8_t lines) {
 
     for (uint8_t y = DISPLAY_Screen_Height - lines; y < DISPLAY_Screen_Height; y++) {
         for (uint8_t x = 0; x < DISPLAY_Screen_Width; x++) {
-            DISPLAY_setc(x, y, CCHR('\0', DISPLAY_color));
+            DISPLAY_setc(x, y, CCHR('\0', DISPLAY_Color));
         }
     }
 }

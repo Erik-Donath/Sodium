@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "hal/display.h"
 #include "stdio.h"
 #include "kernel.h"

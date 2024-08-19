@@ -1,5 +1,4 @@
 #pragma once
-#include <stdint.h>
 
 void kernel_welcome();
 void printf_test();

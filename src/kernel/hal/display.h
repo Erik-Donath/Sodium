@@ -17,7 +17,7 @@
 #define BRIGHT_RED     0x0C
 #define BRIGHT_MAGENTA 0x0D
 #define YELLOW         0x0E
-#define WHITE          0x0F
+#define WHITE          0x0F 
 
 #define COLOR(f, b) (color)(((f) & 0x0F) | ((b) << 4))
 #define DEFAULT_COLOR COLOR(LIGHT_GRAY, BLACK)
