@@ -2,9 +2,10 @@
 #include <stdbool.h>
 
 #include "hal/display.h"
+#include "util/arrays.h"
 #include "stdio.h"
 
-static const char numberTable[] = "0123456789ABCDEF";
+static const char numberTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 void putc(char c) {
     DISPLAY_putc(c);
@@ -27,7 +28,7 @@ void print_signed(int32_t value, uint8_t radix) {
 }
 
 void print_unsigned(uint32_t value, uint8_t radix) {
-    if(radix < 2 || radix > 16) radix = 10;
+    if(radix < 2 || radix > ARRAY_SIZE(numberTable)) radix = 10;
     char buffer[32];
     int32_t pos = 0;
 
