@@ -13,7 +13,6 @@ void kernel_welcome() {
 void kernel_main(void* multiboot_info_ptr) {
     DISPLAY_init();
     kernel_welcome();
-    printf_test();
 
     while(1) ;
 }

@@ -1,5 +1,7 @@
 #pragma once
+
 #include <stdint.h>
+#include <kernel/util/assembly.h>
 
 /*
     Port Belegung:
@@ -33,7 +35,7 @@
 // User by: iowait
 #define IO_UNUSED_PORT         0x0080
 
-void __attribute__((cdecl)) outb(uint16_t port, uint8_t value);
-uint8_t __attribute__((cdecl)) inb(uint16_t port);
+void ASMCALL outb(uint16_t port, uint8_t value);
+uint8_t ASMCALL inb(uint16_t port);
 
 void iowait();
