@@ -1,17 +1,20 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-#include "arch/i686/vga.h"
+#include "hal/display.h"
 #include "stdio.h"
 
 static const char numberTable[] = "0123456789ABCDEF";
 
 void putc(char c) {
-    VGA_putc(c);
+    DISPLAY_putc(c);
 }
 
 void puts(const char* str) {
-    VGA_puts(str);
+    while(*str) {
+        putc(*str);
+        str++;
+    }
 }
 
 void print_signed(int32_t value, uint8_t radix) {
