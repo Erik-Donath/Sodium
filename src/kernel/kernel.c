@@ -19,6 +19,7 @@ void printf_test() {
     printf("%%u -> %u\n", 1337);
     printf("%%o -> %o\n", 34);
     printf("%%X -> %X\n", 4919);
+    printf("%%B -> %B\n", 42);
     printf("%%p -> %p\n", 0x4242);
     printf("%%n -> %n\n");
 }

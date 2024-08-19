@@ -70,6 +70,9 @@ void printf(const char* fmt, ...) {
                 case 'X': // %X -> Hex
                     print_unsigned(va_arg(args, uint32_t), 16);
                     break;
+                case 'B':
+                    print_unsigned(va_arg(args, uint32_t), 2);
+                    break;
                 case 'p': // %p -> Pointer
                     puts("0x");
                     print_unsigned((uint32_t)va_arg(args, void*), 16);
@@ -92,4 +95,18 @@ void printf(const char* fmt, ...) {
     if(inOp)
         putc('%');
     va_end(args);
+}
+
+void printf_test() {
+    printf("prinf Test:\n");
+    printf("%%%% -> %%\n");
+    printf("%%s -> %s\n", "String");
+    printf("%%c -> %c\n", 'C');
+    printf("%%d, %%i -> %d, %i\n", 42, -36);
+    printf("%%u -> %u\n", 1337);
+    printf("%%o -> %o\n", 34);
+    printf("%%X -> %X\n", 4919);
+    printf("%%B -> %B\n", 42);
+    printf("%%p -> %p\n", 0x4242);
+    printf("%%n -> %n\n");
 }

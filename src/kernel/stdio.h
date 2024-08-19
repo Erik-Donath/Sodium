@@ -9,6 +9,7 @@
         %u -> Unsigned value
         %o -> Octal value
         %X -> Hex value
+        %B -> Binary value
         %p -> Pointer
         %n -> Nothing
 
@@ -20,3 +21,6 @@ void puts(const char* str);
 void print_signed(int32_t value, uint8_t radix);
 void print_unsigned(uint32_t value, uint8_t radix);
 void printf(const char* fmt, ...);
+
+// FIXME: Delete printf_test() or add test system
+void printf_test();
