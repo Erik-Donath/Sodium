@@ -41,6 +41,14 @@ void print_unsigned(uint32_t value, uint8_t radix) {
     while(--pos >= 0) putc(buffer[pos]);
 }
 
+void print_hex64(uint64_t value) {
+    uint32_t v1 = value & 0x00000000FFFFFFFF;
+    uint32_t v2 = value >> 32;
+
+    print_unsigned(v2, 16);
+    print_unsigned(v1, 16);
+}
+
 void printf(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);

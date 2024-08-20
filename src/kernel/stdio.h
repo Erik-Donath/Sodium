@@ -21,6 +21,7 @@ void putc(char c);
 void puts(const char* str);
 void print_signed(int32_t value, uint8_t radix);
 void print_unsigned(uint32_t value, uint8_t radix);
+void print_hex64(uint64_t value);
 void printf(const char* fmt, ...);
 
 // FIXME: Delete printf_test() or add test system

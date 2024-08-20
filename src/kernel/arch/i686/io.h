@@ -28,6 +28,9 @@
     0x03F8-0x03FF	First serial port
 */
 
+// Used by: E9 Hack
+#define E9_HACK               0xE9  // Out port for debuging
+
 // Used by: VGA Controller
 #define VGA_CRTC_INDEX_PORT   0x3D4  // CRT Controller Index Port
 #define VGA_CRTC_DATA_PORT    0x3D5  // CRT Controller Data Port
