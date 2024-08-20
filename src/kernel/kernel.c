@@ -21,5 +21,6 @@ void kernel_main(void* mb_info) {
     }
     putc('\n');
 
+    SYSINFO_print_multiboot_info();
     while(1) ;
 }

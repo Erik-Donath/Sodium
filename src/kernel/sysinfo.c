@@ -69,12 +69,33 @@ typedef struct {
     multiboot_tag tags[0];
 } ASMPACK multiboot_header;
 
-/* MULTIBOOT TAG STRUCTS*/
+/* MULTIBOOT COMMON TAG STRUCTS */
 
 typedef struct {
     multiboot_tag head;
     char string[0];
-} ASMPACK multiboot_tag_command_line;
+} ASMPACK multiboot_tag_string;
+
+typedef multiboot_tag_string multiboot_tag_command_line;
+typedef multiboot_tag_string multiboot_tag_bootloader_name;
+
+typedef struct {
+    multiboot_tag head;
+    uint32_t ptr;
+} ASMPACK multiboot_tag_32bit_ptr;
+
+typedef multiboot_tag_32bit_ptr multiboot_tag_efi_32_system_table_ptr;
+typedef multiboot_tag_32bit_ptr multiboot_tag_efi_32_image_handle_ptr;
+
+typedef struct {
+    multiboot_tag head;
+    uint64_t ptr;
+} ASMPACK multiboot_tag_64bit_ptr;
+
+typedef multiboot_tag_64bit_ptr multiboot_tag_efi_64_system_table_ptr;
+typedef multiboot_tag_64bit_ptr multiboot_tag_efi_64_image_handle_ptr;
+
+/* MULTIBOOT TAG STRUCTS*/
 
 typedef struct {
     multiboot_tag head;
@@ -122,11 +143,6 @@ typedef struct {
 
 typedef struct {
     multiboot_tag head;
-    char string[0];
-} ASMPACK multiboot_tag_bootloader_name;
-
-typedef struct {
-    multiboot_tag head;
     uint16_t version;
     uint16_t creg;
     uint32_t offset;
@@ -164,16 +180,6 @@ typedef struct {
 
 typedef struct {
     multiboot_tag head;
-    uint32_t ptr;
-} ASMPACK multiboot_tag_efi_32_system_table_ptr;
-
-typedef struct {
-    multiboot_tag head;
-    uint64_t ptr;
-} ASMPACK multiboot_tag_efi_64_system_table_ptr;
-
-typedef struct {
-    multiboot_tag head;
     uint8_t major;
     uint8_t minor;
     uint8_t reserved[6];
@@ -206,16 +212,6 @@ typedef struct {
     uint8_t efi_memory_map[0];
     /* FIXME: EFI memory map */
 } ASMPACK multiboot_tag_efi_memory_map;
-
-typedef struct {
-    multiboot_tag head;
-    uint32_t ptr;
-} ASMPACK multiboot_tag_efi_32_image_handle_ptr;
-
-typedef struct {
-    multiboot_tag head;
-    uint64_t ptr;
-} ASMPACK multiboot_tag_efi_64_image_handle_ptr;
 
 typedef struct {
     multiboot_tag head;
