@@ -6,13 +6,15 @@
 
 void kernel_welcome() {
     DISPLAY_setcolor(COLOR(BRIGHT_CYAN, BLACK));
-    printf("Welcome to Sodium!\n");
+    puts("Welcome to Sodium!\n");
     DISPLAY_setcolor(DEFAULT_COLOR);
 }
 
-void kernel_main(void* multiboot_info_ptr) {
+void kernel_main(void* mb_info) {
     DISPLAY_init();
     kernel_welcome();
 
+    SYSINFO_parse_multiboot(mb_info);
+    
     while(1) ;
 }

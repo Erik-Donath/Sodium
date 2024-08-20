@@ -64,10 +64,10 @@ $(BUILD_DIR)/obj/asm/%.obj: $(SRC_DIR)/%.asm $(ASM_HEADER)
 
 info:
 	@echo "Info: "
-	@echo "C Header: " $(C_HEADER)
-	@echo "C Source: " $(C_SOURCE)
-	@echo "ASM Header: " $(ASM_HEADER)
+	@echo "C Source:   " $(C_SOURCE)
+	@echo "C Header:   " $(C_HEADER)
 	@echo "ASM Source: " $(ASM_SOURCE)
+	@echo "ASM Header: " $(ASM_HEADER)
 	@echo ""
 
 # Final Build Rules
