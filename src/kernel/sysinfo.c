@@ -30,6 +30,13 @@
 #define MB_STRUCT_ALIGN_UP(value, align) (((value) + (align) - 1) & ~((align - 1)))
 #define MB_STRUCT_NEXT_TAG(tag) (multiboot_tag*)((uint8_t*)tag + MB_STRUCT_ALIGN_UP(tag->size, MB_STRUCT_TAG_ALIGN))
 
+// Memory Types in multiboot_tag_memory_map_entry
+#define MULTIBOOT_MEMORY_AVAILABLE		        1
+#define MULTIBOOT_MEMORY_RESERVED		        2
+#define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE       3
+#define MULTIBOOT_MEMORY_NVS                    4
+#define MULTIBOOT_MEMORY_BADRAM                 5
+
 /* Not needed */
 #define MB_TAG_UNKNOWN "UNKNOWN"
 static const char* mb_info_tag_name_table[23] = {
@@ -275,10 +282,10 @@ void SYSINFO_print_multiboot_info() {
                 multiboot_tag_memory_map_entry* mem_entry = mem_map->entries;
                 while((uint8_t*)mem_entry < (uint8_t*)tag + tag->size) {
                     printf("\t\tTYPE = %u", mem_entry->type);
-                    puts(" BASE = 0x");
-                    print_hex64(mem_entry->base_addr);
-                    puts(" LENGHT =");
-                    print_hex64(mem_entry->lenght);
+                    puts(", BASE = 0x");
+                    print_hex64(mem_entry->base_addr, false);
+                    puts(", LENGHT = ");
+                    print_hex64(mem_entry->lenght, false);
                     putc('\n');
 
                     mem_entry = (multiboot_tag_memory_map_entry*)((uint8_t*)mem_entry + mem_map->entry_size);
@@ -305,7 +312,7 @@ void SYSINFO_print_multiboot_info() {
             case MB_TAG_FRAMEBUFFER_INFO:
                 multiboot_tag_framebuffer_info* framebuffer = (multiboot_tag_framebuffer_info*)tag;
                 puts("\tframebuffer_addr = 0x");
-                print_hex64(framebuffer->framebuffer_addr);
+                print_hex64(framebuffer->framebuffer_addr, false);
                 printf(
                     "\n\tframebuffer_pitch = %u\n\tframebuffer_width = %u\n\tframebuffer_height = %u\n\tframebuffer_bpp = %u\n\tframebuffer_type = %u\n\tcolor_info size: %u\n",
                     framebuffer->framebuffer_pitch, framebuffer->framebuffer_width, framebuffer->framebuffer_height, framebuffer->framebuffer_bpp, framebuffer->framebuffer_type, tag->size - sizeof(multiboot_tag_framebuffer_info)
@@ -318,7 +325,7 @@ void SYSINFO_print_multiboot_info() {
             case MB_TAG_EFI_64_SYSTEM_TABLE_PTR:
                 multiboot_tag_efi_64_system_table_ptr* efi_system_64 = (multiboot_tag_efi_64_system_table_ptr*)tag;
                 puts("\tpointer = 0x");
-                print_hex64(efi_system_64->ptr);
+                print_hex64(efi_system_64->ptr, false);
                 putc('\n');
                 break;
             case MB_TAG_SMBIOS_TABLES:
@@ -359,7 +366,7 @@ void SYSINFO_print_multiboot_info() {
             case MB_TAG_EFI_64_IMAGE_HANDLE_PTR:
                 multiboot_tag_efi_64_image_handle_ptr* efi_64_image_handle = (multiboot_tag_efi_64_image_handle_ptr*)tag;
                 puts("\tpointer = 0x");
-                print_hex64(efi_64_image_handle->ptr);
+                print_hex64(efi_64_image_handle->ptr, false);
                 putc('\n');
                 break;
             case MB_TAG_IMAGE_LOAD_BASE_PHYSICAL_ADDRESS:

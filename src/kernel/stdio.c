@@ -41,12 +41,31 @@ void print_unsigned(uint32_t value, uint8_t radix) {
     while(--pos >= 0) putc(buffer[pos]);
 }
 
-void print_hex64(uint64_t value) {
+void print_hex32(uint32_t value, bool fill) {
+    bool firstDigit = false;
+    for(uint8_t i = 0; i < 8; i++) {
+        uint8_t digit = (uint8_t)(value >> 28);
+        if(digit || fill)
+            firstDigit = true;
+        if(firstDigit)
+            putc(numberTable[digit]);
+        value = value << 4;
+    }
+    if(!firstDigit)
+        putc(numberTable[0]);
+}
+
+void print_hex64(uint64_t value, bool fill) {
     uint32_t v1 = value & 0x00000000FFFFFFFF;
     uint32_t v2 = value >> 32;
 
-    print_unsigned(v2, 16);
-    print_unsigned(v1, 16);
+    if(v2) {
+        print_hex32(v2, fill);
+        print_hex32(v1, true);
+    }
+    else {
+        print_hex32(v1, fill);
+    }
 }
 
 void printf(const char* fmt, ...) {
