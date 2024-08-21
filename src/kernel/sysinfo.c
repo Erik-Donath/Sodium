@@ -234,16 +234,18 @@ void SYSINFO_parse_multiboot(void* mb_info) {
 
 void SYSINFO_print_multiboot_info() {
     multiboot_header* header = SYSINFO_multiboot_header;
-    puts("Multiboot Info:\n");
+    puts("Multiboot Info\n");
 
     if(!header) {
-        puts("Error: multiboot header not set.\n");
+        puts("\tError: multiboot header not set.\n");
         return;
     }
     if(header->reserved) {
-        printf("Error: Reserved value is not zero.\n\treserved_value = %u\n", header->reserved);
+        printf("\tError: Reserved value is not zero.\n\treserved_value = %u\n", header->reserved);
         return;
     }
+
+    printf("\taddress = %p\n\ttotal_size = %u\n", header, header->total_size);
 
     multiboot_tag* tag = header->tags;
     while((uint8_t*)tag < (uint8_t*)header + header->total_size) {
