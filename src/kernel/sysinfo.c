@@ -37,8 +37,8 @@
 #define MULTIBOOT_MEMORY_NVS                    4
 #define MULTIBOOT_MEMORY_BADRAM                 5
 
-/* Not needed */
-#define MB_TAG_UNKNOWN "UNKNOWN"
+// Converting table from Tag to Name
+static const char* mb_info_tag_name_unknown = "UNKNOWN";
 static const char* mb_info_tag_name_table[23] = {
     "END_OF_MULTIBOOT_INFO",
     "BOOT_COMMAND_LINE",
@@ -249,7 +249,7 @@ void SYSINFO_print_multiboot_info() {
 
     multiboot_tag* tag = header->tags;
     while((uint8_t*)tag < (uint8_t*)header + header->total_size) {
-        const char* tag_name = MB_TAG_UNKNOWN;
+        const char* tag_name = mb_info_tag_name_unknown;
         if(tag->type < 23)
             tag_name = mb_info_tag_name_table[tag->type];
         
@@ -355,7 +355,7 @@ void SYSINFO_print_multiboot_info() {
                 break;
             case MB_TAG_EFI_BOOT_SERVICES_NOT_TERMINATED:
                 /* 
-                    IMPORTANT: Indication that ExitBootServices wasn’t called.
+                    IMPORTANT: Indication that ExitBootServices() wasn’t called.
                     KERNEL_PANIC ?
                 */
 
