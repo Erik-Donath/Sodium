@@ -38,6 +38,7 @@
 // User by: iowait
 #define IO_UNUSED_PORT         0x0080
 
+// Maybe rename to IO_outb and IO_inb
 void ASMCALL outb(uint16_t port, uint8_t value);
 uint8_t ASMCALL inb(uint16_t port);
 

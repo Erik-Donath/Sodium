@@ -5,6 +5,6 @@
 #include "hal.h"
 
 void HAL_Initilize() {
-    i686_GDT_Initialize();
+    GDT_Initialize();
     DISPLAY_init();
 }

@@ -2,21 +2,6 @@
 #include <kernel/util/assembly.h>
 #include "gdt.h"
 
-
-typedef struct {
-    uint16_t LimitLow;
-    uint16_t BaseLow;
-    uint8_t  BaseMiddle;
-    uint8_t  Acess;
-    uint8_t  FlagsLimitHi;
-    uint8_t  BaseHigh;
-} ASMPACK GDTEntry;
-
-typedef struct {
-    uint16_t Limit;
-    GDTEntry* Ptr;
-} ASMPACK GDTDescriptor;
-
 typedef enum {
     GDT_ACCESS_CODE_READABLE            = 0x02,
     GDT_ACCESS_DATA_WRITEABLE           = 0x02,
@@ -46,6 +31,20 @@ typedef enum {
     GDT_FLAG_GRANULARITY_1B             = 0x00,
     GDT_FLAG_GRANULARITY_4K             = 0x80,
 } GDT_FLAGS;
+
+typedef struct {
+    uint16_t LimitLow;
+    uint16_t BaseLow;
+    uint8_t  BaseMiddle;
+    uint8_t  Acess;
+    uint8_t  FlagsLimitHi;
+    uint8_t  BaseHigh;
+} ASMPACK GDTEntry;
+
+typedef struct {
+    uint16_t Limit;
+    GDTEntry* Ptr;
+} ASMPACK GDTDescriptor;
 
 // The GDT Entry is a mess!
 #define GDT_ENTRY(base, limit, access, flags) { \
@@ -85,7 +84,7 @@ static GDTDescriptor GDT_DESCRIPTOR = {
     sizeof(GDT) - 1, GDT
 };
 
-void ASMCALL i686_GDT_LOAD(GDTDescriptor* desciptor, uint16_t codeSegment, uint16_t dataSegment);
-void i686_GDT_Initialize() {
-    i686_GDT_LOAD(&GDT_DESCRIPTOR, i686_GDT_CODE_SEGMENT, i686_GDT_DATA_SEGMENT);
+void ASMCALL GDT_LOAD(GDTDescriptor* desciptor, uint16_t codeSegment, uint16_t dataSegment);
+void GDT_Initialize() {
+    GDT_LOAD(&GDT_DESCRIPTOR, GDT_CODE_SEGMENT, GDT_DATA_SEGMENT);
 }
