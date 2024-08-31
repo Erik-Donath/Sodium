@@ -26,3 +26,5 @@ GDT_LOAD:
     mov esp, ebp
     pop ebp
     ret
+
+section .note.GNU-stack noalloc noexec nowrite progbits
