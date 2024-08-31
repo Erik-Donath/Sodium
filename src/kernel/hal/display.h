@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <stdbool.h>
 
 // Colors (Same as in arch/i686/vga.h defined)
 #define BLACK          0x00
@@ -31,6 +32,7 @@ typedef uint8_t color;
 
 void DISPLAY_init();
 void DISPLAY_clear();
+bool DISPLAY_enabledebug();
 
 void  DISPLAY_setcolor(color c);
 color DISPLAY_getcolor();

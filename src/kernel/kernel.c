@@ -7,11 +7,25 @@
 
 void kernel_main(void* mb_info) {
     HAL_Initilize();
-
-    // Display welcome msg and tell user if e9 hack is enabled.
-    DISPLAY_setcolor(COLOR(BRIGHT_CYAN, BLACK));
-    puts("Welcome to Sodium!\n");
-    DISPLAY_setcolor(DEFAULT_COLOR);
+    kernel_welcome();
 
     while(1) ;
+}
+
+void kernel_welcome() {
+    DISPLAY_setcolor(COLOR(WHITE, BLACK));
+    puts("Welcome to ");
+    DISPLAY_setcolor(COLOR(BRIGHT_CYAN, BLACK));
+    puts("Sodium");
+    DISPLAY_setcolor(COLOR(WHITE, BLACK));
+    putc('!');
+
+    if(DISPLAY_enabledebug()) {
+        DISPLAY_setcolor(COLOR(DARK_GRAY, BLACK));
+        DISPLAY_setcursor(54, 0);
+        puts("[CONSOLE DEBUGING ENABLED]");
+    }
+
+    DISPLAY_setcursor(0, 1);
+    DISPLAY_setcolor(DEFAULT_COLOR);
 }

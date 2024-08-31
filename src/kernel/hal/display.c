@@ -24,8 +24,6 @@ void DISPLAY_init() {
 
     DISPLAY_Color = DEFAULT_COLOR;
     DISPLAY_clear();
-
-    DISPLAY_Debug_Enabled = E9_test() > 0;
 }
 
 void DISPLAY_clear() {
@@ -37,6 +35,10 @@ void DISPLAY_clear() {
     DISPLAY_setcursor(0, 0);
 }
 
+bool DISPLAY_enabledebug() {
+    return DISPLAY_Debug_Enabled = E9_test();
+}
+
 void DISPLAY_setcolor(color c) {
     DISPLAY_Color = c;
 }
@@ -45,18 +47,23 @@ color DISPLAY_getcolor() {
     return DISPLAY_Color;
 }
 
+void DISPLAY_debug(char c) {
+    if(DISPLAY_Debug_Enabled)
+        E9_putc(c);
+}
+
 void DISPLAY_nextc(char c) {
     DISPLAY_setc(DISPLAY_Cursor_X, DISPLAY_Cursor_Y, CCHR(c, DISPLAY_Color));
     DISPLAY_setcursor(DISPLAY_Cursor_X + 1, DISPLAY_Cursor_Y);
+    DISPLAY_debug(c); // Does not acound for \n, \t, \r ...
 }
 
 
 void DISPLAY_putc(char c) {
-    if(DISPLAY_Debug_Enabled) E9_putc(c);
-
     switch(c) {
         case '\n':
             DISPLAY_setcursor(0, DISPLAY_Cursor_Y + 1);
+            DISPLAY_debug('\n');
             break;
         case '\t':
             uint8_t tabSteps = 4 - (DISPLAY_Cursor_X % 4);
@@ -65,6 +72,7 @@ void DISPLAY_putc(char c) {
             break;
         case '\r':
             DISPLAY_setcursor(0, DISPLAY_Cursor_Y);
+            DISPLAY_debug('\r');
             break;
         default:
             DISPLAY_nextc(c);
