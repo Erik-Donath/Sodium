@@ -24,23 +24,23 @@ static const char* const ISR_Exceptions[] = {
     "Stack-Segment Fault",
     "General Protection Fault",
     "Page Fault",
-    "",
-    "x87 Floating-Point Exception",
+    "[Name Not Found]", // Name not found
+    "x87 Floating-Point Exception", // ? x87 or x86
     "Alignment Check",
     "Machine Check",
     "SIMD Floating-Point Exception",
     "Virtualization Exception",
     "Control Protection Exception ",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
+    "[Name Not Found]",
+    "[Name Not Found]",
+    "[Name Not Found]",
+    "[Name Not Found]",
+    "[Name Not Found]",
+    "[Name Not Found]",
     "Hypervisor Injection Exception",
     "VMM Communication Exception",
     "Security Exception",
-    ""
+    "[Name Not Found]"
 };
 
 void ISR_InitializeGates();
@@ -52,14 +52,8 @@ void ISR_Initilize() {
 }
 
 void ISR_RegisterHandler(uint8_t interrupt, ISRHandler handler) {
-    if(handler) {
-        ISR_Handlers[interrupt] = handler;
-        IDT_EnableGate(interrupt);
-    }
-    else {
-        IDT_DisableGate(interrupt);
-        ISR_Handlers[interrupt] = 0;
-    }
+    ISR_Handlers[interrupt] = handler;
+    IDT_EnableGate(interrupt);
 }
 
 void ASMCALL ISR_handler(ISR_Registers* regs) {
