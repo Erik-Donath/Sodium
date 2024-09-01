@@ -34,7 +34,6 @@ once = $(if $(filter $2,$1),$1,$1 $2)
 ASM_HEADER := $(call once, $(ASM_HEADER),$(KERNEL_DIR)/arch/i686/isr_gen.inc)
 C_SOURCE   := $(call once, $(C_SOURCE),  $(KERNEL_DIR)/arch/i686/isr_gen.c)
 
-
 # Objects
 ASM_OBJECTS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/obj/asm/%.obj, $(ASM_SOURCE))
 C_OBJECTS   := $(patsubst $(SRC_DIR)/%.c,   $(BUILD_DIR)/obj/c/%.obj,   $(C_SOURCE))

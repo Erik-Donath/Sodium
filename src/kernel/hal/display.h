@@ -30,7 +30,7 @@ typedef uint8_t color;
 #define getChar(c) (char)((c) & 0x00FF)
 #define CCHR(chr, clr) (cchr)((clr) << 8 | (chr))
 
-void DISPLAY_init();
+void DISPLAY_Initilize();
 void DISPLAY_clear();
 bool DISPLAY_enabledebug();
 

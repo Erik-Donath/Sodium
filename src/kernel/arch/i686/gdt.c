@@ -80,6 +80,6 @@ static GDTDescriptor GDT_DESCRIPTOR = {
 };
 
 void ASMCALL GDT_LOAD(GDTDescriptor* desciptor, uint16_t codeSegment, uint16_t dataSegment);
-void GDT_Initialize() {
+void GDT_Initilize() {
     GDT_LOAD(&GDT_DESCRIPTOR, GDT_CODE_SEGMENT, GDT_DATA_SEGMENT);
 }

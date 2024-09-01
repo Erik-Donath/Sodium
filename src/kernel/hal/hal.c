@@ -7,8 +7,8 @@
 #include "hal.h"
 
 void HAL_Initilize() {
-    GDT_Initialize();
+    GDT_Initilize();
     IDT_Initilize();
     ISR_Initilize();
-    DISPLAY_init();
+    DISPLAY_Initilize();
 }

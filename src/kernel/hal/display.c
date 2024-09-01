@@ -16,8 +16,8 @@ static bool     DISPLAY_Debug_Enabled = false;
 
 #define CALC_Pos(x, y) (uint16_t)(y * DISPLAY_Screen_Width + x)
 
-void DISPLAY_init() {
-    VGA_init();
+void DISPLAY_Initilize() {
+    VGA_Initilize();
 
     DISPLAY_Screen_Height = VGA_getScreenHeight();
     DISPLAY_Screen_Width  = VGA_getScreenWidth();

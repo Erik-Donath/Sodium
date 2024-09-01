@@ -3,7 +3,7 @@
 
 #define SCREEN_BUFFER ((uint16_t*)VGA_SCREEN_BUFFER_ADDRESS)
 
-void VGA_init() {
+void VGA_Initilize() {
     /* TODO: VGA driver has yet to be implemented! */
 }
 

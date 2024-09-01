@@ -25,7 +25,7 @@
 #define VGA_COLOR_YELLOW         0x0E
 #define VGA_COLOR_WHITE          0x0F
 
-void VGA_init();
+void VGA_Initilize();
 
 uint8_t VGA_getScreenHeight();
 uint8_t VGA_getScreenWidth();
