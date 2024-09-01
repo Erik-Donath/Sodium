@@ -16,7 +16,10 @@ You can also run the OS by using the .iso file directly (For example in VBox or 
 Here is an overview of the current project Architekture
 ```
 Sodium
-├── build
+├── buildenv
+│   └── Dockerfile
+├── script
+│   └── Code Generation Scripts (used by Makefile)
 ├── src
 │   ├── kernel
 │   │   ├── arch
@@ -33,6 +36,9 @@ Sodium
 ├── dist
 │   ├── Sodium.iso
 │   └── kernel.bin
-├── Readme.md
-└── Makefile
+├── build
+│   └── Build Directory
+├── Makefile
+├── README.md
+└── LICENSE
 ```
