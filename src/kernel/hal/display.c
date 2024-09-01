@@ -36,7 +36,7 @@ void DISPLAY_clear() {
 }
 
 bool DISPLAY_enabledebug() {
-    return DISPLAY_Debug_Enabled = E9_test();
+    return DISPLAY_Debug_Enabled = E9_read();
 }
 
 void DISPLAY_setcolor(color c) {
@@ -49,7 +49,7 @@ color DISPLAY_getcolor() {
 
 void DISPLAY_debug(char c) {
     if(DISPLAY_Debug_Enabled)
-        E9_putc(c);
+        E9_write(c);
 }
 
 void DISPLAY_nextc(char c) {

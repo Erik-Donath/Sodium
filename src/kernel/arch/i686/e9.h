@@ -1,5 +1,5 @@
 #pragma once
 #include <stdint.h>
 
-uint8_t E9_test();
-void E9_putc(char c);
+uint8_t E9_read();
+void E9_write(char c);
