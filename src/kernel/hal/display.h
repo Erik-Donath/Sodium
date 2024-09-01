@@ -37,6 +37,7 @@ bool DISPLAY_enabledebug();
 void  DISPLAY_setcolor(color c);
 color DISPLAY_getcolor();
 
+void DISPLAY_debug(char c); // Send char to e9 port
 void DISPLAY_nextc(char c); // Ignors escape chars [\n \r etc]
 void DISPLAY_putc(char c);
 

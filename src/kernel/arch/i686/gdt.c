@@ -47,13 +47,13 @@ typedef struct {
 } ASMPACK GDTDescriptor;
 
 // The GDT Entry is a mess!
-#define GDT_ENTRY(base, limit, access, flags) { \
-    (limit & 0xFFFF),                           \
-    (base  & 0xFFFF),                           \
-    ((base >> 16) & 0xFF),                      \
-    (access),                                   \
-    (((limit >> 16) & 0xF) | (flags & 0xF0)),   \
-    ((base >> 24) & 0xFF)                       \
+#define GDT_ENTRY(base, limit, access, flags) {                 \
+    .LimitLow     = (limit & 0xFFFF),                           \
+    .BaseLow      = (base  & 0xFFFF),                           \
+    .BaseMiddle   = ((base >> 16) & 0xFF),                      \
+    .Acess        = (access),                                   \
+    .FlagsLimitHi = (((limit >> 16) & 0xF) | (flags & 0xF0)),   \
+    .BaseHigh     = ((base >> 24) & 0xFF)                       \
 }
 
 static GDTEntry GDT[] = {
@@ -73,11 +73,6 @@ static GDTEntry GDT[] = {
         (GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_DATA_SEGMENT | GDT_ACCESS_DATA_WRITEABLE),
         (GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K)
     ),
-    // Task State Segment (NOT IMPLEMENTED YET) => NULL-Desciptor
-    GDT_ENTRY(0x00000, 0x00000,
-        (0),
-        (0)
-    )
 };
 
 static GDTDescriptor GDT_DESCRIPTOR = {

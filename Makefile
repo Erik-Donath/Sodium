@@ -1,7 +1,8 @@
 # Folders
-SRC_DIR   = src
-BUILD_DIR = build
-DIST_DIR  = dist
+SRC_DIR    = src
+BUILD_DIR  = build
+DIST_DIR   = dist
+SCRIPT_DIR = script
 
 BOOT_DIR   = $(SRC_DIR)/boot
 GRUB_DIR   = $(BOOT_DIR)/grub
@@ -23,10 +24,16 @@ ASFLAGS   = -f elf
 GRUBFLAGS = --product-version="Sodium 0.1"
 
 # Source + Headers
-ASM_HEADER := $(shell find $(SRC_DIR) -name '*.inc')
-ASM_SOURCE := $(shell find $(SRC_DIR) -name '*.asm')
-C_HEADER   := $(shell find $(SRC_DIR) -name '*.h')
-C_SOURCE   := $(shell find $(SRC_DIR) -name '*.c')
+ASM_HEADER = $(shell find $(SRC_DIR) -name '*.inc')
+ASM_SOURCE = $(shell find $(SRC_DIR) -name '*.asm')
+C_HEADER   = $(shell find $(SRC_DIR) -name '*.h')
+C_SOURCE   = $(shell find $(SRC_DIR) -name '*.c')
+
+# Add Generate Sources
+once = $(if $(filter $2,$1),$1,$1 $2)
+ASM_HEADER := $(call once, $(ASM_HEADER),$(KERNEL_DIR)/arch/i686/isr_gen.inc)
+C_SOURCE   := $(call once, $(C_SOURCE),  $(KERNEL_DIR)/arch/i686/isr_gen.c)
+
 
 # Objects
 ASM_OBJECTS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/obj/asm/%.obj, $(ASM_SOURCE))
@@ -34,6 +41,7 @@ C_OBJECTS   := $(patsubst $(SRC_DIR)/%.c,   $(BUILD_DIR)/obj/c/%.obj,   $(C_SOUR
 
 # Create ISO -> dist/Sodium.iso
 $(ISO): $(KERNEL_BIN) $(GRUB_DIR)/grub.cfg
+	@echo "--> Building $@"
 	@mkdir -p $(BUILD_DIR)/iso/bin
 	@mkdir -p $(BUILD_DIR)/iso/boot/grub
 	@mkdir -p $(DIST_DIR)
@@ -47,20 +55,28 @@ $(ISO): $(KERNEL_BIN) $(GRUB_DIR)/grub.cfg
 # Link Objects into dist/kernel.bin
 $(KERNEL_BIN): $(ASM_OBJECTS) $(C_OBJECTS) $(LINKER_SCRIPT)
 	@mkdir -p $(DIST_DIR)
+	@echo "--> Linking: " $@
 	$(LD) $(LDFLAGS) -T $(LINKER_SCRIPT) -o $(KERNEL_BIN) $(ASM_OBJECTS) $(C_OBJECTS)
-	@echo "--> Linked: " $@
-
 
 # Compiling and Assembling Source + Headers
 $(BUILD_DIR)/obj/c/%.obj: $(SRC_DIR)/%.c $(C_HEADER)
 	@mkdir -p $(@D)
+	@echo "--> Compiling: " $<
 	$(CC) $(CFLAGS) -c -o $@ $<
-	@echo "--> Compiled: " $<
 
 $(BUILD_DIR)/obj/asm/%.obj: $(SRC_DIR)/%.asm $(ASM_HEADER)
 	@mkdir -p $(@D)
+	@echo "--> Assembling: " $<
 	$(ASM) $(ASFLAGS) -o $@ $<
-	@echo "--> Assembled: " $<
+
+# Sources that are generated
+$(KERNEL_DIR)/arch/i686/isr_gen.c:
+	@echo "--> Generating: $@"
+	$(SCRIPT_DIR)/generate_isr_c.sh $@
+
+$(KERNEL_DIR)/arch/i686/isr_gen.inc:
+	@echo "--> Generating: $@"
+	$(SCRIPT_DIR)/generate_isr_inc.sh $@
 
 info:
 	@echo "Info: "
@@ -75,7 +91,10 @@ all: $(ISO)
 	@echo "--> DONE"
 
 clean:
-	@rm -rf $(BUILD_DIR)
-	@echo "--> CLEANED"
+	@echo "--> Clearing builds"
+	rm -rf $(BUILD_DIR)
+	rm -rf $(KERNEL_BIN)
+	rm -f $(KERNEL_DIR)/arch/i686/isr_gen.inc
+	rm -f $(KERNEL_DIR)/arch/i686/isr_gen.c
 
 .PHONY: info all clean

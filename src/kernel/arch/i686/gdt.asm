@@ -1,5 +1,6 @@
 bits 32
 
+section .text
 global GDT_LOAD
 GDT_LOAD:
     push ebp
