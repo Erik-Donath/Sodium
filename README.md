@@ -22,9 +22,12 @@ Sodium
 │   └── Code Generation Scripts (used by Makefile)
 ├── src
 │   ├── kernel
-│   │   ├── arch
-│   │   │   ├── i686
-│   │   │   │   └── / i686 Driver and Systems /
+│   │   ├── arch/i686
+│   │   │   └── / i686 Driver and Systems /
+│   │   ├── hal
+│   │   │   └── / Hardware Abstraction Layer /
+│   │   ├── util
+│   │   │   └── / Universal Stuff /
 │   │   ├── kernel.c
 │   │   └── ...
 │   ├── boot
