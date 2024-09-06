@@ -4,6 +4,8 @@ BUILD_DIR  = build
 DIST_DIR   = dist
 SCRIPT_DIR = script
 
+SHELL := /usr/bin/bash
+
 BOOT_DIR   = $(SRC_DIR)/boot
 GRUB_DIR   = $(BOOT_DIR)/grub
 KERNEL_DIR = $(SRC_DIR)/kernel
@@ -75,7 +77,7 @@ $(KERNEL_DIR)/arch/i686/isr_gen.c:
 
 $(KERNEL_DIR)/arch/i686/isr_gen.inc:
 	@echo "--> Generating: $@"
-	$(SCRIPT_DIR)/generate_isr_inc.sh $@
+	test -f $(SCRIPT_DIR)/generate_isr_inc.sh && $(SCRIPT_DIR)/generate_isr_inc.sh $@ || echo "Script not found!"
 
 info:
 	@echo "Info: "
