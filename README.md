@@ -18,6 +18,7 @@ Here is an overview of the current project Architekture
 ```
 Sodium
 ├── buildenv
+│   ├── docker-entrypoint.sh
 │   └── Dockerfile
 ├── script
 │   └── Code Generation Scripts (used by Makefile)
