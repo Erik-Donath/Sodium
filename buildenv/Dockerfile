@@ -10,7 +10,10 @@ RUN apt-get install -y dos2unix
 VOLUME /root/env
 WORKDIR /root/env
 
+# Copies the docker-entrypoint file into the Docker container
+# And preprares it for executing it on Linux.
 COPY docker-entrypoint.sh /usr/local/bin/
+RUN dos2unix /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Will build the Project automatikly
