@@ -1,5 +1,5 @@
 # Sodium
-An small x86 Operating System which uses multiboot2 and the grub bootloader.
+An small x86 Operating System which uses multiboot2 and the grub bootloader.<br>
 Warning: This Sytem is still in early development. Many things can (and propatly will) go wrong.
 
 ## Build & Run
