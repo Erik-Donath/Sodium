@@ -77,8 +77,7 @@ $(KERNEL_DIR)/arch/i686/isr_gen.c:
 
 $(KERNEL_DIR)/arch/i686/isr_gen.inc:
 	@echo "--> Generating: $@"
-	test -f $(SCRIPT_DIR)/generate_isr_inc.sh && $(SCRIPT_DIR)/generate_isr_inc.sh $@ || echo "Script not found!"
-
+	$(SCRIPT_DIR)/generate_isr_inc.sh $@
 info:
 	@echo "Info: "
 	@echo "C Source:   " $(C_SOURCE)
