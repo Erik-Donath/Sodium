@@ -1,5 +1,6 @@
 # Sodium
 An small x86 Operating System which uses multiboot2 and the grub bootloader.
+Warning: This Sytem is still in early development. Many things can (and propatly will) go wrong.
 
 ## Build & Run
 This project is build by using a Docker container. <br><br>
