@@ -2,6 +2,9 @@
 An small x86 Operating System which uses multiboot2 and the grub bootloader.<br>
 Warning: This Sytem is still in early development. Many things can (and propatly will) go wrong.
 
+# What is a Operating System
+![Ex1](Ex1.png)
+
 ## Build & Run
 This project is build by using a Docker container. <br><br>
 Steps to <b>Build and Run</b>:<br>
