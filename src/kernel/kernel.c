@@ -8,9 +8,7 @@
 void kernel_main(void* mb_info) {
     HAL_Initilize();
     kernel_welcome();
-
-    __asm("int $0x2A");
-    __asm("int $0x01");
+    printf("Multiboot2 info struct is located at: %p\n", mb_info);
 
     while(1) ;
 }

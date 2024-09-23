@@ -10,4 +10,4 @@ chmod +x /root/env/script/*.sh
 
 # Run make with the arguments provided
 echo "--> Running make"
-exec make clean info all $@
+exec make info all $@
