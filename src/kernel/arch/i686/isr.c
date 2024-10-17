@@ -6,7 +6,7 @@
 #include "idt.h"
 #include "isr.h"
 
-ISRHandler ISR_Handlers[256];
+static ISRHandler ISR_Handlers[256];
 
 static const char* const ISR_Exceptions[] = {
     "Divide by zero error",

@@ -78,6 +78,7 @@ $(KERNEL_DIR)/arch/i686/isr_gen.c:
 $(KERNEL_DIR)/arch/i686/isr_gen.inc:
 	@echo "--> Generating: $@"
 	$(SCRIPT_DIR)/generate_isr_inc.sh $@
+
 info:
 	@echo "Info: "
 	@echo "C Source:   " $(C_SOURCE)

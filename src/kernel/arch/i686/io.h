@@ -29,17 +29,25 @@
 */
 
 // Used by: E9 Hack
-#define E9_HACK               0xE9  // Out port for debuging
+#define E9_HACK                 0xE9  // Out port for debuging
 
 // Used by: VGA Controller
-#define VGA_CRTC_INDEX_PORT   0x3D4  // CRT Controller Index Port
-#define VGA_CRTC_DATA_PORT    0x3D5  // CRT Controller Data Port
+#define VGA_CRTC_INDEX_PORT     0x3D4  // CRT Controller Index Port
+#define VGA_CRTC_DATA_PORT      0x3D5  // CRT Controller Data Port
+
+// Used by: PIC Controllers
+#define PIC1_COMMAND_PORT       0x20
+#define PIC1_DATA_PORT          0x21
+#define PIC2_COMMAND_PORT       0xA0
+#define PIC2_DATA_PORT          0xA1
 
 // User by: iowait
 #define IO_UNUSED_PORT         0x0080
 
-// Maybe rename to IO_outb and IO_inb
 void ASMCALL outb(uint16_t port, uint8_t value);
 uint8_t ASMCALL inb(uint16_t port);
+
+void ASMCALL EnableInterrupts();
+void ASMCALL DisableInterrupts();
 
 void iowait();

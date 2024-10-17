@@ -5,11 +5,19 @@
 #include "stdio.h"
 #include "kernel.h"
 
+#include "arch/i686/isr.h"
+#include "arch/i686/irq.h"
+
+void timer(ISR_Registers* regs) {
+    putc('.');
+}
+
 void kernel_main(void* mb_info) {
     HAL_Initilize();
     kernel_welcome();
     printf("Multiboot2 info struct is located at: %p\n", mb_info);
 
+    IRQ_RegisterHandler(0, timer);
     while(1) ;
 }
 

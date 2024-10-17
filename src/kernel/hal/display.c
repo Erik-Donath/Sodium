@@ -54,8 +54,9 @@ void DISPLAY_debug(char c) {
 
 void DISPLAY_nextc(char c) {
     DISPLAY_setc(DISPLAY_Cursor_X, DISPLAY_Cursor_Y, CCHR(c, DISPLAY_Color));
+    DISPLAY_debug(c);
+
     DISPLAY_setcursor(DISPLAY_Cursor_X + 1, DISPLAY_Cursor_Y);
-    DISPLAY_debug(c); // Does not acound for \n, \t, \r ...
 }
 
 
@@ -94,6 +95,8 @@ void DISPLAY_setcursor(uint8_t x, uint8_t y) {
     if(x >= DISPLAY_Screen_Width) {
         x = 0;
         y++;
+
+        DISPLAY_debug('\n');
     }
     if(y >= DISPLAY_Screen_Height) {
         y = DISPLAY_Screen_Height - 1;

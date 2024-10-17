@@ -15,4 +15,14 @@ inb:
     in al, dx
     ret
 
+global EnableInterrupts
+EnableInterrupts:
+    sti
+    ret
+
+global DisableInterrupts
+DisableInterrupts:
+    cli
+    ret
+
 section .note.GNU-stack noalloc noexec nowrite progbits
