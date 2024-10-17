@@ -4,8 +4,7 @@ BUILD_DIR  = build
 DIST_DIR   = dist
 SCRIPT_DIR = script
 
-SHELL := /usr/bin/bash
-
+# Spesific Folders
 BOOT_DIR   = $(SRC_DIR)/boot
 GRUB_DIR   = $(BOOT_DIR)/i686/grub
 KERNEL_DIR = $(SRC_DIR)/kernel
@@ -79,6 +78,7 @@ $(KERNEL_DIR)/arch/i686/isr_gen.inc:
 	@echo "--> Generating: $@"
 	$(SCRIPT_DIR)/generate_isr_inc.sh $@
 
+# Final Build Rules
 info:
 	@echo "Info: "
 	@echo "C Source:   " $(C_SOURCE)
@@ -87,7 +87,6 @@ info:
 	@echo "ASM Header: " $(ASM_HEADER)
 	@echo ""
 
-# Final Build Rules
 all: $(ISO)
 	@echo "--> DONE"
 
