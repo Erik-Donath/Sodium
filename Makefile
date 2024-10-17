@@ -7,7 +7,7 @@ SCRIPT_DIR = script
 SHELL := /usr/bin/bash
 
 BOOT_DIR   = $(SRC_DIR)/boot
-GRUB_DIR   = $(BOOT_DIR)/grub
+GRUB_DIR   = $(BOOT_DIR)/i686/grub
 KERNEL_DIR = $(SRC_DIR)/kernel
 
 # Files
@@ -91,7 +91,7 @@ info:
 all: $(ISO)
 	@echo "--> DONE"
 
-clean:
+clear:
 	@echo "--> Clearing builds"
 	rm -rf $(BUILD_DIR)
 	rm -rf $(KERNEL_BIN)
