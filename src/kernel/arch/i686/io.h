@@ -44,6 +44,7 @@
 // User by: iowait
 #define IO_UNUSED_PORT         0x0080
 
+// ? Maybe rewrite as i686_XYZ
 void ASMCALL outb(uint16_t port, uint8_t value);
 uint8_t ASMCALL inb(uint16_t port);
 

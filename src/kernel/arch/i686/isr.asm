@@ -1,19 +1,19 @@
 bits 32
 
 section .text
-extern ISR_handler
+extern ISR_Handler
 
 %macro ISR_NOERRORCODE 1
-global ISR_%1
-ISR_%1:
+global i686_ISR_%1
+i686_ISR_%1:
     push 0 ; error code
     push %1 ; interrupt number
     jmp isr_common
 %endmacro
 
 %macro ISR_ERRORCODE 1
-global ISR_%1
-ISR_%1:
+global i686_ISR_%1
+i686_ISR_%1:
     push %1 ; interrupt number
     jmp isr_common
 %endmacro
@@ -34,7 +34,7 @@ isr_common:
     mov gs, ax 
 
     push esp ; parse pointer which points to pushed information
-    call ISR_handler
+    call ISR_Handler
     add esp, 4
 
     pop eax ; old data segment

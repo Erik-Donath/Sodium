@@ -1,5 +1,4 @@
 #pragma once
 #include <stdint.h>
 
-uint8_t E9_read();
-void E9_write(char c);
+void i686_E9_Write(char c);

@@ -68,8 +68,7 @@ static GDTEntry GDT[] = {
         (GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K)
     ),
     // Kernel 32-bit data segment
-    GDT_ENTRY(
-        0x00000, 0xFFFFF,
+    GDT_ENTRY(0x00000, 0xFFFFF,
         (GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_DATA_SEGMENT | GDT_ACCESS_DATA_WRITEABLE),
         (GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K)
     ),
@@ -79,7 +78,7 @@ static GDTDescriptor GDT_DESCRIPTOR = {
     sizeof(GDT) - 1, GDT
 };
 
-void ASMCALL GDT_LOAD(GDTDescriptor* desciptor, uint16_t codeSegment, uint16_t dataSegment);
-void GDT_Initilize() {
-    GDT_LOAD(&GDT_DESCRIPTOR, GDT_CODE_SEGMENT, GDT_DATA_SEGMENT);
+void ASMCALL i686_GDT_LOAD(GDTDescriptor* desciptor, uint16_t codeSegment, uint16_t dataSegment);
+void i686_GDT_Initilize() {
+    i686_GDT_LOAD(&GDT_DESCRIPTOR, GDT_CODE_SEGMENT, GDT_DATA_SEGMENT);
 }

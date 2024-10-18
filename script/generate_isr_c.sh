@@ -21,14 +21,14 @@ echo "#include <kernel/arch/i686/gdt.h>" >> $ISR_GEN_C
 echo "" >> $ISR_GEN_C
 echo "// Defined in ASM" >> $ISR_GEN_C
 for i in $(seq 0 255); do
-    echo "void ASMCALL ISR_${i}();" >> $ISR_GEN_C
+    echo "void ASMCALL i686_ISR_${i}();" >> $ISR_GEN_C
 done
 
 echo "" >> $ISR_GEN_C
-echo "void ISR_InitializeGates() {" >> $ISR_GEN_C
+echo "void i686_ISR_InitializeGates() {" >> $ISR_GEN_C
 
 for i in $(seq 0 255); do
-    echo "    IDT_SetGate(${i}, ISR_${i}, GDT_CODE_SEGMENT, (IDT_FLAG_RING0 | IDT_FLAG_GATE_32BIT_INT));" >> $ISR_GEN_C
+    echo "    i686_IDT_SetGate(${i}, i686_ISR_${i}, GDT_CODE_SEGMENT, (IDT_FLAG_RING0 | IDT_FLAG_GATE_32BIT_INT));" >> $ISR_GEN_C
 done
 
 echo "}" >> $ISR_GEN_C

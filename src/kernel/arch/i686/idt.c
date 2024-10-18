@@ -21,22 +21,22 @@ static IDTDescriptor IDT_DESCRIPTOR = {
     sizeof(IDT) -1, IDT
 };
 
-void ASMCALL IDT_LOAD(IDTDescriptor* descriptor);
+void ASMCALL i686_IDT_LOAD(IDTDescriptor* descriptor);
 
-void IDT_Initilize() {
-    IDT_LOAD(&IDT_DESCRIPTOR);
+void i686_IDT_Initilize() {
+    i686_IDT_LOAD(&IDT_DESCRIPTOR);
 }
 
-void IDT_SetGate(uint8_t interrupt, void* base, uint16_t segmentDescriptor, uint8_t flags) {
+void i686_IDT_SetGate(uint8_t interrupt, void* base, uint16_t segmentDescriptor, uint8_t flags) {
     IDT[interrupt].BaseLow = ((uint32_t)base) & 0xFFFF;
     IDT[interrupt].SegmentSelector = segmentDescriptor;
     IDT[interrupt].Reserved = 0;
     IDT[interrupt].Flags = flags;
     IDT[interrupt].BaseHigh = ((uint32_t)base >> 16) & 0xFFFF;
 }
-void IDT_EnableGate(uint8_t interrupt) {
+void i686_IDT_EnableGate(uint8_t interrupt) {
     FLAG_SET(IDT[interrupt].Flags, IDT_FLAG_PRESENT);
 }
-void IDT_DisableGate(uint8_t interrupt) {
+void i686_IDT_DisableGate(uint8_t interrupt) {
     FLAG_UNSET(IDT[interrupt].Flags, IDT_FLAG_PRESENT);
 }

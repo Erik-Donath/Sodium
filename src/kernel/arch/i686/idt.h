@@ -47,7 +47,7 @@ typedef enum {
     IDT_FLAG_PRESENT                = 0x80,
 } IDT_FLAGS;
 
-void IDT_Initilize();
-void IDT_SetGate(uint8_t interrupt, void* base, uint16_t segmentDescriptor, uint8_t flags);
-void IDT_EnableGate(uint8_t interrupt);
-void IDT_DisableGate(uint8_t interrupt);
+void i686_IDT_Initilize();
+void i686_IDT_SetGate(uint8_t interrupt, void* base, uint16_t segmentDescriptor, uint8_t flags);
+void i686_IDT_EnableGate(uint8_t interrupt);
+void i686_IDT_DisableGate(uint8_t interrupt);

@@ -2,7 +2,7 @@ bits 32
 
 section .text
     global start
-    extern kernel_main
+    extern pre_main
 
 start:
     ; Deaktivate Interrupts
@@ -18,7 +18,7 @@ start:
 
     ; Jump in the C-Kernel with the first parameter being the mb_info struct pointer (32bit pointer)
     push ebx
-    call kernel_main ; Not expected to return
+    call pre_main ; Not expected to return
 .error:
     cli
     hlt

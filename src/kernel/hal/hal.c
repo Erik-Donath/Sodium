@@ -8,10 +8,10 @@
 #include "hal.h"
 
 void HAL_Initilize() {
-    GDT_Initilize();
-    IDT_Initilize();
-    ISR_Initilize();
-    IRQ_Initilize();
+    i686_GDT_Initilize();
+    i686_IDT_Initilize();
+    i686_ISR_Initilize();
+    i686_IRQ_Initilize();
 
     DISPLAY_Initilize();
 }

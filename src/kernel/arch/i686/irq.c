@@ -8,7 +8,7 @@
 
 static IRQHandler IRQ_Handlers[16];
 
-void IRQ_Handler(ISR_Registers* regs) {
+static void IRQ_Handler(ISR_Registers* regs) {
     uint8_t irq = regs->interrupt - PIC_REMAP_OFFSET;
     IRQHandler handler = IRQ_Handlers[irq];
     if(handler)
@@ -19,7 +19,7 @@ void IRQ_Handler(ISR_Registers* regs) {
     PIC_SendEOI(irq);
 }
 
-void IRQ_Initilize() {
+void i686_IRQ_Initilize() {
     PIC_Configure(PIC_REMAP_OFFSET, PIC_REMAP_OFFSET + 8);
 
     //register isr handler
@@ -31,6 +31,6 @@ void IRQ_Initilize() {
     EnableInterrupts();
 
 }
-void IRQ_RegisterHandler(uint8_t irq, IRQHandler handler) {
+void i686_IRQ_RegisterHandler(uint8_t irq, IRQHandler handler) {
     IRQ_Handlers[irq] = handler;
 }

@@ -1,8 +1,8 @@
 bits 32
 
 section .text
-global GDT_LOAD
-GDT_LOAD:
+global i686_GDT_LOAD
+i686_GDT_LOAD:
     push ebp
     mov ebp, esp
 

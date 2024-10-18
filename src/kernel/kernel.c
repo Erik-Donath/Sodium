@@ -12,21 +12,21 @@ void timer(ISR_Registers* regs) {
     putc('.');
 }
 
-void kernel_main(void* mb_info) {
+void kernel_main() {
     HAL_Initilize();
     kernel_welcome();
-    printf("Multiboot2 info struct is located at: %p\n", mb_info);
 
-    IRQ_RegisterHandler(0, timer);
+    i686_IRQ_RegisterHandler(0, timer);
     while(1) ;
 }
 
 void kernel_welcome() {
+    /*
     if(DISPLAY_enabledebug()) {
         DISPLAY_setcolor(COLOR(DARK_GRAY, BLACK));
         DISPLAY_setcursor(54, 0);
         puts("[CONSOLE DEBUGING ENABLED]\n");
-    }
+    }*/
 
     DISPLAY_setcursor(0, 0);
 

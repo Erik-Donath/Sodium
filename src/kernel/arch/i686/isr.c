@@ -43,20 +43,20 @@ static const char* const ISR_Exceptions[] = {
     "[Name Not Found]"
 };
 
-void ISR_InitializeGates();
-void ISR_Initilize() {
-    ISR_InitializeGates();
+void i686_ISR_InitializeGates();
+void i686_ISR_Initilize() {
+    i686_ISR_InitializeGates();
     // ? Should this be deleted
     for(uint16_t i = 0; i < 256; i++)
-        IDT_EnableGate((uint8_t)i);
+        i686_IDT_EnableGate((uint8_t)i);
 }
 
 void ISR_RegisterHandler(uint8_t interrupt, ISRHandler handler) {
     ISR_Handlers[interrupt] = handler;
-    IDT_EnableGate(interrupt);
+    i686_IDT_EnableGate(interrupt);
 }
 
-void ASMCALL ISR_handler(ISR_Registers* regs) {
+void ASMCALL ISR_Handler(ISR_Registers* regs) {
     ISRHandler handler = ISR_Handlers[regs->interrupt];
     if(handler)
         handler(regs);

@@ -12,5 +12,5 @@ typedef struct {
 
 typedef void (*ISRHandler)(ISR_Registers* regs);
 
-void ISR_Initilize();
-void ISR_RegisterHandler(uint8_t interrupt, ISRHandler handler);
+void i686_ISR_Initilize();
+void i686_ISR_RegisterHandler(uint8_t interrupt, ISRHandler handler);

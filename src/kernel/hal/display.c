@@ -12,8 +12,6 @@ static uint8_t  DISPLAY_Screen_Height = 0,
 static uint8_t  DISPLAY_Cursor_X = 0,
                 DISPLAY_Cursor_Y = 0;
 
-static bool     DISPLAY_Debug_Enabled = false;
-
 #define CALC_Pos(x, y) (uint16_t)(y * DISPLAY_Screen_Width + x)
 
 void DISPLAY_Initilize() {
@@ -35,10 +33,6 @@ void DISPLAY_clear() {
     DISPLAY_setcursor(0, 0);
 }
 
-bool DISPLAY_enabledebug() {
-    return DISPLAY_Debug_Enabled = E9_read();
-}
-
 void DISPLAY_setcolor(color c) {
     DISPLAY_Color = c;
 }
@@ -47,15 +41,8 @@ color DISPLAY_getcolor() {
     return DISPLAY_Color;
 }
 
-void DISPLAY_debug(char c) {
-    if(DISPLAY_Debug_Enabled)
-        E9_write(c);
-}
-
 void DISPLAY_nextc(char c) {
     DISPLAY_setc(DISPLAY_Cursor_X, DISPLAY_Cursor_Y, CCHR(c, DISPLAY_Color));
-    DISPLAY_debug(c);
-
     DISPLAY_setcursor(DISPLAY_Cursor_X + 1, DISPLAY_Cursor_Y);
 }
 
@@ -64,7 +51,6 @@ void DISPLAY_putc(char c) {
     switch(c) {
         case '\n':
             DISPLAY_setcursor(0, DISPLAY_Cursor_Y + 1);
-            DISPLAY_debug('\n');
             break;
         case '\t':
             uint8_t tabSteps = 4 - (DISPLAY_Cursor_X % 4);
@@ -73,7 +59,6 @@ void DISPLAY_putc(char c) {
             break;
         case '\r':
             DISPLAY_setcursor(0, DISPLAY_Cursor_Y);
-            DISPLAY_debug('\r');
             break;
         default:
             DISPLAY_nextc(c);
@@ -95,8 +80,6 @@ void DISPLAY_setcursor(uint8_t x, uint8_t y) {
     if(x >= DISPLAY_Screen_Width) {
         x = 0;
         y++;
-
-        DISPLAY_debug('\n');
     }
     if(y >= DISPLAY_Screen_Height) {
         y = DISPLAY_Screen_Height - 1;

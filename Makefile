@@ -70,11 +70,11 @@ $(BUILD_DIR)/obj/asm/%.obj: $(SRC_DIR)/%.asm $(ASM_HEADER)
 	$(ASM) $(ASFLAGS) -o $@ $<
 
 # Sources that are generated
-$(KERNEL_DIR)/arch/i686/isr_gen.c:
+$(KERNEL_DIR)/arch/i686/isr_gen.c: $(SCRIPT_DIR)/generate_isr_c.sh
 	@echo "--> Generating: $@"
 	$(SCRIPT_DIR)/generate_isr_c.sh $@
 
-$(KERNEL_DIR)/arch/i686/isr_gen.inc:
+$(KERNEL_DIR)/arch/i686/isr_gen.inc: $(SCRIPT_DIR)/generate_isr_inc.sh
 	@echo "--> Generating: $@"
 	$(SCRIPT_DIR)/generate_isr_inc.sh $@
 
