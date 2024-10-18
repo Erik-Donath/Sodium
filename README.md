@@ -35,7 +35,7 @@ Sodium
 │   │   │   └── / Universal Stuff /
 │   │   ├── kernel.c
 │   │   └── ...
-│   ├── boot
+│   ├── boot/i686
 │   │   ├── boot.asm
 │   │   ├── multiboot.asm
 │   │   └── grub
