@@ -51,7 +51,7 @@ void i686_ISR_Initilize() {
         i686_IDT_EnableGate((uint8_t)i);
 }
 
-void ISR_RegisterHandler(uint8_t interrupt, ISRHandler handler) {
+void i686_ISR_RegisterHandler(uint8_t interrupt, ISRHandler handler) {
     ISR_Handlers[interrupt] = handler;
     i686_IDT_EnableGate(interrupt);
 }

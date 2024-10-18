@@ -24,7 +24,7 @@ void i686_IRQ_Initilize() {
 
     //register isr handler
     for(uint8_t i = 0; i < 16; i++) {
-        ISR_RegisterHandler(PIC_REMAP_OFFSET + i, IRQ_Handler);
+        i686_ISR_RegisterHandler(PIC_REMAP_OFFSET + i, IRQ_Handler);
     }
 
     // enable interrupts
