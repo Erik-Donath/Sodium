@@ -3,6 +3,8 @@
 #include "isr.h"
 #include "irq.h"
 
+#include "boot_info.h"
+
 #include <kernel/kernel.h>
 #include "arch.h"
 
@@ -14,7 +16,7 @@ void pre_main(void* mb_info) {
     i686_IRQ_Initilize();
 
     // Step 2: Read System Information
-    // ...
+    INFO_ParseMultiboot(mb_info);
 
     // Step 3: Jump into generic Kernel
     kernel_main();
