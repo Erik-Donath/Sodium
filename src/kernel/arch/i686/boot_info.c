@@ -32,6 +32,7 @@
 #define MB_STRUCT_NEXT_TAG(tag) (multiboot_tag*)((uint8_t*)tag + MB_STRUCT_ALIGN_UP(tag->size, MB_STRUCT_TAG_ALIGN))
 
 /* MULTIBOOT INFO HEADER and TAG HEADER */
+
 typedef struct {
     uint32_t type;
     uint32_t size;
@@ -95,9 +96,15 @@ typedef struct {
     uint16_t entsize;
     uint16_t shndx;
     uint16_t reserved;
-    uint8_t  section_headers[0];
-    /* FIXME: section_headers must be implemented */
+    uint8_t  section_headers[0]; // ! refer to the i386 ELF documentation for details as to how to read the section header(s)
 } ASMPACK multiboot_tag_elf_symbols;
+
+// Memory Types in multiboot_tag_memory_map_entry
+#define MULTIBOOT_MEMORY_AVAILABLE		        1
+#define MULTIBOOT_MEMORY_RESERVED		        2
+#define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE       3
+#define MULTIBOOT_MEMORY_NVS                    4
+#define MULTIBOOT_MEMORY_BADRAM                 5
 
 typedef struct {
     uint64_t base_addr;
@@ -134,8 +141,28 @@ typedef struct {
     uint16_t vbe_interface_len;
     uint8_t  vbe_control_info[512];
     uint8_t  vbe_mode_info[256];
-    /* FIXME: Print vbe_control_info & vbe_mode_info on console. */
 } ASMPACK multiboot_tag_vbe_info;
+
+typedef struct {
+    uint8_t red_value;
+    uint8_t green_value;
+    uint8_t blue_value;
+} ASMPACK multiboot_tag_framebuffer_info_palette;
+
+typedef union {
+    struct {
+        uint32_t framebuffer_platte_num_colors;
+        multiboot_tag_framebuffer_info_palette framebuffer_palette[0];
+    } indexed_color;
+    struct {
+        uint8_t framebuffer_red_field_position;
+        uint8_t framebuffer_red_mask_size;
+        uint8_t framebuffer_green_field_position;
+        uint8_t framebuffer_green_mask_size;
+        uint8_t framebuffer_blue_field_position;
+        uint8_t framebuffer_blue_mask_size;
+    } direct_color;
+} ASMPACK multiboot_tag_framebuffer_info_color_info;
 
 typedef struct {
     multiboot_tag head;
@@ -146,8 +173,7 @@ typedef struct {
     uint8_t  framebuffer_bpp;
     uint8_t  framebuffer_type;
     uint8_t  framebuffer_reserved;
-    uint8_t  color_info[0];
-    /* FIXME: Read Frame buffer color information. */
+    multiboot_tag_framebuffer_info_color_info color_info;
 } ASMPACK multiboot_tag_framebuffer_info;
 
 typedef struct {
@@ -156,25 +182,25 @@ typedef struct {
     uint8_t minor;
     uint8_t reserved[6];
     uint8_t smbios_tables[0];
-    /* FIXME: SMBIOS tables */
+    // FIXME: Implement SMBIOS table definition(s)
 } ASMPACK multiboot_tag_smbios_tables;
 
 typedef struct {
     multiboot_tag head;
     uint8_t rsdp[0];
-    /* FIXME: copy of RSDPv1 */
+    // FIXME: Impement RSDPv1 definiton(s)
 } ASMPACK multiboot_tag_acpi_old_rsdp;
 
 typedef struct {
     multiboot_tag head;
     uint8_t rsdp[0];
-    /* FIXME: copy of RSDPv2 */
+    // FIXME: Impement RSDPv2 definiton(s)
 } ASMPACK multiboot_tag_acpi_new_rsdp;
 
 typedef struct {
     multiboot_tag head;
     uint8_t dhcp_ack[0];
-    /* FIXME: DHCP ACK */
+    // FIXME: Impement DHCP ACK definiton(s)
 } ASMPACK multiboot_tag_network_info;
 
 typedef struct {
@@ -182,8 +208,13 @@ typedef struct {
     uint32_t descriptor_size;
     uint32_t descriptor_version;
     uint8_t efi_memory_map[0];
-    /* FIXME: EFI memory map */
+    // FIXME: Impement EFI memory map definiton(s)
 } ASMPACK multiboot_tag_efi_memory_map;
+
+typedef struct {
+    multiboot_tag head;
+    // If exsists multiboot_tag_efi_memory_map should also exsist
+} ASMPACK multiboot_tag_efi_boot_services_not_terminated;
 
 typedef struct {
     multiboot_tag head;
