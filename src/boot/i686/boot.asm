@@ -6,7 +6,7 @@ align 8
 %include "src/boot/i686/multiboot2.inc"
 
 mb_header_start:
-    MB2_HEADER_START MB2_ARCH_I386, mb_header_end - mb_header_start
+    MB2_HEADER_START MB2_ARCH_I386, (mb_header_end - mb_header_start)
     MB2_INFORMATION_REQUEST_TAG MB2_INFO_REQUEST_MEMORY, MB2_INFO_REQUEST_MEMORY_MAP, MB2_INFO_REQUEST_BOOTDEV, MB2_INFO_REQUEST_CMDLINE, MB2_INFO_REQUEST_MODULES
     MB2_CONSOLE_FLAGS_TAG (MB2_CONSOLE_FLAGS_CONSOLE_REQUIRED | MB2_CONSOLE_FLAGS_EGA_TEXT_SUPPORTED)
     MB2_ENTRY_ADDRESS_TAG start
@@ -50,6 +50,7 @@ start:
 .error:
     cli
     hlt
+    jmp .error
 
 section .bss
     stack_bottom: ; Reserves 8 KB for Stack

@@ -71,7 +71,7 @@ MB2_RELOCATABLE_PREFER_NONE      equ 2
     %endif
 %endmacro
 
-; Macros for specific tags
+; Macro for header start
 %macro MB2_HEADER_START 2
     dd MB2_MAGIC
     dd %1
@@ -79,6 +79,7 @@ MB2_RELOCATABLE_PREFER_NONE      equ 2
     dd -(MB2_MAGIC + %1 + %2)
 %endmacro
 
+; Macros for specific tags
 %macro MB2_END_TAG 0
     MB2_TAG MB2_HEADER_TAG_END, 0, 8
     MB2_PADDING
