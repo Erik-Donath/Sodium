@@ -57,6 +57,8 @@ $(KERNEL_BIN): $(ASM_OBJECTS) $(C_OBJECTS) $(LINKER_SCRIPT)
 	@mkdir -p $(DIST_DIR)
 	@echo "--> Linking: " $@
 	$(LD) $(LDFLAGS) -T $(LINKER_SCRIPT) -o $(KERNEL_BIN) $(ASM_OBJECTS) $(C_OBJECTS)
+	@echo "--> Checking Multiboot2 compliance: $@"
+	grub-file --is-x86-multiboot2 $@ || (echo "Error: Kernel is not Multiboot2 compliant!" && exit 1)
 
 # Compiling and Assembling Source + Headers
 $(BUILD_DIR)/obj/c/%.obj: $(SRC_DIR)/%.c $(C_HEADER)

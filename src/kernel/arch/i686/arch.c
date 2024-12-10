@@ -3,21 +3,17 @@
 #include "isr.h"
 #include "irq.h"
 
-#include "boot_info.h"
-
+#include <kernel/util/assembly.h>
 #include <kernel/kernel.h>
 #include "arch.h"
 
-void pre_main(void* mb_info) {
+ASMCALL void pre_main(void* mb_info) {
     // Step 1: Initilize CPU, Interrupr Handling
     i686_GDT_Initilize();
     i686_IDT_Initilize();
     i686_ISR_Initilize();
     i686_IRQ_Initilize();
 
-    // Step 2: Read System Information
-    INFO_ParseMultiboot(mb_info);
-
-    // Step 3: Jump into generic Kernel
+    // Step 2: Jump into generic Kernel
     kernel_main();
 }
