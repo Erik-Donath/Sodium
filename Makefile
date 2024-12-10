@@ -96,11 +96,10 @@ info:
 all: $(ISO)
 	@echo "--> DONE"
 
-clear:
+.PHONY: clean
+clean:
 	@echo "--> Clearing builds"
 	rm -rf $(BUILD_DIR)
 	rm -rf $(KERNEL_BIN)
 	rm -f $(KERNEL_DIR)/arch/i686/isr_gen.inc
 	rm -f $(KERNEL_DIR)/arch/i686/isr_gen.c
-
-.PHONY: info all clean
