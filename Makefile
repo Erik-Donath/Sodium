@@ -73,12 +73,16 @@ $(BUILD_DIR)/obj/asm/%.obj: $(SRC_DIR)/%.asm $(ASM_HEADER)
 
 # Sources that are generated
 $(KERNEL_DIR)/arch/i686/isr_gen.c: $(SCRIPT_DIR)/generate_isr_c.sh
-	@echo "--> Generating: $@"
-	$(SCRIPT_DIR)/generate_isr_c.sh $@
+	@if [ ! -f $@ ]; then \
+		echo "--> Generating: $@"; \
+		$(SCRIPT_DIR)/generate_isr_c.sh $@; \
+	fi
 
 $(KERNEL_DIR)/arch/i686/isr_gen.inc: $(SCRIPT_DIR)/generate_isr_inc.sh
-	@echo "--> Generating: $@"
-	$(SCRIPT_DIR)/generate_isr_inc.sh $@
+	@if [ ! -f $@ ]; then \
+		echo "--> Generating: $@"; \
+		$(SCRIPT_DIR)/generate_isr_inc.sh $@; \
+	fi
 
 # Final Build Rules
 info:
