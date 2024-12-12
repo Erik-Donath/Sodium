@@ -12,7 +12,7 @@ Steps to <b>Build and Run</b>:<br>
 <b>2:</b> Optional: Install qemu (Linux: ```apt install qemu```, Windows: visit 'https://www.qemu.org/' and use 'Stefan Weil' binaries.<br>
 <b>3:</b> Run ```docker build buildenv -t sodium-buildenv``` to build the builenv<br>
 <b>4:</b> Windows: Use ```docker run --rm -it -v C:/Sodium/:/root/env sodium-buildenv``` and replace 'C:/Sodium/' with the project directory<br>
-<b>4:</b> Linux: Use ```sudo docker run --rm -it -v ./:/root/env:Z sodium-buildenv```
+<b>4:</b> Linux: Use ```sudo docker run --rm -it -v ./:/root/env:Z sodium-buildenv```<br>
 <b>5:</b> <b>Run</b> ```qemu-system-x86_64 -debugcon stdio -cdrom dist/Sodium.iso``` to start the OS! (Only if qemu is install)<br>
 
 You can also run the OS by using the .iso file directly (For example in VBox or on a LiveUSB).
