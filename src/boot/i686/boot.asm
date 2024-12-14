@@ -16,9 +16,8 @@ mb_header_end:
 
 ; Bootcode
 section .text
-    global start
     extern pre_main
-
+    global start
 start:
     cli ; Deactivate Interrupts
 
@@ -55,7 +54,7 @@ start:
 section .bss
     stack_bottom: ; Reserves 8 KB for Stack
     align 16
-    resb 8192
+    resb 16384
     stack_top:
 
 section .note.GNU-stack noalloc noexec nowrite progbits
