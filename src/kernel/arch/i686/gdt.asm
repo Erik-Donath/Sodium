@@ -3,13 +3,13 @@ section .text
 
 global i686_GDT_Flush
 i686_GDT_Flush:
-    ; Function parameters:
-    ; [esp + 4] = gdt_pointer ptr
-    ; [esp + 8] = uint16_t codeSegment
-    ; [esp + 12] = uint16_t dataSegment
     push ebp
     mov ebp, esp
-
+    ; Function parameters:
+    ; [ebp + 8] = gdt_pointer ptr
+    ; [ebp + 12] = uint16_t codeSegment
+    ; [ebp + 16] = uint16_t dataSegment
+    
     ; load gdt
     mov eax, [ebp + 8]
     lgdt [eax]
