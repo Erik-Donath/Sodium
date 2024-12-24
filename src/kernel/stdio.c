@@ -1,3 +1,4 @@
+/*
 #include <stdarg.h>
 #include <stdbool.h>
 
@@ -138,3 +139,4 @@ void printf_test() {
     printf("%%p -> %p\n", 0x4242);
     printf("%%n -> %n\n");
 }
+*/

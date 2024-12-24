@@ -19,7 +19,7 @@ CC  = gcc
 LD  = ld
 ASM = nasm
 
-CFLAGS    = -m32 -g -ffreestanding -std=c99 -nostartfiles -nodefaultlibs -O2 -Wall -Wextra -I$(SRC_DIR)
+CFLAGS    = -m32 -g -ffreestanding -std=c11 -nostartfiles -nodefaultlibs -O2 -Wall -Wextra -I $(SRC_DIR)
 LDFLAGS   = -m elf_i386
 ASFLAGS   = -f elf
 GRUBFLAGS = --product-version="Sodium 0.1"

@@ -18,26 +18,14 @@ mb_header_end:
 section .text
     extern pre_main
     global start
+    global i686_shutdown
 start:
-    cli ; Deactivate Interrupts
+    ; Deactivate Interrupts (JIC)
+    cli
 
     ; Check Multiboot-Magic
     cmp eax, MB2_BOOTLOADER_MAGIC
-    jne .error
-
-    ; FPU initialization
-    fninit
-
-    ; Activate FPU
-    mov eax, cr0
-    and eax, 0xFFFFFFFB ; Bit 2 unset (EM)
-    or eax, 0x2         ; Bit 1 set (MP)
-    mov cr0, eax
-
-    ; Optional: FXSAVE/FXRSTOR activate (for SSE)
-    mov eax, cr4
-    or eax, 0x200       ; Bit 9 set (OSFXSR)
-    mov cr4, eax
+    jne i686_shutdown
 
     ; Creating Stack of 8KB
     mov esp, stack_top
@@ -45,11 +33,48 @@ start:
 
     ; Jump to the C-Kernel with the first parameter being the mb_info struct pointer (32bit pointer)
     push ebx
-    call pre_main ; Not expected to return
-.error:
+    call pre_main
+
+i686_shutdown:
+    ; Deactivate Interrupts
     cli
+
+    ; Check if APM is available
+    mov ax, 5300h
+    xor bx, bx
+    int 15h
+    jc .apm_error
+
+    ; Check APM-Version (must be at least 1.1)
+    mov ax, 530Eh
+    xor bx, bx
+    mov cx, 0101h  ; Version 1.1
+    int 15h
+    jc .apm_error
+
+    ; Connect to APM
+    mov ax, 5301h
+    xor bx, bx
+    int 15h
+    jc .apm_error
+
+    ; Activate Power Managment for all devices
+    mov ax, 530Dh
+    mov bx, 0001h
+    mov cx, 0001h
+    int 15h
+    jc .apm_error
+
+    ; Shutdown System
+    mov ax, 5307h
+    mov bx, 0001h
+    mov cx, 0003h
+    int 15h
+
+    ; Failed to shutdown
+.apm_error:
     hlt
-    jmp .error
+    jmp i686_shutdown
 
 section .bss
     stack_bottom: ; Reserves 8 KB for Stack

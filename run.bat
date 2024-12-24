@@ -1,0 +1,1 @@
+qemu-system-x86_64 -debugcon stdio -cdrom dist/Sodium.iso
