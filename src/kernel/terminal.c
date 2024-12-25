@@ -29,7 +29,6 @@ void terminal_init() {
     }
     
     terminal_driver->init();
-    terminal_status();
 }
 
 void terminal_putchar(char c) {
@@ -58,8 +57,8 @@ void terminal_clear() {
 void terminal_status() {
     uint16_t color = terminal_color;
     terminal_set_color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK);
-    terminal_write("(Terminal connected to '");
+    terminal_write("Terminal connected to '");
     terminal_write(terminal_driver->name);
-    terminal_write("')\n");
+    terminal_write("'\n");
     terminal_color = color;
 }
