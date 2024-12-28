@@ -5,15 +5,15 @@
 #include "gdt.h"
 
 /*
-| Bits    | Beschreibung                             |
-|---------|------------------------------------------|
-| 0-15    | Segmentlimit (untere 16 Bits)            |
-| 16-31   | Basisadresse (untere 16 Bits)            |
-| 32-39   | Basisadresse (mittlere 8 Bits)           |
-| 40-47   | Zugriffsrechte                           |
-| 48-51   | Segmentlimit (obere 4 Bits)              |
-| 52-55   | Flags                                    |
-| 56-63   | Basisadresse (obere 8 Bits)              |
+| Bits    | Description                               |
+|---------|-------------------------------------------|
+| 0-15    | Segment Limit (lower 16 bits)             |
+| 16-31   | Base Address (lower 16 bits)              |
+| 32-39   | Base Address (middle 8 bits)              |
+| 40-47   | Access Rights                             |
+| 48-51   | Segment Limit (upper 4 bits)              |
+| 52-55   | Flags                                     |
+| 56-63   | Base Address (upper 8 bits)               |
 */
 
 typedef struct {
