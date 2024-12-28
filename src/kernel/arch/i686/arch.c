@@ -3,6 +3,7 @@
 #include <kernel/terminal.h>
 #include "fpu.h"
 #include "gdt.h"
+#include "idt.h"
 
 static void ok(const char* msg) {
     terminal_set_color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK);
@@ -38,6 +39,7 @@ void pre_main(void*) {
     
     okF(i686_FPU_Initialize, "FPU initialized");
     okF(i686_GDT_Initialize, "GDT initialized");
+    okF(i686_IDT_Initialize, "IDT initialized");
 
     while(true) {}
 }
