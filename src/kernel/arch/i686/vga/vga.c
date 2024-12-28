@@ -1,4 +1,4 @@
-#include "ports.h"
+#include "../ports.h"
 #include "vga.h"
 
 #define VGA_BUFFER 0xB8000

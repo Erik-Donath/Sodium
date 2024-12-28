@@ -1,3 +1,7 @@
+#include <stdint.h>
+#include "idt.h"
+#include <kernel/arch/i686/gdt/gdt.h>
+
 extern void i686_ISR_0();
 extern void i686_ISR_1();
 extern void i686_ISR_2();
@@ -255,8 +259,10 @@ extern void i686_ISR_253();
 extern void i686_ISR_254();
 extern void i686_ISR_255();
 
+void i686_IDT_SetGate(uint8_t num, uint32_t base, uint16_t selector, uint8_t flags);
+
 void i686_ISR_Initialize() {
-    #define DEFAULT GDT_KERNEL_CODE_SEGMENT, (IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_32BIT_INT)
+    #define DEFAULT GDT_KERNEL_CODE_SEGMENT, DEFAULT_GATE
     i686_IDT_SetGate(0, (uint32_t)i686_ISR_0, DEFAULT);
     i686_IDT_SetGate(1, (uint32_t)i686_ISR_1, DEFAULT);
     i686_IDT_SetGate(2, (uint32_t)i686_ISR_2, DEFAULT);

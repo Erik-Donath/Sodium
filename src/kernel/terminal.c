@@ -1,7 +1,8 @@
 #include "terminal.h"
 _Static_assert(sizeof(char) == sizeof(uint8_t), "char and uint8_t must be the same size!");
 
-#include <kernel/arch/i686/vga.h>
+#include <kernel/arch/i686/vga/vga.h>
+#include <kernel/arch/i686/debug.h>
 
 void terminal_default_driver_init(void) { }
 bool terminal_default_driver_check(void) { return true; }
@@ -33,6 +34,7 @@ void terminal_init() {
 
 void terminal_putchar(char c) {
     terminal_driver->put_char(c, terminal_color);
+    debug_putc(c);
 }
 
 void terminal_write(const char* str) {
@@ -44,6 +46,7 @@ void terminal_write(const char* str) {
 
 void terminal_set_color(terminal_color_types fg, terminal_color_types bg) {
     terminal_color = Color(fg, bg);
+    debug_color(terminal_color);
 }
 
 void terminal_scroll(uint8_t lines) {
