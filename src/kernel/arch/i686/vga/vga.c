@@ -54,13 +54,33 @@ void i686_vga_init() {
     outb(VGA_CRTC_ADDRESS_PORT, 0x03);
     outb(VGA_CRTC_DATA_PORT, 0x03);
 
-    // Set up CRTC registers for 80x25 text mode
     static const uint8_t crtc_regs[] = {
-        0x5F, 0x4F, 0x50, 0x82, 0x55, 0x81, 0xBF, 0x1F,
-        0x00, 0x4F, 0x0D, 0x0E, 0x00, 0x00, 0x00, 0x50,
-        0x9C, 0x0E, 0x8F, 0x28, 0x1F, 0x96, 0xB9, 0xA3,
-        0xFF
-    };
+        [0] = 0x5F,   // Horizontal Total
+        [1] = 0x4F,   // End Horizontal Display
+        [2] = 0x50,   // Start Horizontal Blanking
+        [3] = 0x82,   // End Horizontal Blanking
+        [4] = 0x55,   // Start Horizontal Retrace
+        [5] = 0x81,   // End Horizontal Retrace
+        [6] = 0xBF,   // Vertical Total
+        [7] = 0x1F,   // Overflow
+        [8] = 0x00,   // Preset Row Scan
+        [9] = 0x4F,   // Maximum Scan Line
+        [10] = 0x0D,  // Cursor Start
+        [11] = 0x0E,  // Cursor End
+        [12] = 0x00,  // Start Address High
+        [13] = 0x00,  // Start Address Low
+        [14] = 0x00,  // Cursor Location High
+        [15] = 0x50,  // Cursor Location Low
+        [16] = 0x9C,  // Vertical Retrace Start
+        [17] = 0x0E,  // Vertical Retrace End
+        [18] = 0x8F,  // Vertical Display End
+        [19] = 0x28,  // Offset
+        [20] = 0x1F,  // Underline Location
+        [21] = 0x96,  // Start Vertical Blanking
+        [22] = 0xB9,  // End Vertical Blanking
+        [23] = 0xA3,  // CRTC Mode Control
+        [24] = 0xFF   // Line Compare
+    }; // 80*25 text mode
 
     for (uint8_t i = 0; i < sizeof(crtc_regs); i++) {
         outb(VGA_CRTC_ADDRESS_PORT, i);
