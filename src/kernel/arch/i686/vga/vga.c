@@ -81,7 +81,7 @@ void i686_vga_init() {
         [23] = 0xA3,  // CRTC Mode Control
         [24] = 0xFF   // Line Compare
     }; // 80*25 text mode
-
+    
     for (uint8_t i = 0; i < sizeof(crtc_regs); i++) {
         outb(VGA_CRTC_ADDRESS_PORT, i);
         outb(VGA_CRTC_DATA_PORT, crtc_regs[i]);
@@ -173,4 +173,11 @@ const display_driver vga_driver = {
     .put_char   = i686_vga_putChar,
     .new_line   = i686_vga_newLine,
     .scroll     = i686_vga_scroll
+    /*
+    .check      = i686_debug_check,
+    .activate   = i686_debug_activate,
+    .deactivate = i686_debug_deactivate,
+    .putc       = i686_debug_putc,
+    .clear      = i686_debug_clear
+    */
 };

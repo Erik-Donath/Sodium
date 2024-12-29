@@ -4,53 +4,39 @@ _Static_assert(sizeof(char) == sizeof(uint8_t), "char and uint8_t must be the sa
 #include <kernel/arch/i686/vga/vga.h>
 #include <kernel/arch/i686/debug.h>
 
-void terminal_default_driver_init(void) { }
 bool terminal_default_driver_check(void) { return true; }
-void terminal_default_driver_putChar(char, uint8_t) { }
-void terminal_default_driver_newLine() { }
-void terminal_default_driver_scroll(uint8_t) {}
+void terminal_default_driver_activate(void) { }
+void terminal_default_driver_deactivate(void) { }
+void terminal_default_driver_putc(char) { }
 void terminal_default_driver_clear() {}
 
 static const display_driver terminal_default_driver = {
     .name       = "Terminal Default Driver",
-    .init       = terminal_default_driver_init,
     .check      = terminal_default_driver_check,
-    .put_char   = terminal_default_driver_putChar,
-    .new_line   = terminal_default_driver_newLine,
-    .scroll     = terminal_default_driver_scroll,
+    .activate   = terminal_default_driver_activate,
+    .deactivate = terminal_default_driver_deactivate,
+    .putc       = terminal_default_driver_putc,
     .clear      = terminal_default_driver_clear
 };
 
 static display_driver* terminal_driver = (display_driver*)&vga_driver;
-static uint16_t terminal_color;
 
 void terminal_init() {
     if(!terminal_driver->check()) {
         terminal_driver = (display_driver*)&terminal_default_driver;
     }
-    
-    terminal_driver->init();
+    terminal_driver->activate();
 }
 
-void terminal_putchar(char c) {
-    terminal_driver->put_char(c, terminal_color);
-    debug_putc(c);
+void terminal_putc(char c) {
+    terminal_driver->putc(c, terminal_color);
 }
 
-void terminal_write(const char* str) {
+void terminal_puts(const char* str) {
     while(*str) {
         terminal_putchar(*str);
         str++;
     }
-}
-
-void terminal_set_color(terminal_color_types fg, terminal_color_types bg) {
-    terminal_color = Color(fg, bg);
-    debug_color(terminal_color);
-}
-
-void terminal_scroll(uint8_t lines) {
-    terminal_driver->scroll(lines);
 }
 
 void terminal_clear() {
@@ -58,10 +44,8 @@ void terminal_clear() {
 }
 
 void terminal_status() {
-    uint16_t color = terminal_color;
-    terminal_set_color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK);
-    terminal_write("Terminal connected to '");
-    terminal_write(terminal_driver->name);
-    terminal_write("'\n");
-    terminal_color = color;
+    //terminal_set_color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK);
+    terminal_puts("Terminal connected to '");
+    terminal_puts(terminal_driver->name);
+    terminal_puts("'\n");
 }

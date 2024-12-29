@@ -5,15 +5,14 @@
 #include "gdt/gdt.h"
 #include "idt/idt.h"
 
+#define dc Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
+#define gc Color(TERMINAL_COLOR_GREEN, TERMINAL_COLOR_BLACK)
+#define cc Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
+
 static void ok(const char* msg) {
-    terminal_set_color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK);
-    terminal_write("[ ");
-    terminal_set_color(TERMINAL_COLOR_GREEN, TERMINAL_COLOR_BLACK);
-    terminal_write("OK");
-    terminal_set_color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK);
-    terminal_write(" ] ");
-    terminal_write(msg);
-    terminal_putchar('\n');
+    terminal_puts(dc "[ " gc "OK" dc);
+    terminal_puts(msg);
+    terminal_putc('\n');
 }
 
 static void okF(void(*func)(void), const char* name) {
@@ -22,12 +21,7 @@ static void okF(void(*func)(void), const char* name) {
 }
 
 static void welcome() {
-    terminal_set_color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK);
-    terminal_write("Welcome to ");
-    terminal_set_color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK);
-    terminal_write("Sodium");
-    terminal_set_color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK);
-    terminal_write("!\n");
+    terminal_puts(dc "Welcome to " cc "Sodium" dc "!\n");
 }
 
 void pre_main(void*) {
@@ -71,6 +65,6 @@ void pre_main(void*) {
     __asm__ volatile ("int $0");
     __asm__ volatile ("int $255");
 
-    terminal_write("\nDONE!\n");
+    terminal_puts("\nDONE!\n");
     while(true) {}
 }
