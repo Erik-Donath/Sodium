@@ -32,6 +32,10 @@ typedef enum {
 
 static ASCII_Phase vga_phase;
 
+#define VGA_SEQUENZ_MAX 16
+static uint8_t vga_sequenz_lenght;
+static char vga_sequenz[VGA_SEQUENZ_MAX];
+
 bool i686_vga_check() {
     outb(VGA_MISC_OUTPUT_WRITE_PORT, 0x63);
     outb(VGA_CRTC_ADDRESS_PORT, 0x03);
@@ -103,6 +107,7 @@ void i686_vga_activate() {
 
     i686_vga_clear();
     vga_phase = READ;
+    vga_sequenz_lenght = 0;
 }
 
 void i686_vga_deactivate() {
@@ -119,16 +124,16 @@ void i686_vga_putc(char c) {
                 case '\a':
                     break;
                 case '\b':
-                    i686_vga_cursor_backward();
+                    i686_vga_cursor_left();
                     break;
                 case '\f':
                     i686_vga_clear();
                     break;
                 case '\n':
-                    i686_vga_set_cursor(0, vga_cursor_y + 1);
+                    i686_vga_cursor_set(0, vga_cursor_y + 1);
                     break;
                 case '\r':
-                    i686_vga_set_cursor(0, vga_cursor_y);
+                    i686_vga_cursor_set(0, vga_cursor_y);
                     break;
                 case '\t':
                     uint8_t tabs = 4 - vga_cursor_x % 4;
@@ -149,61 +154,128 @@ void i686_vga_putc(char c) {
                 }
             break;
         case ESCAPE:
-            vga_phase = READ;
+            switch(c) {
+                case 'D':
+                    i686_vga_cursor_down();
+                    vga_phase = READ;
+                    break;
+                case 'E':
+                    i686_vga_cursor_set(0, vga_cursor_y + 1);
+                    vga_phase = READ;
+                    break;
+                case 'M':
+                    i686_vga_cursor_up();
+                    vga_phase = READ;
+                    break;
+                case '[':
+                    vga_sequenz_lenght = 0;
+                    vga_phase = PARAMETER;
+                    break;
+                default:
+                    i686_vga_out('_');
+                    i686_vga_out('E');
+                    vga_phase = READ;
+                    break;
+            }
             break;
         case PARAMETER:
+            // End of Sequenz
+            if (!(c >= '0' && c <= '9') && c != ';') {
+                i686_vga_parserSequnez(c);
+                vga_phase = READ;
+            }
+            else if (vga_sequenz_lenght >= VGA_SEQUENZ_MAX) {
+                i686_vga_out('_');
+                i686_vga_out('E');
+                vga_phase = READ;
+            }
+            else
+                vga_sequenz[vga_sequenz_lenght++] = c;
             break;
     }
 }
 
 void i686_vga_out(char c) {
     vga_buffer[SCREEN_POS(vga_cursor_x, vga_cursor_y)] = CHAR(c, vga_color);
-    i686_vga_cursor_forward();
+    i686_vga_cursor_right();
 }
 
-void i686_vga_cursor_forward() {
-    uint8_t x = vga_cursor_x + 1;
-    uint8_t y = vga_cursor_y;
-
-    if(x >= VGA_WIDTH) {
-        x = 0;
-        y++;
+void i686_vga_parserSequnez(char operation) {
+    uint16_t params[VGA_SEQUENZ_MAX + 1]; // Worst case: ;;; n times.
+    uint16_t param_value = 0;
+    uint8_t  param_count = 0;
+    
+    for(uint8_t i = 0; i < vga_sequenz_lenght; i++) {
+        if(vga_sequenz[i] == ';') {
+            params[param_count++] = param_value;
+            param_value = 0;
+        }
+        param_value = param_value * 10 + (vga_sequenz[i] - '0');
     }
-    if(y >= VGA_HEIGHT) {
-        i686_vga_scroll(1);
-        y = VGA_HEIGHT -1;
+    params[param_count++] = param_value;
+
+    switch(operation) {
+        case 'm':
+            // Not implemented yet
+            break;
+        case 'H':
+        case 'f':
+            if(param_count >= 2)
+                i686_vga_cursor_set((uint8_t)params[0], (uint8_t)params[1]);
+            break;
+        case 'A':
+            for(uint16_t i = 0; i < params[0]; i++)
+                i686_vga_cursor_up();
+            break;
+        case 'B':
+            for(uint16_t i = 0; i < params[0]; i++)
+                i686_vga_cursor_down();
+            break;
+        case 'C':
+            for(uint16_t i = 0; i < params[0]; i++)
+                i686_vga_cursor_right();
+            break;
+        case 'D':
+            for(uint16_t i = 0; i < params[0]; i++)
+                i686_vga_cursor_left();
+            break;
+        case 'J': {
+            uint16_t cursor = SCREEN_POS(vga_cursor_x, vga_cursor_y);
+            switch(params[0]) {
+                case 0:
+                    break;
+                case 1:
+                case 2:
+                    i686_vga_clear();
+                    break;
+                default:
+                    i686_vga_out('_');
+                    i686_vga_out('E');
+                    break;
+            }
+            break; }
+        case 'K': {
+            uint16_t cursor = SCREEN_POS(vga_cursor_x, vga_cursor_y);
+            switch(params[0]) {
+                case 0:
+                    break;
+                case 2:
+                case 1:
+                    for(uint8_t x = 0; x < vga_cursor_x; x++)
+                        vga_buffer[vga_cursor_y * VGA_WIDTH + x] = 0x0F20;
+                    i686_vga_cursor_set(0, vga_cursor_y);
+                    break;
+                default:
+                    i686_vga_out('_');
+                    i686_vga_out('E');
+                    break;
+            }
+            break; }
+        default:
+            i686_vga_out('_');
+            i686_vga_out('E');
+        break;
     }
-
-    i686_vga_set_cursor(x, y);
-}
-
-void i686_vga_cursor_backward() {
-    uint8_t x = vga_cursor_x - 1;
-    uint8_t y = vga_cursor_y;
-
-    if(x >= VGA_WIDTH) {
-        x = VGA_WIDTH - 1;
-        y--;
-    }
-    if(y >= VGA_HEIGHT) {
-        y = 0;
-    }
-
-    i686_vga_set_cursor(x, y);
-}
-
-void i686_vga_set_cursor(uint8_t x, uint8_t y) {
-    if(x >= VGA_WIDTH)  x = VGA_WIDTH  - 1;
-    if(y >= VGA_HEIGHT) y = VGA_HEIGHT - 1;
-
-    uint16_t pos = SCREEN_POS(x, y);
-    outb(VGA_CRTC_ADDRESS_PORT, VGA_CURSOR_HIGH);
-    outb(VGA_CRTC_DATA_PORT, (pos >> 8) & 0xFF);
-    outb(VGA_CRTC_ADDRESS_PORT, VGA_CURSOR_LOW);
-    outb(VGA_CRTC_DATA_PORT, pos & 0xFF);
-
-    vga_cursor_x = x;
-    vga_cursor_y = y;
 }
 
 void i686_vga_scroll(uint8_t lines) {
@@ -224,14 +296,79 @@ void i686_vga_scroll(uint8_t lines) {
         }
     }
 
-    vga_cursor_y -= lines;
+    i686_vga_cursor_set(0, vga_cursor_y - lines);
 }
 
 void i686_vga_clear() {
     for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++) {
         vga_buffer[i] = CHAR('\0', 0x0F);
     }
-    i686_vga_set_cursor(0, 0);
+    i686_vga_cursor_set(0, 0);
+}
+
+void i686_vga_cursor_right() {
+    uint8_t x = vga_cursor_x + 1;
+    uint8_t y = vga_cursor_y;
+
+    if(x >= VGA_WIDTH) {
+        x = 0;
+        y++;
+    }
+    if(y >= VGA_HEIGHT) {
+        i686_vga_scroll(1);
+        y = VGA_HEIGHT -1;
+    }
+
+    i686_vga_cursor_set(x, y);
+}
+
+void i686_vga_cursor_left() {
+    uint8_t x = vga_cursor_x - 1;
+    uint8_t y = vga_cursor_y;
+
+    if(x >= VGA_WIDTH) {
+        x = VGA_WIDTH - 1;
+        y--;
+    }
+    if(y >= VGA_HEIGHT) {
+        y = 0;
+    }
+
+    i686_vga_cursor_set(x, y);
+}
+
+void i686_vga_cursor_up() {
+    uint8_t x = vga_cursor_x;
+    uint8_t y = vga_cursor_y;
+
+    if(y != 0) y--;
+    i686_vga_cursor_set(x, y);
+}
+
+void i686_vga_cursor_down() {
+    uint8_t x = vga_cursor_x;
+    uint8_t y = vga_cursor_y + 1;
+
+    if(y >= VGA_HEIGHT) {
+        i686_vga_scroll(1);
+        y = VGA_HEIGHT -1;
+    }
+
+    i686_vga_cursor_set(x, y);
+}
+
+void i686_vga_cursor_set(uint8_t x, uint8_t y) {
+    if(x >= VGA_WIDTH)  x = VGA_WIDTH  - 1;
+    if(y >= VGA_HEIGHT) y = VGA_HEIGHT - 1;
+
+    uint16_t pos = SCREEN_POS(x, y);
+    outb(VGA_CRTC_ADDRESS_PORT, VGA_CURSOR_HIGH);
+    outb(VGA_CRTC_DATA_PORT, (pos >> 8) & 0xFF);
+    outb(VGA_CRTC_ADDRESS_PORT, VGA_CURSOR_LOW);
+    outb(VGA_CRTC_DATA_PORT, pos & 0xFF);
+
+    vga_cursor_x = x;
+    vga_cursor_y = y;
 }
 
 const display_driver vga_driver = {

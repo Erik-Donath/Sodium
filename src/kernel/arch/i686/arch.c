@@ -10,7 +10,7 @@
 #define cc Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
 
 static void ok(const char* msg) {
-    terminal_puts(dc "[ " gc "OK" dc "] ");
+    terminal_puts(dc "[ " gc "OK" dc " ] ");
     terminal_puts(msg);
     terminal_putc('\n');
 }
