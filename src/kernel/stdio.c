@@ -9,7 +9,7 @@
 static const char numberTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 void putc(char c) {
-    terminal_putchar(c);
+    terminal_putc(c);
 }
 
 void puts(const char* str) {

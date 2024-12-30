@@ -17,8 +17,20 @@
 #define VGA_CURSOR_HIGH 0x0E
 #define VGA_CURSOR_LOW  0x0F
 
-static uint16_t  vga_cursor = 0;
+static uint8_t vga_cursor_x = 0, vga_cursor_y = 0;
+static uint8_t vga_color = 0x0F;
 static uint16_t* vga_buffer = (uint16_t*)VGA_BUFFER;
+
+#define CHAR(chr, color) (uint16_t)((color) << 8) | (uint16_t)(chr)
+#define SCREEN_POS(x, y) (uint16_t)(y) * VGA_WIDTH + (uint16_t)(x)
+
+typedef enum {
+    READ        = 0,
+    ESCAPE      = 1,
+    PARAMETER   = 2,
+} ASCII_Phase;
+
+static ASCII_Phase vga_phase;
 
 bool i686_vga_check() {
     outb(VGA_MISC_OUTPUT_WRITE_PORT, 0x63);
@@ -27,13 +39,15 @@ bool i686_vga_check() {
 
     uint16_t value = vga_buffer[0];
     vga_buffer[0] = 0x55AA;
-    
+
     bool check = (vga_buffer[0] == 0x55AA);
     vga_buffer[0] = value;
     return check;
 }
 
-void i686_vga_init() {
+void i686_vga_activate() {
+    // TODO: Implement 'activate' part
+
     // Reset the controller
     outb(VGA_MISC_OUTPUT_WRITE_PORT, 0x67);
 
@@ -88,39 +102,108 @@ void i686_vga_init() {
     }
 
     i686_vga_clear();
+    vga_phase = READ;
 }
 
-void i686_vga_putChar(char c, uint8_t color) {
-    switch(c) {
-        case '\n':
-            i686_vga_newLine();
+void i686_vga_deactivate() {
+    // TODO: Implement later
+}
+
+void i686_vga_putc(char c) {
+    outb(0xE9, c);
+    switch(vga_phase) {
+        case READ:
+            // Handle ESCAPE Characters. Otherwise print char normaly.
+            // NOTE: \nnn and \xhh are not supported. (Oktal and Hex)
+            switch(c) {
+                case '\a':
+                    break;
+                case '\b':
+                    i686_vga_cursor_backward();
+                    break;
+                case '\f':
+                    i686_vga_clear();
+                    break;
+                case '\n':
+                    i686_vga_set_cursor(0, vga_cursor_y + 1);
+                    break;
+                case '\r':
+                    i686_vga_set_cursor(0, vga_cursor_y);
+                    break;
+                case '\t':
+                    uint8_t tabs = 4 - vga_cursor_x % 4;
+                    for(uint8_t i = 0; i < tabs; i++)
+                        i686_vga_out(' ');
+                    break;
+                case '\v':
+                    uint8_t skip = (4 - vga_cursor_x % 4) + VGA_WIDTH;
+                    for(uint8_t i = 0; i < skip; i++)
+                        i686_vga_out(' ');
+                    break;
+                case '\033': // same as \e
+                    vga_phase = ESCAPE;
+                    break;
+                default:
+                    i686_vga_out(c);
+                    break;
+                }
             break;
-        case '\r':
-            i686_vga_set_cursor_position((vga_cursor / VGA_WIDTH + 1) * VGA_WIDTH);
+        case ESCAPE:
+            vga_phase = READ;
             break;
-        case '\t':
-            uint8_t tabs = 4 - (vga_cursor % VGA_WIDTH) % 4;
-            for(uint8_t i = 0; i < tabs; i++) i686_vga_out(' ', color);
-            break;
-        default:
-            i686_vga_out(c, color);
+        case PARAMETER:
             break;
     }
 }
 
-void i686_vga_out(char c, uint8_t color) {
-    vga_buffer[vga_cursor++] = (uint16_t)c | ((uint16_t)color << 8);
-    if (vga_cursor >= VGA_WIDTH * VGA_HEIGHT) {
+void i686_vga_out(char c) {
+    vga_buffer[SCREEN_POS(vga_cursor_x, vga_cursor_y)] = CHAR(c, vga_color);
+    i686_vga_cursor_forward();
+}
+
+void i686_vga_cursor_forward() {
+    uint8_t x = vga_cursor_x + 1;
+    uint8_t y = vga_cursor_y;
+
+    if(x >= VGA_WIDTH) {
+        x = 0;
+        y++;
+    }
+    if(y >= VGA_HEIGHT) {
         i686_vga_scroll(1);
+        y = VGA_HEIGHT -1;
     }
+
+    i686_vga_set_cursor(x, y);
 }
 
-void i686_vga_newLine() {
-    vga_cursor = (vga_cursor / VGA_WIDTH + 1) * VGA_WIDTH;
-    if(vga_cursor >= VGA_WIDTH * VGA_HEIGHT) {
-        i686_vga_scroll(1);
+void i686_vga_cursor_backward() {
+    uint8_t x = vga_cursor_x - 1;
+    uint8_t y = vga_cursor_y;
+
+    if(x >= VGA_WIDTH) {
+        x = VGA_WIDTH - 1;
+        y--;
     }
-    i686_vga_set_cursor_position(vga_cursor);
+    if(y >= VGA_HEIGHT) {
+        y = 0;
+    }
+
+    i686_vga_set_cursor(x, y);
+}
+
+void i686_vga_set_cursor(uint8_t x, uint8_t y) {
+    if(x >= VGA_WIDTH)  x = VGA_WIDTH  - 1;
+    if(y >= VGA_HEIGHT) y = VGA_HEIGHT - 1;
+
+    uint16_t pos = SCREEN_POS(x, y);
+    outb(VGA_CRTC_ADDRESS_PORT, VGA_CURSOR_HIGH);
+    outb(VGA_CRTC_DATA_PORT, (pos >> 8) & 0xFF);
+    outb(VGA_CRTC_ADDRESS_PORT, VGA_CURSOR_LOW);
+    outb(VGA_CRTC_DATA_PORT, pos & 0xFF);
+
+    vga_cursor_x = x;
+    vga_cursor_y = y;
 }
 
 void i686_vga_scroll(uint8_t lines) {
@@ -141,43 +224,21 @@ void i686_vga_scroll(uint8_t lines) {
         }
     }
 
-    // Adjust cursor
-    if(vga_cursor > lines * VGA_WIDTH)
-        vga_cursor -= lines * VGA_WIDTH;
-    else vga_cursor = 0;
-    i686_vga_set_cursor_position(vga_cursor);
+    vga_cursor_y -= lines;
 }
 
 void i686_vga_clear() {
     for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++) {
-        vga_buffer[i] = 0x0F20;
+        vga_buffer[i] = CHAR('\0', 0x0F);
     }
-}
-
-void i686_vga_set_cursor_position(uint16_t pos) {
-    if(pos >= VGA_WIDTH * VGA_HEIGHT) {
-        pos = VGA_WIDTH * VGA_HEIGHT - 1;
-    }
-
-    outb(VGA_CRTC_ADDRESS_PORT, VGA_CURSOR_HIGH);
-    outb(VGA_CRTC_DATA_PORT, (pos >> 8) & 0xFF);
-    outb(VGA_CRTC_ADDRESS_PORT, VGA_CURSOR_LOW);
-    outb(VGA_CRTC_DATA_PORT, pos & 0xFF);
-    vga_cursor = pos;
+    i686_vga_set_cursor(0, 0);
 }
 
 const display_driver vga_driver = {
-    .name       = "Simple VGA Driver",
-    .init       = i686_vga_init,
+    .name       = "ASCII VGA Driver",
     .check      = i686_vga_check,
-    .put_char   = i686_vga_putChar,
-    .new_line   = i686_vga_newLine,
-    .scroll     = i686_vga_scroll
-    /*
-    .check      = i686_debug_check,
-    .activate   = i686_debug_activate,
-    .deactivate = i686_debug_deactivate,
-    .putc       = i686_debug_putc,
-    .clear      = i686_debug_clear
-    */
+    .activate   = i686_vga_activate,
+    .deactivate = i686_vga_deactivate,
+    .putc       = i686_vga_putc,
+    .clear      = i686_vga_clear
 };

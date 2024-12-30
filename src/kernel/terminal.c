@@ -29,12 +29,12 @@ void terminal_init() {
 }
 
 void terminal_putc(char c) {
-    terminal_driver->putc(c, terminal_color);
+    terminal_driver->putc(c);
 }
 
 void terminal_puts(const char* str) {
     while(*str) {
-        terminal_putchar(*str);
+        terminal_putc(*str);
         str++;
     }
 }
