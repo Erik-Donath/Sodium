@@ -130,7 +130,7 @@ void i686_vga_putc(char c) {
                     i686_vga_clear();
                     break;
                 case '\n':
-                    i686_vga_cursor_set(0, vga_cursor_y + 1);
+                    i686_vga_newLine();
                     break;
                 case '\r':
                     i686_vga_cursor_set(0, vga_cursor_y);
@@ -160,7 +160,7 @@ void i686_vga_putc(char c) {
                     vga_phase = READ;
                     break;
                 case 'E':
-                    i686_vga_cursor_set(0, vga_cursor_y + 1);
+                    i686_vga_newLine();
                     vga_phase = READ;
                     break;
                 case 'M':
@@ -198,6 +198,17 @@ void i686_vga_putc(char c) {
 void i686_vga_out(char c) {
     vga_buffer[SCREEN_POS(vga_cursor_x, vga_cursor_y)] = CHAR(c, vga_color);
     i686_vga_cursor_right();
+}
+
+void i686_vga_newLine() {
+    uint8_t y = vga_cursor_y + 1;
+
+    if(y >= VGA_HEIGHT) {
+        i686_vga_scroll(1);
+        y = VGA_HEIGHT -1;
+    }
+
+    i686_vga_cursor_set(0, y);
 }
 
 void i686_vga_parserSequnez(char operation) {
@@ -255,7 +266,6 @@ void i686_vga_parserSequnez(char operation) {
             }
             break; }
         case 'K': {
-            uint16_t cursor = SCREEN_POS(vga_cursor_x, vga_cursor_y);
             switch(params[0]) {
                 case 0:
                     break;
