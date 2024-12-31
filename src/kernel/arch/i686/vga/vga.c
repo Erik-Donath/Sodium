@@ -39,6 +39,20 @@ static ASCII_Phase vga_phase;
 static uint8_t vga_sequenz_lenght;
 static char vga_sequenz[VGA_SEQUENZ_MAX];
 
+static const uint8_t color_map[256] = {
+    0,  4,  2,  6,  1,  5,  3,  7,  8, 12, 10, 14,  9, 13, 11, 15,  // 16 Standard-Farben
+    0,  0,  0,  0,  1,  1,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  // Blau-Töne
+    0,  0,  0,  0,  1,  1,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  // Grün-Töne
+    0,  0,  0,  0,  1,  1,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  // Cyan-Töne
+    0,  0,  0,  0,  1,  1,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  // Rot-Töne
+    0,  0,  0,  0,  1,  1,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  // Magenta-Töne
+    0,  0,  0,  0,  1,  1,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  // Gelb-Töne
+    0,  0,  0,  0,  7,  7,  7,  7,  8,  8,  8,  8, 15, 15, 15, 15,  // Grau-Töne
+    0,  0,  0,  0,  0,  0,  0,  0,  8,  8,  8,  8,  8,  8,  8,  8,  // Hellere Grau-Töne
+    8,  8,  8,  8,  8,  8,  8,  8,  7,  7,  7,  7,  7,  7,  7,  7,  // Noch hellere Grau-Töne
+    15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15  // Weiß-Töne
+};
+
 bool i686_vga_check() {
     outb(VGA_MISC_OUTPUT_WRITE_PORT, 0x63);
     outb(VGA_CRTC_ADDRESS_PORT, 0x03);
@@ -299,8 +313,8 @@ void i686_vga_sequenz_setGraphicsMode(uint16_t* params, uint16_t param_count) {
         if((i+3) <= param_count && (params[i+0] == 38 || params[i+0] == 48) && params[i+1] == 5) {
             uint16_t type = params[i+0];
             uint16_t color = params[i+2];
-            if(type == 38) vga_color = setFG(vga_color, (uint8_t)color);
-            if(type == 48) vga_color = setBG(vga_color, (uint8_t)color);
+            if(type == 38) vga_color = setFG(vga_color, color_map[color]);
+            if(type == 48) vga_color = setBG(vga_color, color_map[color]);
             i += 2;
         }
         else {
