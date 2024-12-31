@@ -44,8 +44,7 @@ void terminal_clear() {
 }
 
 void terminal_status() {
-    //terminal_set_color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK);
-    terminal_puts("Terminal connected to '");
+    terminal_puts(Color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK) "Terminal connected to '");
     terminal_puts(terminal_driver->name);
-    terminal_puts("'\n");
+    terminal_puts("'" Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK) "\n");
 }

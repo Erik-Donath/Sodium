@@ -65,23 +65,19 @@ void pre_main(void*) {
     __asm__ volatile ("int $0");
     __asm__ volatile ("int $255");
 
-    terminal_puts("\nDONE!\n");
 
     const char* table[16] = {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"
     };
 
-    terminal_puts("Colors: \n");
-    for(uint8_t fg = 0; fg < 16; fg++) {
-        for(uint8_t bg = 0; bg < 16; bg++) {
-            terminal_puts("\033[38;5;");
-            terminal_puts(table[fg]);
-            terminal_puts("m\033[48;5;");
-            terminal_puts(table[bg]);
-            terminal_puts("m#\033[0m");
-        }
-        terminal_putc('\n');
+    terminal_putc('\n');
+    for(uint8_t fg = 0; fg <= 15; fg++) {
+        terminal_puts("\033[38;5;");
+        terminal_puts(table[fg]);
+        terminal_puts(";48;5;0m#\033[0m");
+        if((fg+1) % 8 == 0) terminal_putc('\n');
     }
+    terminal_puts("\nDONE!\n");
 
     while(true) {}
 }

@@ -21,6 +21,9 @@ static uint8_t vga_cursor_x = 0, vga_cursor_y = 0;
 static uint8_t vga_color = 0x0F;
 static uint16_t* vga_buffer = (uint16_t*)VGA_BUFFER;
 
+#define setFG(color, fg) (((color) & 0xF0) | ((fg) & 0x0F))
+#define setBG(color, bg) (((color) & 0x0F) | (((bg) & 0x0F) << 4))
+
 #define CHAR(chr, color) (uint16_t)((color) << 8) | (uint16_t)(chr)
 #define SCREEN_POS(x, y) (uint16_t)(y) * VGA_WIDTH + (uint16_t)(x)
 
@@ -221,13 +224,13 @@ void i686_vga_parserSequnez(char operation) {
             params[param_count++] = param_value;
             param_value = 0;
         }
-        param_value = param_value * 10 + (vga_sequenz[i] - '0');
+        else param_value = param_value * 10 + (vga_sequenz[i] - '0');
     }
     params[param_count++] = param_value;
 
     switch(operation) {
         case 'm':
-            // Not implemented yet
+            i686_vga_sequenz_setGraphicsMode(params, param_count);
             break;
         case 'H':
         case 'f':
@@ -285,6 +288,44 @@ void i686_vga_parserSequnez(char operation) {
             i686_vga_out('_');
             i686_vga_out('E');
         break;
+    }
+}
+
+void i686_vga_sequenz_setGraphicsMode(uint16_t* params, uint16_t param_count) {
+    for(uint16_t i = 0; i < param_count; i++) {
+        /*
+        IF: 38;5;n or 48;5;n at i+0, i+1, i+2
+        */
+        if((i+3) <= param_count && (params[i+0] == 38 || params[i+0] == 48) && params[i+1] == 5) {
+            uint16_t type = params[i+0];
+            uint16_t color = params[i+2];
+            if(type == 38) vga_color = setFG(vga_color, (uint8_t)color);
+            if(type == 48) vga_color = setBG(vga_color, (uint8_t)color);
+            i += 2;
+        }
+        else {
+            uint16_t n = params[i];
+            if(n >= 30 && n <= 37) vga_color = setFG(vga_color, (uint8_t)(n - 30));
+            else if(n >= 40 && n <= 47) vga_color = setBG(vga_color, (uint8_t)(n - 40));
+            else if(n >= 90 && n <= 97) vga_color = setFG(vga_color, (uint8_t)(n - 82));
+            else if(n >= 100 && n <= 107) vga_color = setBG(vga_color, (uint8_t)(n - 92));
+            else {
+                switch(n) {
+                    case 0:
+                        vga_color = 0x0F;
+                        break;
+                    case 7: // inverse color
+                        uint8_t bg = vga_color & 0xF0>> 4;
+                        uint8_t fg = vga_color & 0x0F;
+                        vga_color = (fg << 4) | bg;
+                        break;
+                    default:
+                        i686_vga_out('_');
+                        i686_vga_out('E');
+                        break;
+                }
+            }
+        }
     }
 }
 

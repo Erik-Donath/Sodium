@@ -21,7 +21,7 @@
 
 // Escape Sequenz for colorization
 #define TS(x) #x
-#define Color(fg, bg) "\033[38;5;" TS(fg) "m\033[48;5;" TS(bg) "m"
+#define Color(fg, bg) "\033[38;5;" TS(fg) ";48;5;" TS(bg) "m"
 
 typedef struct {
     const char* name;
