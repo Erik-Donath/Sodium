@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 typedef enum {
     // Gate Types
     IDT_FLAG_GATE_TASK              = 0x5,  // Task gate

@@ -2,7 +2,7 @@
 _Static_assert(sizeof(char) == sizeof(uint8_t), "char and uint8_t must be the same size!");
 
 #include <kernel/arch/i686/vga/vga.h>
-#include <kernel/arch/i686/debug.h>
+#include <kernel/arch/i686/debug/debug.h>
 
 bool terminal_default_driver_check(void) { return true; }
 void terminal_default_driver_activate(void) { }

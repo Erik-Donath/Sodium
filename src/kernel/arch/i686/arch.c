@@ -1,9 +1,11 @@
 #include "arch.h"
 
-#include <kernel/terminal.h>
 #include "fpu/fpu.h"
 #include "gdt/gdt.h"
 #include "idt/idt.h"
+#include "mb2/mb.h"
+
+#include <kernel/terminal.h>
 
 #define dc Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
 #define gc Color(TERMINAL_COLOR_GREEN, TERMINAL_COLOR_BLACK)
