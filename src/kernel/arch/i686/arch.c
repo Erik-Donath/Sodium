@@ -31,8 +31,6 @@ void pre_main(void*) {
     welcome();
 
     ok("Terminal initialized");
-    terminal_status();
-
     okF(i686_FPU_Initialize, "FPU initialized");
     okF(i686_GDT_Initialize, "GDT initialized");
     okF(i686_IDT_Initialize, "IDT initialized");
@@ -72,12 +70,13 @@ void pre_main(void*) {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"
     };
 
-    terminal_putc('\n');
+    terminal_puts("\n\033[;48;5;0m");
     for(uint8_t fg = 0; fg <= 15; fg++) {
         terminal_puts("\033[38;5;");
         terminal_puts(table[fg]);
-        terminal_puts(";48;5;0m#\033[0m");
-        if((fg+1) % 8 == 0) terminal_putc('\n');
+    	terminal_puts("m#");
+
+        if((fg+1) % 8 == 0) terminal_puts("\033[0m\n\033[;48;5;0m");
     }
     terminal_puts("\nDONE!\n");
 

@@ -132,7 +132,6 @@ void i686_VGA_deactivate() {
 }
 
 void i686_VGA_putc(char c) {
-    outb(0xE9, c);
     switch(vga_phase) {
         case READ:
             // Handle ESCAPE Characters. Otherwise print char normaly.
@@ -267,8 +266,7 @@ void i686_VGA_parserSequnez(char operation) {
             for(uint16_t i = 0; i < params[0]; i++)
                 i686_VGA_cursor_left();
             break;
-        case 'J': {
-            uint16_t cursor = SCREEN_POS(vga_cursor_x, vga_cursor_y);
+        case 'J':
             switch(params[0]) {
                 case 0:
                     break;
@@ -281,8 +279,8 @@ void i686_VGA_parserSequnez(char operation) {
                     i686_VGA_out('E');
                     break;
             }
-            break; }
-        case 'K': {
+            break;
+        case 'K':
             switch(params[0]) {
                 case 0:
                     break;
@@ -297,7 +295,7 @@ void i686_VGA_parserSequnez(char operation) {
                     i686_VGA_out('E');
                     break;
             }
-            break; }
+            break;
         default:
             i686_VGA_out('_');
             i686_VGA_out('E');

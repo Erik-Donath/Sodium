@@ -1,35 +1,40 @@
+#include "util.h"
 #include "terminal.h"
 _Static_assert(sizeof(char) == sizeof(uint8_t), "char and uint8_t must be the same size!");
 
 #include <kernel/arch/i686/vga/vga.h>
 #include <kernel/arch/i686/debug/debug.h>
 
-bool terminal_default_driver_check(void) { return true; }
-void terminal_default_driver_activate(void) { }
-void terminal_default_driver_deactivate(void) { }
-void terminal_default_driver_putc(char) { }
-void terminal_default_driver_clear() {}
-
-static const display_driver terminal_default_driver = {
-    .name       = "Terminal Default Driver",
-    .check      = terminal_default_driver_check,
-    .activate   = terminal_default_driver_activate,
-    .deactivate = terminal_default_driver_deactivate,
-    .putc       = terminal_default_driver_putc,
-    .clear      = terminal_default_driver_clear
+static const display_driver* terminal_drivers[] = {
+    &vga_driver, &debug_driver
 };
 
-static display_driver* terminal_driver = (display_driver*)&vga_driver;
+static display_driver* terminal_active_drivers[ARRAY_SIZE(terminal_drivers)];
+static uint32_t terminal_active_driver_count;
 
 void terminal_init() {
-    if(!terminal_driver->check()) {
-        terminal_driver = (display_driver*)&terminal_default_driver;
+    terminal_active_driver_count = 0;
+    for(uint32_t i = 0; i < ARRAY_SIZE(terminal_active_drivers); i++) {
+        if(terminal_drivers[i]->check()) {
+            display_driver* driver = terminal_active_drivers[terminal_active_driver_count++] = (display_driver*)terminal_drivers[i];
+            driver->activate();
+        }
     }
-    terminal_driver->activate();
+    for(uint32_t i = terminal_active_driver_count; i < ARRAY_SIZE(terminal_active_drivers); i++)
+        terminal_active_drivers[i] = 0;
+}
+
+
+#define TS(x) #x
+#define FOR_ALL_ACTIVE_DRIVERS(var, func) { \
+    for(uint32_t i = 0; i < terminal_active_driver_count; i++) { \
+        display_driver* var = terminal_active_drivers[i]; \
+        func ;\
+    } \
 }
 
 void terminal_putc(char c) {
-    terminal_driver->putc(c);
+    FOR_ALL_ACTIVE_DRIVERS(driver, driver->putc(c));
 }
 
 void terminal_puts(const char* str) {
@@ -40,11 +45,5 @@ void terminal_puts(const char* str) {
 }
 
 void terminal_clear() {
-    terminal_driver->clear();
-}
-
-void terminal_status() {
-    terminal_puts(Color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK) "Terminal connected to '");
-    terminal_puts(terminal_driver->name);
-    terminal_puts("'" Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK) "\n");
+    FOR_ALL_ACTIVE_DRIVERS(driver, driver->clear());
 }
