@@ -47,3 +47,18 @@ void terminal_puts(const char* str) {
 void terminal_clear() {
     FOR_ALL_ACTIVE_DRIVERS(driver, driver->clear());
 }
+
+void terminal_testColor() {
+    const char* table[16] = {
+        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"
+    };
+
+    terminal_puts("\033[0;48;5;0m");
+    for(uint8_t fg = 0; fg <= 15; fg++) {
+        terminal_puts("\033[38;5;");
+        terminal_puts(table[fg]);
+    	terminal_puts("m#");
+
+        if((fg+1) % 8 == 0) terminal_puts("\033[0m\n\033[48;5;0m");
+    }
+}
