@@ -23,7 +23,7 @@ static void okF(void(*func)(void), const char* name) {
 }
 
 static void welcome() {
-    terminal_puts(dc "Welcome to " cc "Sodium" dc "!\n");
+    terminal_puts("\033[0m" dc "Welcome to " cc "Sodium" dc "!\n");
 }
 
 void pre_main(void*) {

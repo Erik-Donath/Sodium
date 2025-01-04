@@ -135,7 +135,6 @@ void i686_VGA_putc(char c) {
     switch(vga_phase) {
         case READ:
             // Handle ESCAPE Characters. Otherwise print char normaly.
-            // NOTE: \nnn and \xhh are not supported. (Oktal and Hex)
             switch(c) {
                 case '\a':
                     break;
@@ -284,8 +283,8 @@ void i686_VGA_parserSequnez(char operation) {
             switch(params[0]) {
                 case 0:
                     break;
-                case 2:
                 case 1:
+                case 2:
                     for(uint8_t x = 0; x < vga_cursor_x; x++)
                         vga_buffer[vga_cursor_y * VGA_WIDTH + x] = 0x0F20;
                     i686_VGA_cursor_set(0, vga_cursor_y);
@@ -326,10 +325,8 @@ void i686_VGA_sequenz_setGraphicsMode(uint16_t* params, uint16_t param_count) {
                     case 0:
                         vga_color = 0x0F;
                         break;
-                    case 7: // inverse color
-                        uint8_t bg = vga_color & 0xF0>> 4;
-                        uint8_t fg = vga_color & 0x0F;
-                        vga_color = (fg << 4) | bg;
+                    case 7:
+                        // TODO: Implement inverse color
                         break;
                     default:
                         i686_VGA_out('_');
