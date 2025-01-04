@@ -47,6 +47,8 @@ void pre_main(mb_info_ptr mb) {
         return;
     }
     ok("Loaded multiboot info");
+    terminal_putc('\n');
+    mb_print(mb);
 
     // Color test
     terminal_putc('\n');
