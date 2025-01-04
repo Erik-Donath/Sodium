@@ -17,8 +17,8 @@ mb_header_end:
 ; Bootcode
 section .text
     extern pre_main
+    extern i686_shutdown
     global start
-    global i686_shutdown
 start:
     ; Deactivate Interrupts (JIC)
     cli
@@ -34,46 +34,6 @@ start:
     ; Jump to the C-Kernel with the first parameter being the mb_info struct pointer (32bit pointer)
     push ebx
     call pre_main
-
-i686_shutdown:
-    ; Deactivate Interrupts
-    cli
-
-    ; Check if APM is available
-    mov ax, 5300h
-    xor bx, bx
-    int 15h
-    jc .apm_error
-
-    ; Check APM-Version (must be at least 1.1)
-    mov ax, 530Eh
-    xor bx, bx
-    mov cx, 0101h  ; Version 1.1
-    int 15h
-    jc .apm_error
-
-    ; Connect to APM
-    mov ax, 5301h
-    xor bx, bx
-    int 15h
-    jc .apm_error
-
-    ; Activate Power Managment for all devices
-    mov ax, 530Dh
-    mov bx, 0001h
-    mov cx, 0001h
-    int 15h
-    jc .apm_error
-
-    ; Shutdown System
-    mov ax, 5307h
-    mov bx, 0001h
-    mov cx, 0003h
-    int 15h
-
-    ; Failed to shutdown
-.apm_error:
-    hlt
     jmp i686_shutdown
 
 section .bss
