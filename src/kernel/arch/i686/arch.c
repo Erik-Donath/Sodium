@@ -7,21 +7,22 @@
 #include <kernel/terminal.h>
 #include <kernel/stdio.h>
 
-#define dc Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
-#define ec Color(TERMINAL_COLOR_RED, TERMINAL_COLOR_BLACK)
-#define gc Color(TERMINAL_COLOR_GREEN, TERMINAL_COLOR_BLACK)
-#define cc Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
+#define defaultColor Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
+#define errorColor Color(TERMINAL_COLOR_RED, TERMINAL_COLOR_BLACK)
+#define successColor Color(TERMINAL_COLOR_GREEN, TERMINAL_COLOR_BLACK)
+#define sodiumColor Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
+#define infoColor Color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK)
 
 static void ok(const char* msg) {
-    printf("%s[ %sOK%s ] %s\n", dc, gc, dc, msg);
+    printf("%s[ %sOK%s ] %s\n", defaultColor, successColor, defaultColor, msg);
 }
 
 static void failed(const char* msg) {
-    printf("%s[ %sFAILED%s ] %s\n", dc, ec, dc, msg);
+    printf("%s[ %sFAILED%s ] %s\n", defaultColor, errorColor, defaultColor, msg);
 }
 
 static void welcome() {
-    puts("\033[0m" dc "Welcome to " cc "Sodium" dc "!\n");
+    puts("\033[0m" defaultColor "Welcome to " sodiumColor "Sodium" defaultColor "!\n");
 }
 
 void pre_main(mb_info_ptr mb) {
@@ -44,11 +45,14 @@ void pre_main(mb_info_ptr mb) {
         return;
     }
     ok("Loaded multiboot info");
-    terminal_putc('\n');
-    const memory_info* mem_info = mb_getMemoryInfo();
+    puts(infoColor);
+    mb_print(mb);
+    puts(defaultColor);
 
+    /*
     // Print Memory Info
-    printf("Memory Info:\n\tmem_lower = %u\n\tmem_upper = %u\n\tMemory Map:\n", mem_info->mem_lower, mem_info->mem_upper);
+    const memory_info* mem_info = mb_getMemoryInfo();
+    printf("\nMemory Info:\n\tmem_lower = %u\n\tmem_upper = %u\n\tMemory Map:\n", mem_info->mem_lower, mem_info->mem_upper);
     for(uint32_t i = 0; i < mem_info->entry_count; i++) {
         memory_map_entry mem_entry = mem_info->entries[i];
         printf("\t\tTYPE = %u", mem_entry.type);
@@ -58,12 +62,13 @@ void pre_main(mb_info_ptr mb) {
         print_hex64(mem_entry.lenght, false);
         putc('\n');
     }
-    //mb_print(mb);
+    */
 
     // Color test
-    putc('\n');
+    puts("\n Stated \n\n");
     terminal_testColor();
-    puts("\nDONE!\n");
+
+    puts("\n\033[0m" defaultColor "> ");
 
     while(true) {}
 }
