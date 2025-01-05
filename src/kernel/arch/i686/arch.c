@@ -5,6 +5,7 @@
 #include "idt/idt.h"
 
 #include <kernel/terminal.h>
+#include <kernel/stdio.h>
 
 #define dc Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
 #define ec Color(TERMINAL_COLOR_RED, TERMINAL_COLOR_BLACK)
@@ -12,19 +13,15 @@
 #define cc Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
 
 static void ok(const char* msg) {
-    terminal_puts(dc "[ " gc "OK" dc " ] ");
-    terminal_puts(msg);
-    terminal_putc('\n');
+    printf("%s[ %sOK%s ] %s\n", dc, gc, dc, msg);
 }
 
 static void failed(const char* msg) {
-    terminal_puts(dc "[ " ec "FAILED" dc " ] ");
-    terminal_puts(msg);
-    terminal_putc('\n');
+    printf("%s[ %sFAILED%s ] %s\n", dc, ec, dc, msg);
 }
 
 static void welcome() {
-    terminal_puts("\033[0m" dc "Welcome to " cc "Sodium" dc "!\n");
+    puts("\033[0m" dc "Welcome to " cc "Sodium" dc "!\n");
 }
 
 void pre_main(mb_info_ptr mb) {
@@ -48,13 +45,25 @@ void pre_main(mb_info_ptr mb) {
     }
     ok("Loaded multiboot info");
     terminal_putc('\n');
-    mb_print(mb);
+    const memory_info* mem_info = mb_getMemoryInfo();
+
+    // Print Memory Info
+    printf("Memory Info:\n\tmem_lower = %u\n\tmem_upper = %u\n\tMemory Map:\n", mem_info->mem_lower, mem_info->mem_upper);
+    for(uint32_t i = 0; i < mem_info->entry_count; i++) {
+        memory_map_entry mem_entry = mem_info->entries[i];
+        printf("\t\tTYPE = %u", mem_entry.type);
+        puts(", BASE = 0x");
+        print_hex64(mem_entry.base_addr, false);
+        puts(", LENGHT = ");
+        print_hex64(mem_entry.lenght, false);
+        putc('\n');
+    }
+    //mb_print(mb);
 
     // Color test
-    terminal_putc('\n');
+    putc('\n');
     terminal_testColor();
-    terminal_puts("\nDONE!\n");
-
+    puts("\nDONE!\n");
 
     while(true) {}
 }
