@@ -3,7 +3,7 @@
 #include "fpu/fpu.h"
 #include "gdt/gdt.h"
 #include "idt/idt.h"
-#include "pic/i8259A.h"
+#include "irq/irq.h"
 
 #include <kernel/terminal.h>
 #include <kernel/stdio.h>
@@ -29,7 +29,6 @@ static void welcome() {
 static void timer(ISR_Registers*) {
     static uint32_t count = 0;
     printf("\rTimer: %d", ++count);
-    i8259A_SendSEOI(0);
 }
 
 void pre_main(mb_info_ptr mb) {
@@ -46,26 +45,31 @@ void pre_main(mb_info_ptr mb) {
     i686_IDT_Initialize();
     ok("CPU Tables initialized");
 
-    // Setup PIC
-    if(!i8259A_Check()) {
-        failed("Failed to find i8259A pic");
-        return;
-    }
-    i686_IDT_RegisterHandler(INT_TIMER, timer);
+    // Setup IRQ
+    {
+        bool success = i686_IRQ_Init();
+        if(!success) {
+            failed("Failed to initialize IRQ");
+            return;
+        }
 
-    i8259A_Enable();
-    ok("i8259A initialized");
+        i686_IRQ_RegisterHandler(INT_TIMER, timer);
+        ok("IRQ initialized");
+    }
 
     // Parse multiboot Information
-    bool success = mb_parse(mb);
-    if(!success) {
-        failed("Failed to load multiboot info");
-        return;
+    {
+        bool success = mb_parse(mb);
+        if(!success) {
+            failed("Failed to load multiboot info");
+            return;
+        }
+
+        ok("Loaded multiboot info");
+        puts(infoColor);
+        mb_print(mb);
+        puts(defaultColor);
     }
-    ok("Loaded multiboot info");
-    puts(infoColor);
-    mb_print(mb);
-    puts(defaultColor);
 
     /*
     // Print Memory Info
@@ -87,6 +91,7 @@ void pre_main(mb_info_ptr mb) {
     terminal_testColor();
 
     puts("\n\033[0m" defaultColor "> ");
+    putc('\n');
 
     while(true) {}
 }
