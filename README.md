@@ -24,21 +24,16 @@ Sodium
 ├── buildenv
 │   ├── docker-entrypoint.sh
 │   └── Dockerfile
-├── script
-│   └── Code Generation Scripts (used by Makefile)
 ├── src
 │   ├── kernel
 │   │   ├── arch/i686
 │   │   │   └── / i686 Driver and Systems /
-│   │   ├── hal
-│   │   │   └── / Hardware Abstraction Layer /
-│   │   ├── util
-│   │   │   └── / Universal Stuff /
 │   │   ├── kernel.c
 │   │   └── ...
 │   ├── boot/i686
 │   │   ├── boot.asm
-│   │   ├── multiboot.asm
+│   │   ├── multiboot.inc
+│   │   ├── shutdown.asm
 │   │   └── grub
 │   │       └── grub.cfg
 │   └── linker.ld
@@ -46,8 +41,9 @@ Sodium
 │   ├── Sodium.iso
 │   └── kernel.bin
 ├── build
-│   └── Build Directory
+│   └── /* Build Directory */
 ├── Makefile
 ├── README.md
 └── LICENSE
 ```
+s
