@@ -29,5 +29,8 @@ typedef struct {
 } __attribute__((packed)) ISR_Registers;
 
 #define DEFAULT_GATE (IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_32BIT_INT)
+typedef void (*ISRHandler)(ISR_Registers* regs);
 
 void i686_IDT_Initialize();
+void i686_IDT_RegisterHandler(uint8_t interrupt, ISRHandler handler);
+void i686_IDT_ClearHandler(uint8_t interrupt);

@@ -73,6 +73,8 @@ static const char* const ISR_Exceptions[] = {
     [29] = "VMM Communication Exception",
     [30] = "Security Exception",
     [31] = "[Reserved]"
+    // 32 - 40 => PIC 1
+    // 41 - 48 => PIC 2
 };
 
 static idt_entry idt[256];
@@ -80,6 +82,8 @@ static idt_pointer idt_ptr = {
     .limit = sizeof(idt) - 1,
     .base = idt
 };
+
+static ISRHandler handlers[256];
 
 void i686_IDT_SetGate(uint8_t num, uint32_t base, uint16_t selector, uint8_t flags) {
     idt[num] = (idt_entry){
@@ -100,7 +104,11 @@ void i686_IDT_Initialize() {
 }
 
 void ASM_CALL i686_IDT_Handler(ISR_Registers* regs) {
-    if(regs->interrupt >= 32)
+    if(handlers[regs->interrupt]) {
+        // Run Handler if registert
+        handlers[regs->interrupt](regs);
+    }
+    else if(regs->interrupt >= 32)
         printf("Unhandled interrupt %d:%d\n", regs->interrupt, regs->error);
     else {
         printf(
@@ -123,4 +131,11 @@ void ASM_CALL i686_IDT_Handler(ISR_Registers* regs) {
 
         // We fucked up!
     }
+}
+
+void i686_IDT_RegisterHandler(uint8_t interrupt, ISRHandler handler) {
+    handlers[interrupt] = handler;
+}
+void i686_IDT_ClearHandler(uint8_t interrupt) {
+    handlers[interrupt] = 0;
 }

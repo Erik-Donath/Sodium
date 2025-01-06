@@ -3,6 +3,7 @@
 #include "fpu/fpu.h"
 #include "gdt/gdt.h"
 #include "idt/idt.h"
+#include "pic/i8259A.h"
 
 #include <kernel/terminal.h>
 #include <kernel/stdio.h>
@@ -25,6 +26,12 @@ static void welcome() {
     puts("\033[0m" defaultColor "Welcome to " sodiumColor "Sodium" defaultColor "!\n");
 }
 
+static void timer(ISR_Registers*) {
+    static uint32_t count = 0;
+    printf("\rTimer: %d", ++count);
+    i8259A_SendSEOI(0);
+}
+
 void pre_main(mb_info_ptr mb) {
     // Setup CPU
     i686_FPU_Initialize();
@@ -38,6 +45,17 @@ void pre_main(mb_info_ptr mb) {
     i686_GDT_Initialize();
     i686_IDT_Initialize();
     ok("CPU Tables initialized");
+
+    // Setup PIC
+    if(!i8259A_Check()) {
+        failed("Failed to find i8259A pic");
+        return;
+    }
+    i686_IDT_RegisterHandler(INT_TIMER, timer);
+
+    i8259A_Enable();
+    ok("i8259A initialized");
+
     // Parse multiboot Information
     bool success = mb_parse(mb);
     if(!success) {

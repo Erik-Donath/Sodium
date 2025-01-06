@@ -16,3 +16,6 @@ extern uint16_t ASM_CALL i686_PORTS_inw(uint16_t port);
 #define inl(port) i686_PORTS_inl(port)
 extern void ASM_CALL i686_PORTS_outl(uint16_t port, uint32_t value);
 extern uint32_t ASM_CALL i686_PORTS_inl(uint16_t port);
+
+#define i686_PORTS_unused 0x0080
+#define iowait() outb(i686_PORTS_unused, 0)
