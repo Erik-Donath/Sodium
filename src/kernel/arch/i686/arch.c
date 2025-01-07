@@ -4,9 +4,11 @@
 #include "gdt/gdt.h"
 #include "idt/idt.h"
 #include "irq/irq.h"
+#include "memory/heap.h"
 
 #include <kernel/terminal.h>
 #include <kernel/stdio.h>
+#include <kernel/memory.h>
 
 #define defaultColor Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
 #define errorColor Color(TERMINAL_COLOR_RED, TERMINAL_COLOR_BLACK)
@@ -31,6 +33,8 @@ static void timer(ISR_Registers*) {
     printf("\rTimer: %d", ++count);
 }
 
+static void irq_void(ISR_Registers*) {}
+
 void pre_main(mb_info_ptr mb) {
     // Setup CPU
     i686_FPU_Initialize();
@@ -54,6 +58,8 @@ void pre_main(mb_info_ptr mb) {
         }
 
         i686_IRQ_RegisterHandler(INT_TIMER, timer);
+        i686_IRQ_RegisterHandler(INT_MOUSE, irq_void);
+        i686_IRQ_RegisterHandler(INT_KEYBOARD, irq_void);
         ok("IRQ initialized");
     }
 
@@ -68,26 +74,32 @@ void pre_main(mb_info_ptr mb) {
         ok("Loaded multiboot info");
         puts(infoColor);
         mb_print(mb);
-        puts(defaultColor);
+        puts(defaultColor "\n");
     }
 
-    /*
-    // Print Memory Info
-    const memory_info* mem_info = mb_getMemoryInfo();
-    printf("\nMemory Info:\n\tmem_lower = %u\n\tmem_upper = %u\n\tMemory Map:\n", mem_info->mem_lower, mem_info->mem_upper);
-    for(uint32_t i = 0; i < mem_info->entry_count; i++) {
-        memory_map_entry mem_entry = mem_info->entries[i];
-        printf("\t\tTYPE = %u", mem_entry.type);
-        puts(", BASE = 0x");
-        print_hex64(mem_entry.base_addr, false);
-        puts(", LENGHT = ");
-        print_hex64(mem_entry.lenght, false);
-        putc('\n');
+    // Init Heap
+    {
+        bool success = i686_memory_init();
+        if(!success) {
+            failed("Failed to allocate heap block");
+            return;
+        }
+
+        ok("Allocated heap block");
+        puts(infoColor);
+        i686_memory_info();
+        puts(defaultColor "\n");
+
+        void* a = i686_memory_malloc(4);
+        void* b = i686_memory_malloc(6);
+        void* c = i686_memory_malloc(100);
+        i686_memory_free(a);
+        i686_memory_free(b);
+        i686_memory_free(c);
     }
-    */
 
     // Color test
-    puts("\n Stated \n\n");
+    puts("\nStated\n\n");
     terminal_testColor();
 
     puts("\n\033[0m" defaultColor "> ");

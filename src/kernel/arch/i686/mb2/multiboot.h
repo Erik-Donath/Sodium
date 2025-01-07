@@ -6,13 +6,13 @@
 typedef const void* mb_info_ptr;
 
 // Copied from mb definition
-typedef enum {
+enum {
     MEMORY_INFO_AVAILABLE           = 1,
     MEMORY_INFOY_RESERVED           = 2,
     MEMORY_INFO_ACPI_RECLAIMABLE    = 3,
     MEMORY_INFO_NVS                 = 4,
     MEMORY_INFO_BADRAM              = 5
-} memory_entry_type;
+};
 
 typedef struct {
     uint64_t base_addr;
@@ -28,7 +28,7 @@ typedef struct {
 
     // Memory Map
     uint32_t entry_count;
-    memory_map_entry* entries; // WARN: Only valid if Bootloader is accessable / not unloaded !
+    memory_map_entry* entries; // WARN: Only valid if Bootloader is accessable / loaded !
 } memory_info;
 
 bool mb_parse(mb_info_ptr mb);

@@ -17,7 +17,7 @@ static void i686_IRQ_Handler(ISR_Registers* regs) {
         handlers[irq](regs);
     else {
         printf("Unhandled IRQ %d\n", irq);
-        printf(defaultColor "[ " warnColor "Warn " defaultColor " ] Device %d (int: 0x%X) is properly locked up\n", irq, regs->interrupt);
+        printf(defaultColor "[ " warnColor "Warn" defaultColor " ] Device %d (int: 0x%X) is properly locked up\n", irq, regs->interrupt);
     }
     i8259A_SendEOI(irq);
 }
