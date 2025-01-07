@@ -16,6 +16,8 @@
 #define sodiumColor Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
 #define infoColor Color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK)
 
+static bool terminal_initialized = false;
+
 static void ok(const char* msg) {
     printf("%s[ %sOK%s ] %s\n", defaultColor, successColor, defaultColor, msg);
 }
@@ -43,6 +45,7 @@ void pre_main(mb_info_ptr mb) {
     terminal_init();
     welcome();
     ok("Terminal initialized");
+    terminal_initialized = true;
 
     // Setup CPU Tables
     i686_GDT_Initialize();
@@ -52,10 +55,7 @@ void pre_main(mb_info_ptr mb) {
     // Setup IRQ
     {
         bool success = i686_IRQ_Init();
-        if(!success) {
-            failed("Failed to initialize IRQ");
-            return;
-        }
+        if(!success) panic("Failed to initialize IRQ");
 
         i686_IRQ_RegisterHandler(INT_TIMER, timer);
         i686_IRQ_RegisterHandler(INT_MOUSE, irq_void);
@@ -66,10 +66,7 @@ void pre_main(mb_info_ptr mb) {
     // Parse multiboot Information
     {
         bool success = mb_parse(mb);
-        if(!success) {
-            failed("Failed to load multiboot info");
-            return;
-        }
+        if(!success) panic("Failed to load multiboot info");
 
         ok("Loaded multiboot info");
         puts(infoColor);
@@ -80,10 +77,7 @@ void pre_main(mb_info_ptr mb) {
     // Init Heap
     {
         bool success = i686_memory_init();
-        if(!success) {
-            failed("Failed to allocate heap block");
-            return;
-        }
+        if(!success) panic("Failed to allocate heap block");
 
         ok("Allocated heap block");
         puts(infoColor);
@@ -106,4 +100,9 @@ void pre_main(mb_info_ptr mb) {
     putc('\n');
 
     while(true) {}
+}
+
+void NORETURN panic(const char* msg) {
+    if(terminal_initialized) failed(msg);
+    i686_shutdown();
 }

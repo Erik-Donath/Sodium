@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <kernel/stdio.h>
 
+#include "../arch.h"
 #include "../mb2/multiboot.h"
 #include "heap.h"
 
@@ -90,7 +91,6 @@ void* i686_memory_malloc(size_t size) {
         *best_fit_prev = block->next;
     }
 
-    printf("Allocated Block at 0x%X with size %d\n", (void*)block->content, block->size);
     return (void*)block->content;
 }
 
@@ -100,10 +100,8 @@ void i686_memory_free(void* ptr) {
     // Find block descriptor
     block_t* block = (block_t*)((uint8_t*)ptr - offsetof(block_t, content));
 
-    if((uint8_t*)block < heap_base || (uint8_t*)block >= heap_base + heap_size) {
-        // Attempted to free a block outside the heap boundaries.
-        return;
-    }
+    if((uint8_t*)block < heap_base || (uint8_t*)block >= heap_base + heap_size)
+        panic("Attempted to free a block outside the heap boundaries");
 
     // insert block sorted in free_list
     block_t** prev = &free_list;
@@ -115,14 +113,11 @@ void i686_memory_free(void* ptr) {
     current = block;
 
     // Coalesce adjacent free blocks
-    printf("Freeing %X\n", block);
-
     prev = &free_list;
     while(current && current->next) {
         block_t* next = current->next;
 
         if((uint8_t*)(current) + current->size + sizeof(block_t) == (uint8_t*)next) {
-            printf("\tCoalesce %X, %X\n", current, next);
             current->size += next->size + sizeof(block_t);
             current->next = next->next;
         }
