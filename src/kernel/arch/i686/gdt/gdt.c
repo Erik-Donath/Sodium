@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include <kernel/util.h>
+#include "tss.h"
 #include "gdt.h"
 
 /*
@@ -61,6 +62,13 @@ typedef enum {
     // Commonly used combinations
     GDT_ACCESS_DATA_SEGMENT             = GDT_ACCESS_CODE_DATA,
     GDT_ACCESS_CODE_SEGMENT             = GDT_ACCESS_CODE_DATA | GDT_ACCESS_EXECUTABLE,
+
+    // System segment types
+    GDT_ACCESS_TSS_AVAILABLE            = 0x09,
+    GDT_ACCESS_TSS_BUSY                 = 0x0B,
+    GDT_ACCESS_CALL_GATE                = 0x0C,
+    GDT_ACCESS_INTERRUPT_GATE           = 0x0E,
+    GDT_ACCESS_TRAP_GATE                = 0x0F
 } GDT_ACCESS;
 
 typedef enum {
@@ -90,7 +98,7 @@ typedef enum {
 
 
 // GDT Table
-static gdt_entry gdt[] = {
+static gdt_entry gdt[5] = {
     // Null descriptor
     GDT_ENTRY(0, 0, 0, 0),
     
@@ -104,7 +112,27 @@ static gdt_entry gdt[] = {
     GDT_ENTRY(0, 0xFFFFF,
         GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_DATA_SEGMENT | GDT_ACCESS_DATA_WRITEABLE,
         GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    ),
+
+    // User 32-bit code segment
+    GDT_ENTRY(0, 0xFFFFF, 
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_SEGMENT | GDT_ACCESS_CODE_READABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    ),
+    
+    // User 32-bit data segment
+    GDT_ENTRY(0, 0xFFFFF,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_DATA_SEGMENT | GDT_ACCESS_DATA_WRITEABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    ),
+
+    // TSS segment
+    /*
+    GDT_ENTRY((uint32_t)&i686_tss, sizeof(i686_tss) - 1,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_TSS_AVAILABLE,
+        0
     )
+    */
 };
 
 // GDT pointer
@@ -115,8 +143,15 @@ static gdt_pointer gdt_ptr = {
 
 // Assert that Segment positions are correct
 #define GDT_ASSERT(segment, index, expected) _Static_assert(offsetof(gdt_entry, limit_low) + sizeof(gdt_entry) * index == expected, segment " offset mismatch.")
+GDT_ASSERT("Null descriptor segment", 0, GDT_NULL_DESCRIPTOR_SEGMENT);
 GDT_ASSERT("Kernel code segment", 1, GDT_KERNEL_CODE_SEGMENT);
 GDT_ASSERT("Kernel data segment", 2, GDT_KERNEL_DATA_SEGMENT);
+GDT_ASSERT("User code segment", 3, GDT_USER_CODE_SEGMENT);
+GDT_ASSERT("User data segment", 4, GDT_USER_DATA_SEGMENT);
+//GDT_ASSERT("tss segment", 5, GDT_TSS_SEGMENT);
 
 extern void ASM_CALL i686_GDT_Flush(gdt_pointer* ptr, uint16_t codeSegment, uint16_t dataSegment);
-void i686_GDT_Initialize() { i686_GDT_Flush(&gdt_ptr, GDT_KERNEL_CODE_SEGMENT, GDT_KERNEL_DATA_SEGMENT); }
+void i686_GDT_Initialize() {
+    i686_GDT_Flush(&gdt_ptr, GDT_KERNEL_CODE_SEGMENT, GDT_KERNEL_DATA_SEGMENT);
+    //i686_TSS_Init();
+}
