@@ -83,13 +83,6 @@ void pre_main(mb_info_ptr mb) {
         puts(infoColor);
         i686_memory_info();
         puts(defaultColor "\n");
-
-        void* a = i686_memory_malloc(4);
-        void* b = i686_memory_malloc(6);
-        void* c = i686_memory_malloc(100);
-        i686_memory_free(a);
-        i686_memory_free(b);
-        i686_memory_free(c);
     }
 
     // Color test

@@ -107,6 +107,9 @@ void i686_memory_free(void* ptr) {
     block_t** prev = &free_list;
     #define current (*prev)
     while(current && current < block) {
+        if(current == block) {
+            panic("Double free detected");
+        }
         prev = &(current->next);
     }
     block->next = current;
