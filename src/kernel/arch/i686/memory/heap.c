@@ -90,7 +90,6 @@ void* i686_memory_malloc(size_t size) {
     else {
         *best_fit_prev = block->next;
     }
-
     return (void*)block->content;
 }
 
@@ -102,16 +101,22 @@ void i686_memory_free(void* ptr) {
 
     if((uint8_t*)block < heap_base || (uint8_t*)block >= heap_base + heap_size)
         panic("Attempted to free a block outside the heap boundaries");
-
-    // insert block sorted in free_list
+    
+    // Find prev block and check if block is not in free list
     block_t** prev = &free_list;
     #define current (*prev)
-    while(current && current < block) {
-        if(current == block) {
-            panic("Double free detected");
-        }
+    while(current && current <= block) {
+        if(current == block)
+            panic("Tried to double free block");
         prev = &(current->next);
     }
+
+    // validate block
+    if(prev != &free_list && (uint8_t*)current + current->size + sizeof(block_t) != (uint8_t*)block) {
+        panic("Tried to free invalid block");
+    }
+
+    // insert block sorted in free_list
     block->next = current;
     current = block;
 

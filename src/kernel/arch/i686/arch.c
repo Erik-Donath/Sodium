@@ -30,11 +30,6 @@ static void welcome() {
     puts("\033[0m" defaultColor "Welcome to " sodiumColor "Sodium" defaultColor "!\n");
 }
 
-static void timer(ISR_Registers*) {
-    static uint32_t count = 0;
-    printf("\rTimer: %d", ++count);
-}
-
 static void irq_void(ISR_Registers*) {}
 
 void pre_main(mb_info_ptr mb) {
@@ -57,7 +52,8 @@ void pre_main(mb_info_ptr mb) {
         bool success = i686_IRQ_Init();
         if(!success) panic("Failed to initialize IRQ");
 
-        i686_IRQ_RegisterHandler(INT_TIMER, timer);
+        //i686_IRQ_RegisterHandler(INT_TIMER, timer);
+        i686_IRQ_RegisterHandler(INT_TIMER, irq_void);
         i686_IRQ_RegisterHandler(INT_MOUSE, irq_void);
         i686_IRQ_RegisterHandler(INT_KEYBOARD, irq_void);
         ok("IRQ initialized");
@@ -90,7 +86,6 @@ void pre_main(mb_info_ptr mb) {
     terminal_testColor();
 
     puts("\n\033[0m" defaultColor "> ");
-    putc('\n');
 
     while(true) {}
 }
