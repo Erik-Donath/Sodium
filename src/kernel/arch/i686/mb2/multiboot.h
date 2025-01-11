@@ -17,7 +17,7 @@ enum {
 typedef struct {
     uint64_t base_addr;
     uint64_t lenght;
-    uint32_t type; // = memory_entry_type
+    uint32_t type;
     uint32_t reserved;
 } PACKED memory_map_entry;
 

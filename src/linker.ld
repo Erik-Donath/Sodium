@@ -3,6 +3,7 @@ OUTPUT_FORMAT(elf32-i386)
 
 SECTIONS {
     . = 0x00100000;
+    os_start = .;
 
     .multiboot_header ALIGN(8) : {
         KEEP(*(.multiboot_header))
@@ -24,5 +25,5 @@ SECTIONS {
     }
 
     . = ALIGN(4K);
-    end = .;
+    os_end = .;
 }

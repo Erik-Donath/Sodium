@@ -24,13 +24,31 @@ bool i686_memory_init() {
     const memory_info* mem_info = mb_getMemoryInfo();
     bool found_block = false;
 
+    uintptr_t os_start_addr = (uintptr_t)&os_start;
+    uintptr_t os_end_addr = (uintptr_t)&os_end;
+
     for(uint32_t i = 0; i < mem_info->entry_count; i++) {
         const memory_map_entry entry = mem_info->entries[i];
-        if(entry.type == MEMORY_INFO_AVAILABLE && entry.lenght >= MIN_HEAP_SIZE) {
-            heap_base = (uint8_t*)(uintptr_t)entry.base_addr;
-            heap_size = entry.lenght;
-            found_block = true;
-            break;
+
+        if(entry.type == MEMORY_INFO_AVAILABLE) {
+            uintptr_t entry_base = (uintptr_t)entry.base_addr;
+            uintptr_t entry_end = entry_base + entry.lenght;
+
+            uint8_t* base  = (uint8_t*)entry_base;
+            size_t size = (size_t)entry.lenght;
+
+            // If entry is OS entry
+            if((uintptr_t)base >= os_start_addr && (uintptr_t)base <= os_end_addr) {
+                base = (uint8_t*)(os_end_addr + 0x1000); // 4KB after OS
+                size = (size_t)(entry_end - (uintptr_t)base);
+            }
+
+            if(size >= MIN_HEAP_SIZE) {
+                heap_base = base;
+                heap_size = size;
+                found_block = true;
+                break;
+            }
         }
     }
 
