@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "terminal.h"
+
 /*
     Printf Specifier:
         %% -> %

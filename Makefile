@@ -2,7 +2,7 @@
 SRC_DIR    = src
 BUILD_DIR  = build
 DIST_DIR   = dist
-SCRIPT_DIR = script
+# SCRIPT_DIR = script
 
 # Spesific Folders
 BOOT_DIR   = $(SRC_DIR)/boot
@@ -19,9 +19,9 @@ CC  = gcc
 LD  = ld
 ASM = nasm
 
-CFLAGS    = -m32 -g -ffreestanding -std=c99 -nostartfiles -nodefaultlibs -O2 -Wall -Wextra -I$(SRC_DIR)
+CFLAGS    = -m32 -g -ffreestanding -std=c11 -nostartfiles -nodefaultlibs -O2 -Wall -Wextra -I $(SRC_DIR)
 LDFLAGS   = -m elf_i386
-ASFLAGS   = -f elf
+ASFLAGS   = -f elf32
 GRUBFLAGS = --product-version="Sodium 0.1"
 
 # Source + Headers
@@ -32,8 +32,8 @@ C_SOURCE   = $(shell find $(SRC_DIR) -name '*.c')
 
 # Add Generate Sources
 once = $(if $(filter $2,$1),$1,$1 $2)
-ASM_HEADER := $(call once, $(ASM_HEADER),$(KERNEL_DIR)/arch/i686/isr_gen.inc)
-C_SOURCE   := $(call once, $(C_SOURCE),  $(KERNEL_DIR)/arch/i686/isr_gen.c)
+# ASM_HEADER := $(call once, $(ASM_HEADER),$(KERNEL_DIR)/arch/i686/isr_gen.inc)
+# C_SOURCE   := $(call once, $(C_SOURCE),  $(KERNEL_DIR)/arch/i686/isr_gen.c)
 
 # Objects
 ASM_OBJECTS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/obj/asm/%.obj, $(ASM_SOURCE))
@@ -72,14 +72,14 @@ $(BUILD_DIR)/obj/asm/%.obj: $(SRC_DIR)/%.asm $(ASM_HEADER)
 	$(ASM) $(ASFLAGS) -o $@ $<
 
 # Sources that are generated
-$(KERNEL_DIR)/arch/i686/isr_gen.c: $(SCRIPT_DIR)/generate_isr_c.sh
-	@if [ ! -f $@ ]; then \
+#$(KERNEL_DIR)/arch/i686/isr_gen.c: $(SCRIPT_DIR)/generate_isr_c.sh
+#	@if [ ! -f $@ ]; then \
 		echo "--> Generating: $@"; \
 		$(SCRIPT_DIR)/generate_isr_c.sh $@; \
 	fi
 
-$(KERNEL_DIR)/arch/i686/isr_gen.inc: $(SCRIPT_DIR)/generate_isr_inc.sh
-	@if [ ! -f $@ ]; then \
+#$(KERNEL_DIR)/arch/i686/isr_gen.inc: $(SCRIPT_DIR)/generate_isr_inc.sh
+#	@if [ ! -f $@ ]; then \
 		echo "--> Generating: $@"; \
 		$(SCRIPT_DIR)/generate_isr_inc.sh $@; \
 	fi

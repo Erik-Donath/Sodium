@@ -4,6 +4,7 @@ bits 32
 section .multiboot_header
 align 8
 %include "src/boot/i686/multiboot2.inc"
+global mb_header_start
 
 mb_header_start:
     MB2_HEADER_START MB2_ARCH_I386, (mb_header_end - mb_header_start)
@@ -17,27 +18,15 @@ mb_header_end:
 ; Bootcode
 section .text
     extern pre_main
+    extern i686_shutdown
     global start
 start:
-    cli ; Deactivate Interrupts
+    ; Deactivate Interrupts (JIC)
+    cli
 
     ; Check Multiboot-Magic
     cmp eax, MB2_BOOTLOADER_MAGIC
-    jne .error
-
-    ; FPU initialization
-    fninit
-
-    ; Activate FPU
-    mov eax, cr0
-    and eax, 0xFFFFFFFB ; Bit 2 unset (EM)
-    or eax, 0x2         ; Bit 1 set (MP)
-    mov cr0, eax
-
-    ; Optional: FXSAVE/FXRSTOR activate (for SSE)
-    mov eax, cr4
-    or eax, 0x200       ; Bit 9 set (OSFXSR)
-    mov cr4, eax
+    jne i686_shutdown
 
     ; Creating Stack of 8KB
     mov esp, stack_top
@@ -45,11 +34,8 @@ start:
 
     ; Jump to the C-Kernel with the first parameter being the mb_info struct pointer (32bit pointer)
     push ebx
-    call pre_main ; Not expected to return
-.error:
-    cli
-    hlt
-    jmp .error
+    call pre_main
+    jmp i686_shutdown
 
 section .bss
     stack_bottom: ; Reserves 8 KB for Stack

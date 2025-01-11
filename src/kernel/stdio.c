@@ -1,14 +1,15 @@
+
 #include <stdarg.h>
 #include <stdbool.h>
 
-#include "hal/display.h"
-#include "util/arrays.h"
+#include "util.h"
+#include "terminal.h"
 #include "stdio.h"
 
 static const char numberTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 void putc(char c) {
-    DISPLAY_putc(c);
+    terminal_putc(c);
 }
 
 void puts(const char* str) {
