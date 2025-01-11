@@ -1,0 +1,48 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Docker Image",
+      "type": "shell",
+      "windows": {
+        "command": "cmd.exe",
+        "args": [
+          "/C",
+          "git status --porcelain buildenv | findstr . && docker build buildenv -t sodium-buildenv || echo No changes in buildenv, skipping Docker build"
+        ]
+      },
+      "linux": {
+        "command": "/bin/bash",
+        "args": [
+          "-c",
+          "git status --porcelain buildenv | grep -q . && docker build buildenv -t sodium-buildenv || echo 'No changes in buildenv, skipping Docker build'"
+        ]
+      }
+    },
+    {
+      "label": "Build Sodium",
+      "type": "shell",
+      "command": "docker run --rm -it -v ${workspaceFolder}:/root/env sodium-buildenv",
+      "problemMatcher": [
+        {
+          "owner": "custom",
+          "pattern": {
+            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          }
+        }
+      ],
+      "dependsOn": "Build Docker Image",
+      "dependsOrder": "sequence",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
+  

@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "command": "qemu-system-x86_64 -debugcon stdio -cdrom ${workspaceFolder}/dist/Sodium.iso",
+            "name": "Run Sodium in QEMU",
+            "request": "launch",
+            "type": "node-terminal"
+        }
+    ]
+  }
+  
