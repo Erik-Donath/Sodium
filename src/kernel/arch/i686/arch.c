@@ -35,9 +35,6 @@ static void irq_void(ISR_Registers*) {}
 extern char mb_header_start;
 
 void pre_main(mb_info_ptr mb) {
-    // Setup CPU
-    i686_FPU_Initialize();
-
     // Setup Terminal
     terminal_init();
     welcome();
@@ -45,50 +42,40 @@ void pre_main(mb_info_ptr mb) {
     terminal_initialized = true;
 
     // Setup CPU Tables
+    i686_FPU_Initialize();
     i686_GDT_Initialize();
     i686_IDT_Initialize();
     ok("CPU Tables initialized");
 
     // Setup IRQ
-    {
-        bool success = i686_IRQ_Init();
-        if(!success) panic("Failed to initialize IRQ");
-
-        //i686_IRQ_RegisterHandler(INT_TIMER, timer);
-        i686_IRQ_RegisterHandler(INT_TIMER, irq_void);
-        i686_IRQ_RegisterHandler(INT_MOUSE, irq_void);
-        i686_IRQ_RegisterHandler(INT_KEYBOARD, irq_void);
-        ok("IRQ initialized");
-    }
+    if(!i686_IRQ_Init()) panic("Failed to initialize IRQ");
+    //i686_IRQ_RegisterHandler(INT_TIMER, timer);
+    i686_IRQ_RegisterHandler(INT_TIMER, irq_void);
+    i686_IRQ_RegisterHandler(INT_MOUSE, irq_void);
+    i686_IRQ_RegisterHandler(INT_KEYBOARD, irq_void);
+    ok("IRQ initialized");
 
     // Parse multiboot Information
-    {
-        bool success = mb_parse(mb);
-        if(!success) panic("Failed to load multiboot info");
+    if(!mb_parse(mb)) panic("Failed to load multiboot info");
+    ok("Loaded multiboot info");
 
-        ok("Loaded multiboot info");
-        puts(infoColor);
-        mb_print(mb);
-        puts(defaultColor "\n");
-    }
+    // Print multiboot Information
+    puts(infoColor);
+    mb_print(mb);
+    puts(defaultColor);
 
     // Init Heap
-    {
-        bool success = i686_memory_init();
-        if(!success) panic("Failed to allocate heap block");
+    if(!i686_memory_init()) panic("Failed to allocate heap block");
+    ok("Allocated heap block");
 
-        ok("Allocated heap block");
-        puts(infoColor);
-        i686_memory_info();
-        puts(defaultColor "\n");
-    }
+    // Print Heap Information
+    puts(infoColor);
+    i686_memory_info();
+    puts(defaultColor "\n");
 
-    printf("System located at: %p\n", (void*)&mb_header_start);
-
-    // Color test
-    puts("\nStated\n\n");
+    // Finish
+    printf("System located at: %p\n\n", (void*)&mb_header_start);
     terminal_testColor();
-
     puts("\n\033[0m" defaultColor "> ");
 
     while(true) {}
