@@ -87,59 +87,9 @@ typedef enum {
     GDT_FLAG_AVAILABLE                  = 0x10
 } GDT_FLAGS;
 
-#define GDT_ENTRY(base, limit, access, flags) { \
-    (uint16_t)((limit) & 0xFFFF), \
-    (uint16_t)((base) & 0xFFFF), \
-    (uint8_t)(((base) >> 16) & 0xFF), \
-    (uint8_t)(access), \
-    (uint8_t)(((limit) >> 16) & 0x0F) | (uint8_t)((flags) & 0xF0), \
-    (uint8_t)(((base) >> 24) & 0xFF) \
-}
-
-
 // GDT Table
-static gdt_entry gdt[5] = {
-    // Null descriptor
-    GDT_ENTRY(0, 0, 0, 0),
-    
-    // Kernel 32-bit code segment
-    GDT_ENTRY(0, 0xFFFFF, 
-        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_SEGMENT | GDT_ACCESS_CODE_READABLE,
-        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
-    ),
-    
-    // Kernel 32-bit data segment
-    GDT_ENTRY(0, 0xFFFFF,
-        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_DATA_SEGMENT | GDT_ACCESS_DATA_WRITEABLE,
-        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
-    ),
-
-    // User 32-bit code segment
-    GDT_ENTRY(0, 0xFFFFF, 
-        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_SEGMENT | GDT_ACCESS_CODE_READABLE,
-        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
-    ),
-    
-    // User 32-bit data segment
-    GDT_ENTRY(0, 0xFFFFF,
-        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_DATA_SEGMENT | GDT_ACCESS_DATA_WRITEABLE,
-        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
-    ),
-
-    // TSS segment
-    /*
-    GDT_ENTRY((uint32_t)&i686_tss, sizeof(i686_tss) - 1,
-        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_TSS_AVAILABLE,
-        0
-    )
-    */
-};
-
-// GDT pointer
-static gdt_pointer gdt_ptr = {
-    .limit = sizeof(gdt) - 1,
-    .base = gdt
-};
+static gdt_entry gdt[6] = { 0 };
+static gdt_pointer gdt_ptr = { 0 };
 
 // Assert that Segment positions are correct
 #define GDT_ASSERT(segment, index, expected) _Static_assert(offsetof(gdt_entry, limit_low) + sizeof(gdt_entry) * index == expected, segment " offset mismatch.")
@@ -148,10 +98,66 @@ GDT_ASSERT("Kernel code segment", 1, GDT_KERNEL_CODE_SEGMENT);
 GDT_ASSERT("Kernel data segment", 2, GDT_KERNEL_DATA_SEGMENT);
 GDT_ASSERT("User code segment", 3, GDT_USER_CODE_SEGMENT);
 GDT_ASSERT("User data segment", 4, GDT_USER_DATA_SEGMENT);
-//GDT_ASSERT("tss segment", 5, GDT_TSS_SEGMENT);
+GDT_ASSERT("tss segment", 5, GDT_TSS_SEGMENT);
+
+void i686_GDT_SetGate(uint8_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t flags) {
+    gdt[num] = (gdt_entry) {
+        .limit_low = (uint16_t)((limit) & 0xFFFF),
+        .base_low  = (uint16_t)((base)  & 0xFFFF),
+        .base_middle = (uint8_t)(((base) >> 16) & 0xFF),
+        .access = (uint8_t)access,
+        .granularity = (uint8_t)(((limit) >> 16) & 0x0F) | (uint8_t)((flags) & 0xF0),
+        .base_high = (uint8_t)(((base) >> 24) & 0xFF),
+    };
+}
 
 extern void ASM_CALL i686_GDT_Flush(gdt_pointer* ptr, uint16_t codeSegment, uint16_t dataSegment);
+void i686_TSS_Init();
+
 void i686_GDT_Initialize() {
-    i686_GDT_Flush(&gdt_ptr, GDT_KERNEL_CODE_SEGMENT, GDT_KERNEL_DATA_SEGMENT);
+    // Null descriptor
+    i686_GDT_SetGate(0,
+        0, 0,
+        0, 0
+    );
+    // Kernel 32-bit code segment
+    i686_GDT_SetGate(1,
+        0, 0xFFFFF, 
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_SEGMENT | GDT_ACCESS_CODE_READABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    );
+    // Kernel 32-bit data segment
+    i686_GDT_SetGate(2,
+        0, 0xFFFFF,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_DATA_SEGMENT | GDT_ACCESS_DATA_WRITEABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    );
+    // User 32-bit code segment
+    i686_GDT_SetGate(3,
+        0, 0xFFFFF, 
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_SEGMENT | GDT_ACCESS_CODE_READABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    );
+    // User 32-bit data segment
+    i686_GDT_SetGate(4,
+        0, 0xFFFFF,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_DATA_SEGMENT | GDT_ACCESS_DATA_WRITEABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    );
+
+    // TSS segment
+    i686_GDT_SetGate(5,
+        (uint32_t)&i686_tss, (uint32_t)sizeof(tss_entry) - 1,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_TSS_AVAILABLE,
+        0
+    );
+
+    gdt_ptr = (gdt_pointer) {
+        .limit = sizeof(gdt) - 1,
+        .base = gdt
+    };
+
     //i686_TSS_Init();
+    i686_GDT_Flush(&gdt_ptr, GDT_KERNEL_CODE_SEGMENT, GDT_KERNEL_DATA_SEGMENT);
+    i686_TSS_Init();
 }

@@ -4,6 +4,7 @@ bits 32
 section .multiboot_header
 align 8
 %include "src/boot/i686/multiboot2.inc"
+global mb_header_start
 
 mb_header_start:
     MB2_HEADER_START MB2_ARCH_I386, (mb_header_end - mb_header_start)

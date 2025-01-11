@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <kernel/util.h>
 
 #include "tss.h"
 #include "gdt.h"
@@ -15,12 +16,11 @@ enum {
     TI_LDT  = 0x04,
 };
 
-tss_entry i686_tss;
+tss_entry i686_tss = (tss_entry){ 0 };
 
 void i686_TSS_Flush(uint16_t tssSegment);
 
 void i686_TSS_Init() {
-    i686_tss = (tss_entry){ 0 };
     i686_tss.ss0 = GDT_KERNEL_DATA_SEGMENT;
     i686_tss.esp0 = 0;
     i686_tss.cs  = GDT_KERNEL_CODE_SEGMENT | RPL3;

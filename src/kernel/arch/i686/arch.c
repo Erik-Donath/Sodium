@@ -32,6 +32,8 @@ static void welcome() {
 
 static void irq_void(ISR_Registers*) {}
 
+extern char mb_header_start;
+
 void pre_main(mb_info_ptr mb) {
     // Setup CPU
     i686_FPU_Initialize();
@@ -80,6 +82,8 @@ void pre_main(mb_info_ptr mb) {
         i686_memory_info();
         puts(defaultColor "\n");
     }
+
+    printf("System located at: %p\n", (void*)&mb_header_start);
 
     // Color test
     puts("\nStated\n\n");
