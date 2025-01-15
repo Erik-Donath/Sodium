@@ -1,4 +1,7 @@
+#include <stddef.h>
 #pragma once
+
+void *memset(void *dest, int val, size_t len);
 
 // ASN_CALL used when Assembly calls this funktion in C and C_CALL when C calls a funktion in Assembly
 #define ASM_CALL __attribute__((cdecl))

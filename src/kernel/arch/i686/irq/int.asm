@@ -14,3 +14,5 @@ i686_IRQ_Disable:
     ; None
     cli
     ret
+
+section .note.GNU-stack noalloc noexec nowrite progbits

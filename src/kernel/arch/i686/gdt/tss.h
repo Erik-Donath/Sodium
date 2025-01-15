@@ -46,5 +46,3 @@ typedef struct {
 } PACKED tss_entry;
 
 extern tss_entry i686_tss;
-
-void i686_TSS_Init();
