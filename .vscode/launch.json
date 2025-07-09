@@ -1,12 +1,69 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Sodium",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "qemu-system-x86_64 -debugcon stdio -cdrom ${workspaceFolder}/dist/Sodium.iso"
+    },
+    {
+      "name": "Run QEMU Debug Mode",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "qemu-system-x86_64 -s -S -debugcon stdio -cdrom ${workspaceFolder}/dist/Sodium.iso"
+    },
+    {
+      "name": "Debug with GDB",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/dist/kernel.bin",
+      "cwd": "${workspaceFolder}",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "miDebuggerServerAddress": "localhost:1234",
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "setupCommands": [
         {
-            "command": "qemu-system-x86_64 -debugcon stdio -cdrom ${workspaceFolder}/dist/Sodium.iso; exit",
-            "name": "Run Sodium in QEMU",
-            "request": "launch",
-            "type": "node-terminal"
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Set disassembly flavor to Intel",
+          "text": "set disassembly-flavor intel",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Set architecture to i386",
+          "text": "set architecture i386",
+          "ignoreFailures": true
         }
-    ]
-  }
-  
+      ],
+      "preLaunchTask": "run-qemu-debug"
+    },
+    {
+      "name": "Debug with Native GDB",
+      "type": "gdb",
+      "request": "launch",
+      "target": "${workspaceFolder}/dist/kernel.bin",
+      "cwd": "${workspaceFolder}",
+      "gdbpath": "gdb",
+      "autorun": [
+        "target remote localhost:1234",
+        "symbol-file ${workspaceFolder}/dist/kernel.bin",
+        "file ${workspaceFolder}/dist/kernel.bin",
+        "set disassembly-flavor intel",
+        "set architecture i386"
+      ]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Sodium with GDB",
+      "configurations": ["Run QEMU Debug Mode", "Debug with GDB"],
+      "stopAll": true
+    }
+  ]
+}

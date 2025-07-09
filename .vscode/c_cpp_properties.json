@@ -1,0 +1,38 @@
+{
+  "configurations": [
+    {
+      "name": "Sodium Kernel",
+      "includePath": [
+        "${workspaceFolder}/src/**"
+      ],
+      "defines": [
+        "__KERNEL__",
+        "__i386__",
+        "PACKED=__attribute__((packed))",
+        "NORETURN=__attribute__((noreturn))",
+        "ASM_CALL=__attribute__((cdecl))"
+      ],
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "c11",
+      "intelliSenseMode": "gcc-x86",
+      "compilerArgs": [
+        "-m32",
+        "-ffreestanding",
+        "-nostdlib",
+        "-fno-builtin",
+        "-fno-stack-protector",
+        "-nostartfiles",
+        "-nodefaultlibs",
+        "-Wall",
+        "-Wextra"
+      ],
+      "browse": {
+        "path": [
+          "${workspaceFolder}/src"
+        ],
+        "limitSymbolsToIncludedHeaders": true
+      }
+    }
+  ],
+  "version": 4
+}

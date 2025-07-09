@@ -1,0 +1,34 @@
+{
+  "files.associations": {
+    "*.asm": "asm-intel-x86-generic",
+    "*.inc": "asm-intel-x86-generic",
+    "*.ld": "linkerscript"
+  },
+  "C_Cpp.default.cStandard": "c11",
+  "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+  "C_Cpp.default.intelliSenseMode": "gcc-x86",
+  "C_Cpp.errorSquiggles": "enabled",
+  "C_Cpp.autocomplete": "default",
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "editor.rulers": [80, 120],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "search.exclude": {
+    "**/build/**": true,
+    "**/dist/**": true,
+    "**/.git/**": true
+  },
+  "files.exclude": {
+    "**/build/**": true,
+    "**/.git/**": true
+  },
+  "makefile.configureOnOpen": true,
+  "makefile.makeDirectory": "${workspaceFolder}",
+  "makefile.makePath": "make",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.windows": "Command Prompt"
+}
