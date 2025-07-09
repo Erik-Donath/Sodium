@@ -2,24 +2,29 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "docker-build",
+      "type": "shell",
       "label": "docker-build-buildenv",
-      "dockerBuild": {
-        "context": "${workspaceFolder}",
-        "dockerfile": "${workspaceFolder}/buildenv/Dockerfile",
-        "tag": "sodium-buildenv"
-      },
+      "command": "docker",
+      "args": [
+        "build",
+        "-t",
+        "sodium-buildenv",
+        "-f",
+        "${workspaceFolder}/buildenv/Dockerfile",
+        "${workspaceFolder}"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "silent",
         "focus": false,
         "panel": "shared"
-      }
+      },
+      "problemMatcher": []
     },
     {
       "type": "shell",
-      "label": "build-sodium",
+      "label": "Build Sodium",
       "dependsOn": ["docker-build-buildenv"],
       "command": "docker",
       "args": [
@@ -85,8 +90,8 @@
         "--rm",
         "-v",
         "${workspaceFolder}:/root/env:Z",
+        "--entrypoint=make",
         "sodium-buildenv",
-        "make",
         "debug"
       ],
       "group": "build",
@@ -120,8 +125,8 @@
         "--rm",
         "-v",
         "${workspaceFolder}:/root/env:Z",
+        "--entrypoint=make",
         "sodium-buildenv",
-        "make",
         "clean"
       ],
       "group": "build",
@@ -143,7 +148,7 @@
         "${workspaceFolder}/dist/Sodium.iso"
       ],
       "group": "test",
-      "dependsOn": ["build-sodium"],
+      "dependsOn": ["Build Sodium"],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -170,6 +175,20 @@
         "reveal": "always",
         "focus": true,
         "panel": "new"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": ".*waiting for gdb connection.*"
+        }
       }
     },
     {
@@ -181,8 +200,8 @@
         "--rm",
         "-v",
         "${workspaceFolder}:/root/env:Z",
+        "--entrypoint=make",
         "sodium-buildenv",
-        "make",
         "info"
       ],
       "group": "build",
