@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <kernel/stdio.h>
+#include "kernel/libc/stdio.h"
 
 #include "definition.h"
 #include "multiboot.h"
@@ -21,7 +21,7 @@ bool mb_parse(mb_info_ptr mb) {
     mb2_tag* tag = header->tags;
     if(!header || header->reserved)
         return false;
-    
+
     while((uint8_t*)tag < (uint8_t*)header + header->total_size) {
         switch(tag->type) {
             case MB_TAG_BASIC_MEMORY_INFORMATION:

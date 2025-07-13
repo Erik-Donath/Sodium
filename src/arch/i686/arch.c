@@ -7,9 +7,9 @@
 #include "memory/heap/heap.h"
 #include "boot/multiboot.h"
 
-#include "kernel/terminal.h"
-#include "kernel/stdio.h"
-#include "kernel/memory.h"
+#include "kernel/core/terminal.h"
+#include "kernel/libc/stdio.h"
+#include "kernel/memory/memory.h"
 
 #define defaultColor Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
 #define errorColor Color(TERMINAL_COLOR_RED, TERMINAL_COLOR_BLACK)

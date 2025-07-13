@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include "util.h"
-#include "terminal.h"
+#include "../core/terminal.h"
 #include "stdio.h"
 
 static const char numberTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -24,7 +24,7 @@ void print_signed(int32_t value, uint8_t radix) {
         putc('-');
         print_unsigned((uint32_t)(-value), radix);
     }
-    else 
+    else
         print_unsigned((uint32_t)value, radix);
 }
 
@@ -73,7 +73,7 @@ void printf(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     bool inOp = false;
-    
+
     while(*fmt) {
         if(inOp) {
             switch(*fmt) {
@@ -113,11 +113,11 @@ void printf(const char* fmt, ...) {
                     break;
             }
             inOp = false;
-        } 
+        }
         else if (*fmt == '%')
             inOp = true;
         else
-            putc(*fmt); 
+            putc(*fmt);
         fmt++;
     }
 

@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "kernel/stdio.h"
+#include "kernel/libc/stdio.h"
 
 #include "../../arch.h"
 #include "../../boot/multiboot.h"

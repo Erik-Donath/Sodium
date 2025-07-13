@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "terminal.h"
+#include "../core/terminal.h"
 
 /*
     Printf Specifier:

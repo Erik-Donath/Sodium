@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include <kernel/util.h>
+#include <kernel/libc/util.h>
 
 #define outb(port, value) i686_PORTS_outb(port, value)
 #define inb(port) i686_PORTS_inb(port)

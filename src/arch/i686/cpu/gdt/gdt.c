@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <kernel/util.h>
+#include <kernel/libc/util.h>
 #include "tss.h"
 #include "gdt.h"
 
@@ -122,7 +122,7 @@ void i686_GDT_Initialize() {
     );
     // Kernel 32-bit code segment
     i686_GDT_SetGate(1,
-        0, 0xFFFFF, 
+        0, 0xFFFFF,
         GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_SEGMENT | GDT_ACCESS_CODE_READABLE,
         GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
     );
@@ -134,7 +134,7 @@ void i686_GDT_Initialize() {
     );
     // User 32-bit code segment
     i686_GDT_SetGate(3,
-        0, 0xFFFFF, 
+        0, 0xFFFFF,
         GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_SEGMENT | GDT_ACCESS_CODE_READABLE,
         GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
     );

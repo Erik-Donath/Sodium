@@ -1,5 +1,5 @@
 #pragma once
-#include <kernel/terminal.h>
+#include "kernel/core/terminal.h"
 
 extern const display_driver debug_driver;
 

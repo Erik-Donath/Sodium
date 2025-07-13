@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#include <kernel/stdio.h>
-#include <kernel/util.h>
+#include <kernel/libc/stdio.h>
+#include <kernel/libc/util.h>
 
 #include "../gdt/gdt.h"
 #include "idt.h"

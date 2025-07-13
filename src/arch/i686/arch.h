@@ -1,5 +1,5 @@
 #pragma once
-#include "kernel/util.h"
+#include "kernel/libc/util.h"
 #include "boot/multiboot.h"
 
 #define NORETURN __attribute__((noreturn))

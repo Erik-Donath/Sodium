@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <kernel/util.h>
+#include <kernel/libc/util.h>
 
 #include "tss.h"
 #include "gdt.h"
@@ -24,9 +24,9 @@ void i686_TSS_Init() {
     memset(&i686_tss, 0, sizeof(tss_entry));
     i686_tss.ss0 = GDT_KERNEL_DATA_SEGMENT;
     i686_tss.esp0 = 0;
-    
+
     i686_tss.cs  = GDT_KERNEL_CODE_SEGMENT | RPL3;
     i686_tss.ds = i686_tss.es = i686_tss.fs = i686_tss.gs = i686_tss.ss = GDT_KERNEL_DATA_SEGMENT | RPL3;
 
-    i686_TSS_Flush(GDT_TSS_SEGMENT | TI_GDT | RPL3);    
+    i686_TSS_Flush(GDT_TSS_SEGMENT | TI_GDT | RPL3);
 }

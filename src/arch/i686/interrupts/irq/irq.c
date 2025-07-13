@@ -1,4 +1,4 @@
-#include "kernel/stdio.h"
+#include "kernel/libc/stdio.h"
 
 #include "../../cpu/idt/idt.h"
 #include "i8259A/pic.h"

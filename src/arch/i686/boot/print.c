@@ -1,4 +1,4 @@
-#include <kernel/stdio.h>
+#include "kernel/libc/stdio.h"
 
 #include "definition.h"
 #include "multiboot.h"
@@ -40,7 +40,7 @@ void mb_print(mb_info_ptr mb) {
         const char* tag_name = mb_info_tag_name_unknown;
         if(tag->type < 23)
             tag_name = mb_info_tag_name_table[tag->type];
-        
+
         printf("Entry at %p %s(%u) with %u bytes\n", tag, tag_name, tag->type, tag->size);
         switch(tag->type) {
             case MB_TAG_END_OF_MULTIBOOT_INFO:
@@ -142,7 +142,7 @@ void mb_print(mb_info_ptr mb) {
                 );
                 break;
             case MB_TAG_EFI_BOOT_SERVICES_NOT_TERMINATED:
-                /* 
+                /*
                     IMPORTANT: Indication that ExitBootServices() wasn’t called.
                     KERNEL_PANIC ?
                 */

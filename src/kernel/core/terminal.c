@@ -1,4 +1,4 @@
-#include "util.h"
+#include "../libc/util.h"
 #include "terminal.h"
 _Static_assert(sizeof(char) == sizeof(uint8_t), "char and uint8_t must be the same size!");
 
