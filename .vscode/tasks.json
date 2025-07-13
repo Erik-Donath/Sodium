@@ -3,7 +3,7 @@
   "tasks": [
     {
       "type": "shell",
-      "label": "docker-build-buildenv",
+      "label": "build-buildenv",
       "command": "docker",
       "args": [
         "build",
@@ -24,7 +24,7 @@
     },
     {
       "type": "shell",
-      "label": "Build Sodium",
+      "label": "build",
       "dependsOn": ["docker-build-buildenv"],
       "command": "docker",
       "args": [
@@ -154,41 +154,6 @@
         "reveal": "always",
         "focus": true,
         "panel": "new"
-      }
-    },
-    {
-      "type": "shell",
-      "label": "run-qemu-debug",
-      "command": "qemu-system-x86_64",
-      "args": [
-        "-s",
-        "-S",
-        "-debugcon",
-        "stdio",
-        "-cdrom",
-        "${workspaceFolder}/dist/Sodium.iso"
-      ],
-      "group": "test",
-      "dependsOn": ["build-debug"],
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "new"
-      },
-      "isBackground": true,
-      "problemMatcher": {
-        "pattern": {
-          "regexp": "^.*$",
-          "file": 1,
-          "location": 2,
-          "message": 3
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": ".*",
-          "endsPattern": ".*waiting for gdb connection.*"
-        }
       }
     },
     {

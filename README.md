@@ -81,16 +81,6 @@ qemu-system-x86_64 -debugcon stdio -cdrom dist/Sodium.iso
 
 ## Development
 
-### VSCode Setup
-
-The project includes complete VSCode configuration with:
-
-- **IntelliSense** for C/C++ with kernel-specific settings
-- **Build tasks** for debug/release builds
-- **Debugging support** with GDB integration
-- **Problem matchers** for compiler errors
-- **Assembly syntax highlighting**
-
 ### Available Make Targets
 
 ```bash
@@ -101,12 +91,6 @@ make clean    # Clean build artifacts
 make info     # Show source file information
 make help     # Show all available targets
 ```
-
-### Debugging
-
-1. Build in debug mode: **Ctrl+Shift+P** → "Tasks: Run Task" → "build-debug"
-2. Start debugging: **F5** → "Debug Sodium with GDB"
-3. QEMU will start in debug mode, GDB will attach automatically
 
 ### Project Structure
 
@@ -178,7 +162,6 @@ Sodium/
 - Use `make clean` before rebuilding after major changes
 - Test in both debug and release modes
 - Keep backup of working versions before major refactoring
-- Use GDB for step-by-step debugging of kernel issues
 
 ### Getting Help
 

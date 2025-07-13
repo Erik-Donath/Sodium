@@ -6,24 +6,7 @@
       "type": "node-terminal",
       "request": "launch",
       "command": "qemu-system-x86_64 -debugcon stdio -cdrom ${workspaceFolder}/dist/Sodium.iso",
-      "preLaunchTask": "Build Sodium"
-    },
-    {
-      "name": "Debug Sodium with GDB",
-      "type": "gdb",
-      "request": "launch",
-      "target": "${workspaceFolder}/dist/kernel.bin",
-      "cwd": "${workspaceFolder}",
-      "gdbpath": "gdb",
-      "autorun": [
-        "target remote localhost:1234",
-        "symbol-file ${workspaceFolder}/dist/kernel.bin",
-        "set disassembly-flavor intel",
-        "set architecture i8086",
-        "break _start"
-      ],
-      "preLaunchTask": "run-qemu-debug",
-      "stopAtEntry": false
+      "preLaunchTask": "build"
     }
   ]
 }

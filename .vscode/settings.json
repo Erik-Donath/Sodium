@@ -19,5 +19,11 @@
     "**/.git/**": true
   },
   "makefile.configureOnOpen": true,
-  "debug.allowBreakpointsEverywhere": true
+  "debug.allowBreakpointsEverywhere": true,
+  "debug.inlineValues": "on",
+  "debug.showBreakpointsInOverviewRuler": true,
+  "debug.openDebug": "openOnDebugBreak",
+  "debug.focusWindowOnBreak": true,
+  "debug.console.fontSize": 12,
+  "debug.console.fontFamily": "Consolas, 'Courier New', monospace"
 }
