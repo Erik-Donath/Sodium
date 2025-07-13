@@ -185,7 +185,6 @@ This document outlines the development progress and future plans for the Sodium 
 
 ### Research & Development
 
-- [ ] **Rust Integration** - Experiment with Rust for kernel components
 - [ ] **Formal Verification** - Verify critical kernel components
 - [ ] **Container Support** - Lightweight virtualization
 - [ ] **Real-time Scheduling** - Hard real-time task support
@@ -205,13 +204,6 @@ This document outlines the development progress and future plans for the Sodium 
 - [ ] **Documentation Coverage** - Document all public APIs
 - [ ] **Static Analysis** - Zero warnings from static analysis tools
 - [ ] **Performance Benchmarks** - Establish baseline performance metrics
-
-### Community & Contribution Goals
-
-- [ ] **Contributor Guidelines** - Clear contribution process
-- [ ] **Code Review Process** - Systematic code review workflow
-- [ ] **Issue Tracking** - Organized issue management
-- [ ] **Release Process** - Regular, versioned releases
 
 ## 🎓 Learning & Educational Goals
 
