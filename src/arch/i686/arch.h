@@ -1,6 +1,6 @@
 #pragma once
 #include "kernel/libc/util.h"
-#include "boot/multiboot.h"
+#include "boot/multiboot2/multiboot.h"
 
 #define NORETURN __attribute__((noreturn))
 

@@ -3,6 +3,8 @@
 #include "definition.h"
 #include "multiboot.h"
 
+#include "../smbios/smbios.h"
+
 static const char* mb_info_tag_name_unknown = "UNKNOWN";
 static const char* mb_info_tag_name_table[23] = {
     "END_OF_MULTIBOOT_INFO",
@@ -121,6 +123,9 @@ void mb_print(mb_info_ptr mb) {
             case MB_TAG_SMBIOS_TABLES:
                 mb2_tag_smbios_tables* smbios = (mb2_tag_smbios_tables*)tag;
                 printf("\tmajor = %u\n\tminor = %u\n\tsmbios_tables size: %u", smbios->major, smbios->minor, tag->size - sizeof(mb2_tag_smbios_tables));
+
+                printf("SMBIOS TABLE: ");
+                smbios_print(*smbios->smbios_tables, tag->size - sizeof(mb2_tag_smbios_tables));
                 break;
             case MB_TAG_ACPI_OLD_RSDP:
                 mb2_tag_acpi_old_rsdp* acpi_old_rsdp = (mb2_tag_acpi_old_rsdp*)tag;

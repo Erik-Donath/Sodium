@@ -2,7 +2,7 @@
 #include "kernel/libc/stdio.h"
 
 #include "../../arch.h"
-#include "../../boot/multiboot.h"
+#include "../../boot/multiboot2/multiboot.h"
 #include "heap.h"
 
 

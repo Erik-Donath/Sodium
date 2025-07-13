@@ -5,7 +5,7 @@
 #include "cpu/idt/idt.h"
 #include "interrupts/irq/irq.h"
 #include "memory/heap/heap.h"
-#include "boot/multiboot.h"
+#include "boot/multiboot2/multiboot.h"
 
 #include "kernel/core/terminal.h"
 #include "kernel/libc/stdio.h"
