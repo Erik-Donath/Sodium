@@ -1,9 +1,9 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
-#include <kernel/util.h>
+#include "kernel/util.h"
 
-#include "../idt/idt.h"
+#include "../../cpu/idt/idt.h"
 
 // PIC1 - Master (IRQs 0-7)
 #define INT_TIMER           0    // IRQ 0 - Programmable Interval Timer

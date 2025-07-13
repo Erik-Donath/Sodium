@@ -1,4 +1,4 @@
-#include "../ports.h"
+#include "../../cpu/ports.h"
 #include "vga.h"
 
 #define VGA_BUFFER 0xB8000
@@ -116,7 +116,7 @@ void i686_VGA_activate() {
         [23] = 0xA3,  // CRTC Mode Control
         [24] = 0xFF   // Line Compare
     }; // 80*25 text mode
-    
+
     for (uint8_t i = 0; i < sizeof(crtc_regs); i++) {
         outb(VGA_CRTC_ADDRESS_PORT, i);
         outb(VGA_CRTC_DATA_PORT, crtc_regs[i]);
@@ -230,7 +230,7 @@ void i686_VGA_parserSequnez(char operation) {
     uint16_t params[VGA_SEQUENZ_MAX + 1]; // Worst case: ;;; n times.
     uint16_t param_value = 0;
     uint8_t  param_count = 0;
-    
+
     for(uint8_t i = 0; i < vga_sequenz_lenght; i++) {
         if(vga_sequenz[i] == ';') {
             params[param_count++] = param_value;

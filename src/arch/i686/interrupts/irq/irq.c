@@ -1,6 +1,6 @@
-#include <kernel/stdio.h>
+#include "kernel/stdio.h"
 
-#include "../idt/idt.h"
+#include "../../cpu/idt/idt.h"
 #include "i8259A/pic.h"
 #include "irq.h"
 

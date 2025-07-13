@@ -101,9 +101,26 @@ Sodium/
 ├── scripts/              # Helper scripts
 ├── src/
 │   ├── boot/i686/        # Boot code and GRUB config
-│   ├── kernel/           # Kernel source code
-│   │   ├── arch/i686/    # i686-specific code
-│   │   ├── *.c *.h       # Generic kernel code
+│   ├── kernel/           # Generic kernel code
+│   │   ├── *.c *.h       # Core kernel functionality
+│   │   ├── terminal.c/h  # Terminal abstraction
+│   │   ├── stdio.c/h     # Standard I/O functions
+│   │   └── util.c/h      # Utility functions
+│   ├── arch/i686/        # i686-specific implementation
+│   │   ├── arch.c/h      # Architecture initialization
+│   │   ├── cpu/          # CPU management
+│   │   │   ├── gdt/      # Global Descriptor Table
+│   │   │   ├── idt/      # Interrupt Descriptor Table
+│   │   │   ├── fpu/      # Floating Point Unit
+│   │   │   └── ports.*   # Port I/O operations
+│   │   ├── interrupts/   # Interrupt handling
+│   │   │   └── irq/      # IRQ management and PIC
+│   │   ├── memory/       # Memory management
+│   │   │   └── heap/     # Heap allocator
+│   │   ├── drivers/      # Hardware drivers
+│   │   │   ├── vga/      # VGA text mode driver
+│   │   │   └── debug/    # Debug output driver
+│   │   └── boot/         # Multiboot2 support
 │   └── linker.ld         # Linker script
 ├── build/                # Build artifacts (generated)
 ├── dist/                 # Output files (generated)
@@ -111,6 +128,39 @@ Sodium/
 │   └── Sodium.iso        # Bootable ISO
 └── Makefile              # Build system
 ```
+
+## Architecture Overview
+
+Sodium follows a layered architecture with clear separation between generic kernel code and architecture-specific implementations:
+
+### **Generic Kernel Layer** (`src/kernel/`)
+
+- **Core functionality** that works across different architectures
+- **Driver interfaces** and abstractions
+- **Standard library** functions (stdio, string utilities)
+- **Terminal management** with multi-driver support
+
+### **Architecture Layer** (`src/arch/i686/`)
+
+- **Hardware-specific implementations** for i686 processors
+- **CPU management** (GDT, IDT, FPU setup)
+- **Interrupt handling** (IRQ routing, PIC management)
+- **Memory management** (heap allocation, future paging)
+- **Hardware drivers** (VGA, debug output, future keyboard/timer)
+- **Boot support** (Multiboot2 parsing and information)
+
+### **Boot Layer** (`src/boot/i686/`)
+
+- **Assembly boot code** and multiboot2 header
+- **GRUB configuration** and bootloader setup
+- **Early system initialization** before kernel handoff
+
+This structure makes it easy to:
+
+- **Add new architectures** (ARM, x86_64, RISC-V)
+- **Implement new drivers** following established interfaces
+- **Maintain and debug** with clear module boundaries
+- **Test components** independently
 
 ## Troubleshooting
 

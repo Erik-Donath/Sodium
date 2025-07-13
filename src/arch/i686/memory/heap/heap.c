@@ -1,8 +1,8 @@
 #include <stdint.h>
-#include <kernel/stdio.h>
+#include "kernel/stdio.h"
 
-#include "../arch.h"
-#include "../mb2/multiboot.h"
+#include "../../arch.h"
+#include "../../boot/multiboot.h"
 #include "heap.h"
 
 
@@ -119,7 +119,7 @@ void i686_memory_free(void* ptr) {
 
     if((uint8_t*)block < heap_base || (uint8_t*)block >= heap_base + heap_size)
         panic("Attempted to free a block outside the heap boundaries");
-    
+
     // Find prev block and check if block is not in free list
     block_t** prev = &free_list;
     #define current (*prev)

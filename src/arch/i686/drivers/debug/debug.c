@@ -1,4 +1,4 @@
-#include "../ports.h"
+#include "../../cpu/ports.h"
 #include "debug.h"
 
 const display_driver debug_driver = {

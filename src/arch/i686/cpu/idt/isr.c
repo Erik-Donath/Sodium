@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "idt.h"
-#include <kernel/arch/i686/gdt/gdt.h>
+#include "../gdt/gdt.h"
 
 extern void i686_ISR_0();
 extern void i686_ISR_1();

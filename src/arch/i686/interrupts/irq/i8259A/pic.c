@@ -1,8 +1,8 @@
-#include "../../ports.h"
+#include "../../../cpu/ports.h"
 #include "pic.h"
 
 /*
-Layout: 
+Layout:
 | Pin Group               | Pins      | Description                                                                           |
 |-------------------------|-----------|---------------------------------------------------------------------------------------|
 | Interrupt Request Lines | IR0-IR7   | 8 input lines for interrupt requests from external devices                            |
@@ -41,7 +41,7 @@ enum {
     CMD_END_OF_INTERRUPT            = 0x20,
     CMD_SPESIFIC_END_OF_INTERRUPT   = 0x60,
     CMD_READ_IRR                    = 0x0A,
-    CMD_READ_ISR                    = 0x0B 
+    CMD_READ_ISR                    = 0x0B
 };
 
 bool i8259A_Check() {

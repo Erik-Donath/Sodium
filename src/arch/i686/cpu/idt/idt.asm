@@ -1,7 +1,7 @@
 bits 32
 section .text
 
-%include "src/kernel/arch/i686/idt/isr.inc"
+%include "src/arch/i686/cpu/idt/isr.inc"
 
 extern i686_IDT_Handler
 %define GDT_KERNEL_DATA_SEGMENT 0x10
