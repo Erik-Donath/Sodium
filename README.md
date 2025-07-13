@@ -102,10 +102,15 @@ Sodium/
 ├── src/
 │   ├── boot/i686/        # Boot code and GRUB config
 │   ├── kernel/           # Generic kernel code
-│   │   ├── *.c *.h       # Core kernel functionality
-│   │   ├── terminal.c/h  # Terminal abstraction
-│   │   ├── stdio.c/h     # Standard I/O functions
-│   │   └── util.c/h      # Utility functions
+│   │   ├── core/         # Core kernel functionality
+│   │   │   └── terminal.*# Terminal abstraction layer
+│   │   ├── libc/         # Standard library functions
+│   │   │   ├── stdio.*   # Standard I/O functions
+│   │   │   └── util.*    # Utility functions and macros
+│   │   ├── memory/       # Memory management interfaces
+│   │   │   └── memory.h  # Memory allocation interface
+│   │   ├── drivers/      # Driver interfaces (future expansion)
+│   │   └── process/      # Process management (future expansion)
 │   ├── arch/i686/        # i686-specific implementation
 │   │   ├── arch.c/h      # Architecture initialization
 │   │   ├── cpu/          # CPU management
@@ -132,6 +137,26 @@ Sodium/
 ## Architecture Overview
 
 Sodium follows a layered architecture with clear separation between generic kernel code and architecture-specific implementations:
+
+```
+┌─────────────────────────────────────┐
+│           User Programs             │  (Future)
+├─────────────────────────────────────┤
+│          System Calls               │  (Future)
+├─────────────────────────────────────┤
+│         Kernel Core                 │  ← kernel/core/
+│  (Terminal, Process, Memory, etc.)  │    kernel/libc/
+├─────────────────────────────────────┤
+│       Driver Interfaces             │  ← kernel/drivers/
+│   (Display, Input, Storage)         │
+├─────────────────────────────────────┤
+│    Architecture Abstraction         │  ← arch/i686/
+│        (i686 specific)              │
+├─────────────────────────────────────┤
+│         Hardware Layer              │  (Physical Hardware)
+│   (CPU, Memory, Devices)            │
+└─────────────────────────────────────┘
+```
 
 ### **Generic Kernel Layer** (`src/kernel/`)
 
@@ -220,3 +245,7 @@ If you encounter issues not covered here:
 1. Check the [GitHub Issues](https://github.com/Erik-Donath/Sodium/issues)
 2. Ensure you're using the latest version
 3. Include build output and error messages when reporting issues
+
+## Development Planning
+
+For detailed development roadmap, feature planning, and project goals, see [ROADMAP.md](ROADMAP.md).
