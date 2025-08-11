@@ -8,7 +8,7 @@ _Static_assert(sizeof(memory_map_entry) == sizeof(mb2_tag_memory_map_entry), "me
 
 static memory_info mem_info;
 
-bool mb_parse(mb_info_ptr mb) {
+MB_ERROR_t mb_parse(mb_info_ptr mb) {
     // Reset stored values to 0
     mem_info = (memory_info){
         .mem_lower = 0,
@@ -20,7 +20,7 @@ bool mb_parse(mb_info_ptr mb) {
     mb2_header* header = (mb2_header*)mb;
     mb2_tag* tag = header->tags;
     if(!header || header->reserved)
-        return false;
+        return MB_ERROR_INVALID_HEADER;
 
     while((uint8_t*)tag < (uint8_t*)header + header->total_size) {
         switch(tag->type) {
@@ -39,7 +39,7 @@ bool mb_parse(mb_info_ptr mb) {
         }
         tag = MB_STRUCT_NEXT_TAG(tag);
     }
-    return true;
+    return MB_ERROR_OK;
 }
 
 const memory_info* mb_getMemoryInfo() {

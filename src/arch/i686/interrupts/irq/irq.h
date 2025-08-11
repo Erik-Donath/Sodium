@@ -28,7 +28,12 @@
 
 typedef void(*IRQHandler)(ISR_Registers* regs);
 
-bool i686_IRQ_Init();
+typedef enum i686_IRQ_ERROR {
+    i686_IRQ_ERROR_OK = 0,
+    i686_IRQ_ERROR_NO_DEVICE
+} i686_IRQ_ERROR_t;
+
+i686_IRQ_ERROR_t i686_IRQ_Init();
 
 void i686_IRQ_RegisterHandler(uint8_t irq, IRQHandler handler);
 void i686_IRQ_ClearHandler(uint8_t irq);

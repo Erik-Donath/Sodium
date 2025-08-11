@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "kernel/core/error.h"
 #include "kernel/libc/stdio.h"
 
 #include "../../arch.h"
@@ -15,14 +16,14 @@ typedef struct block {
     uint8_t content[0];
 } block_t;
 
-static uint8_t* heap_base = 0;
-static size_t heap_size = 0;
+static uint8_t* lowest_heap_base = 0;
+static size_t total_heap_size = 0;
 
 static block_t* free_list = 0;
 
-bool i686_memory_init() {
+MEM_ERROR_t i686_memory_init() {
     const memory_info* mem_info = mb_getMemoryInfo();
-    bool found_block = false;
+    block_t* last_block = 0;
 
     uintptr_t os_start_addr = (uintptr_t)&os_start;
     uintptr_t os_end_addr = (uintptr_t)&os_end;
@@ -37,29 +38,30 @@ bool i686_memory_init() {
             uint8_t* base  = (uint8_t*)entry_base;
             size_t size = (size_t)entry.lenght;
 
-            // If entry is OS entry
+            // Skip / Adjust OS region
             if((uintptr_t)base >= os_start_addr && (uintptr_t)base <= os_end_addr) {
                 base = (uint8_t*)(os_end_addr + 0x1000); // 4KB after OS
                 size = (size_t)(entry_end - (uintptr_t)base);
             }
 
             if(size >= MIN_HEAP_SIZE) {
-                heap_base = base;
-                heap_size = size;
-                found_block = true;
-                break;
+                block_t* block = (block_t*)base;
+                block->size = size - sizeof(block_t);
+                block->next = 0;
+
+                if(last_block) last_block->next = block;
+                else free_list = block;
+                last_block = block;
+
+                if(lowest_heap_base < base)
+                    lowest_heap_base = base;
+                total_heap_size += size;
             }
         }
     }
 
-    if(found_block) {
-        block_t* block = (block_t*)heap_base;
-        block->size = heap_size - sizeof(block_t);
-        block->next = 0;
-        free_list = block;
-    }
-
-    return found_block;
+    i686_memory_coalesce_adjacent_blocks();
+    return last_block ? MEM_ERROR_OK : MEM_ERROR_NO_BLOCK_FOUND;
 }
 
 void i686_memory_info() {
@@ -70,11 +72,20 @@ void i686_memory_info() {
         free_heap += current->size;
         current = current->next;
     }
-    size_t used_heap = heap_size - free_heap; // including block desciptors
-    printf("Heap Block:\n\tbase = 0x%X\n\tsize = %d\n\tused = %d\n\tfree = %d\n", heap_base, heap_size, used_heap, free_heap);
+    size_t used_heap = total_heap_size - free_heap; // including block desciptors
+    printf("Heap Block:\n\tlowest base = 0x%X\n\tsize = %d\n\tused = %d\n\tfree = %d\n", lowest_heap_base, total_heap_size, used_heap, free_heap);
+
+    printf("Free Block(s):\n");
+    current = free_list;
+    while(current) {
+        printf("\t0x%X with %d free bytes\n", current, current->size);
+        current = current->next;
+    }
 }
 
 void* i686_memory_malloc(size_t size) {
+    if (size > SIZE_MAX - sizeof(block_t) + 1)
+        return NULL; // Size too large to align safely
     size = (size + sizeof(block_t) - 1) & ~(sizeof(block_t) - 1); // Align size
 
     block_t** best_fit_prev = 0;
@@ -117,29 +128,46 @@ void i686_memory_free(void* ptr) {
     // Find block descriptor
     block_t* block = (block_t*)((uint8_t*)ptr - offsetof(block_t, content));
 
-    if((uint8_t*)block < heap_base || (uint8_t*)block >= heap_base + heap_size)
-        panic("Attempted to free a block outside the heap boundaries");
+    if((uint8_t*)block < lowest_heap_base || (uint8_t*)block >= lowest_heap_base + total_heap_size)
+        PANIC("Attempted to free a block outside the heap boundaries");
+
+    if(block->size == 0 || block->size > total_heap_size) {
+        PANIC("Attempted to free block with invalid size");
+    }
+
+    if((uint8_t*)block + sizeof(block_t) + block->size > lowest_heap_base + total_heap_size) {
+        PANIC("Attempted to free block extending beyond heap");
+    }
+
+    // TODO: Block Magic validation
 
     // Find prev block and check if block is not in free list
     block_t** prev = &free_list;
     #define current (*prev)
     while(current && current <= block) {
         if(current == block)
-            panic("Tried to double free block");
+            PANIC("Tried to double free block");
         prev = &(current->next);
     }
 
     // validate block
     if(prev != &free_list && (uint8_t*)current + current->size + sizeof(block_t) != (uint8_t*)block) {
-        panic("Tried to free invalid block");
+        PANIC("Tried to free invalid block");
     }
 
     // insert block sorted in free_list
     block->next = current;
     current = block;
 
-    // Coalesce adjacent free blocks
-    prev = &free_list;
+    i686_memory_coalesce_adjacent_blocks();
+}
+
+void i686_memory_coalesce_adjacent_blocks() {
+    if(!free_list) return;
+
+    block_t** prev = &free_list;
+    #define current (*prev)
+
     while(current && current->next) {
         block_t* next = current->next;
 
@@ -151,6 +179,4 @@ void i686_memory_free(void* ptr) {
             prev = &(current->next);
         }
     }
-
-    return;
 }

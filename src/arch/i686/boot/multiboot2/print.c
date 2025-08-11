@@ -125,7 +125,7 @@ void mb_print(mb_info_ptr mb) {
                 printf("\tmajor = %u\n\tminor = %u\n\tsmbios_tables size: %u", smbios->major, smbios->minor, tag->size - sizeof(mb2_tag_smbios_tables));
 
                 printf("SMBIOS TABLE: ");
-                smbios_print(*smbios->smbios_tables, tag->size - sizeof(mb2_tag_smbios_tables));
+                //smbios_print((uint8_t*)*(smbios->smbios_tables), tag->size - sizeof(mb2_tag_smbios_tables));
                 break;
             case MB_TAG_ACPI_OLD_RSDP:
                 mb2_tag_acpi_old_rsdp* acpi_old_rsdp = (mb2_tag_acpi_old_rsdp*)tag;

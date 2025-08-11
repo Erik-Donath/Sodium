@@ -14,3 +14,6 @@ void *memset(void *dest, int val, size_t len);
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 #define ARRAY_FIRST(x) (x[0])
 #define ARRAY_LAST(x) (x[ARRAY_SIZE(x) - 1])
+
+// Used by functions like panic which are garanted to not return.
+#define NORETURN __attribute__((noreturn))

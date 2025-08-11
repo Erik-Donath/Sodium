@@ -31,7 +31,12 @@ typedef struct {
     memory_map_entry* entries; // WARN: Only valid if Bootloader is accessable / loaded !
 } memory_info;
 
-bool mb_parse(mb_info_ptr mb);
+typedef enum MB_ERROR {
+    MB_ERROR_OK = 0,
+    MB_ERROR_INVALID_HEADER
+} MB_ERROR_t;
+
+MB_ERROR_t mb_parse(mb_info_ptr mb);
 const memory_info* mb_getMemoryInfo();
 
 void mb_print(mb_info_ptr mb);

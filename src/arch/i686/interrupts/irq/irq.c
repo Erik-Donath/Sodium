@@ -22,9 +22,9 @@ static void i686_IRQ_Handler(ISR_Registers* regs) {
     i8259A_SendEOI(irq);
 }
 
-bool i686_IRQ_Init() {
+i686_IRQ_ERROR_t i686_IRQ_Init() {
     if(!i8259A_Check()) {
-        return false;
+        return i686_IRQ_ERROR_NO_DEVICE;
     }
 
     for(uint8_t i = 0; i < 16; i++) {
@@ -33,7 +33,7 @@ bool i686_IRQ_Init() {
 
     i8259A_Enable();
     i686_IRQ_Enable();
-    return true;
+    return i686_IRQ_ERROR_OK;
 }
 
 void i686_IRQ_RegisterHandler(uint8_t irq, IRQHandler handler) {
