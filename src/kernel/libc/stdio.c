@@ -1,9 +1,9 @@
 
-#include <stdarg.h>
-#include <stdbool.h>
+#include <kernel/libc/stdarg.h>
+#include <kernel/libc/stdbool.h>
 
 #include "util.h"
-#include "../core/terminal.h"
+#include <kernel/core/terminal.h>
 #include "stdio.h"
 
 static const char numberTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

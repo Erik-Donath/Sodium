@@ -1,9 +1,9 @@
-#include "../libc/util.h"
+#include <kernel/libc/util.h>
 #include "terminal.h"
 _Static_assert(sizeof(char) == sizeof(uint8_t), "char and uint8_t must be the same size!");
 
-#include "arch/i686/drivers/vga/vga.h"
-#include "arch/i686/drivers/debug/debug.h"
+#include <arch/i686/drivers/vga/vga.h>
+#include <arch/i686/drivers/debug/debug.h>
 
 static const display_driver* terminal_drivers[] = {
     &vga_driver, &debug_driver

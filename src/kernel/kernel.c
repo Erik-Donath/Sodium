@@ -1,5 +1,5 @@
 #include "kernel.h"
-#include "libc/stdio.h"
+#include <kernel/libc/stdio.h>
 
 void kmain() {
     printf("Sodium Loaded\n\n");

@@ -5,33 +5,26 @@
 #include "cpu/idt/idt.h"
 #include "interrupts/irq/irq.h"
 #include "memory/heap/heap.h"
-#include "boot/multiboot2/multiboot.h"
 
-#include "kernel/core/terminal.h"
-#include "kernel/libc/stdio.h"
-#include "kernel/memory/memory.h"
+#include <kernel/core/terminal.h>
+#include <kernel/libc/stdio.h>
+#include <kernel/memory/memory.h>
 
-#include "kernel/core/error.h"
-#include "kernel/kernel.h"
-
-#define defaultColor Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
-#define errorColor Color(TERMINAL_COLOR_RED, TERMINAL_COLOR_BLACK)
-#define successColor Color(TERMINAL_COLOR_GREEN, TERMINAL_COLOR_BLACK)
-#define sodiumColor Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
-#define infoColor Color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK)
+#include <kernel/core/error.h>
+#include <kernel/kernel.h>
 
 static bool terminal_initialized = false;
 
 static void ok(const char* msg) {
-    printf("%s[ %sOK%s ] %s\n", defaultColor, successColor, defaultColor, msg);
+    printf(DEFAULT_COLOR "[ " SUCCESS_COLOR "OK" DEFAULT_COLOR " ] %s\n", msg);
 }
 /*
 static void failed(const char* msg) {
-    printf("%s[ %sFAILED%s ] %s\n", defaultColor, errorColor, defaultColor, msg);
+    printf(DEFAULT_COLOR "[ " ERROR_COLOR "FAILED" DEFAULT_COLOR " ] %s\n", msg);
 }*/
 
 static void welcome() {
-    puts("\033[0m" defaultColor "Welcome to " sodiumColor "Sodium" defaultColor "!\n");
+    puts("\033[0m" DEFAULT_COLOR "Welcome to " SODIUM_COLOR "Sodium" DEFAULT_COLOR "!\n");
 }
 
 static void irq_void(ISR_Registers*) {}
@@ -68,9 +61,9 @@ void pre_main(mb_info_ptr mb) {
     ok("Loaded multiboot info");
 
     // Print multiboot Information
-    puts(infoColor);
+    puts(INFO_COLOR);
     mb_print(mb);
-    puts(defaultColor);
+    puts(DEFAULT_COLOR);
 
     // Init Heap
     MEM_ERROR_t mem_err = i686_memory_init();
@@ -78,9 +71,9 @@ void pre_main(mb_info_ptr mb) {
     ok("Allocated heap block");
 
     // Print Heap Information
-    puts(infoColor);
+    puts(INFO_COLOR);
     i686_memory_info();
-    puts(defaultColor "\n");
+    puts(DEFAULT_COLOR "\n");
 
     // Finish
     printf("System located at: %p\n", (void*)&mb_header_start);

@@ -1,6 +1,6 @@
-#include <stdint.h>
-#include "kernel/core/error.h"
-#include "kernel/libc/stdio.h"
+#include <kernel/libc/stdint.h>
+#include <kernel/core/error.h>
+#include <kernel/libc/stdio.h>
 
 #include "../../arch.h"
 #include "../../boot/multiboot2/multiboot.h"

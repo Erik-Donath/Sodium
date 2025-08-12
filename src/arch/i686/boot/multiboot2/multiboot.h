@@ -1,7 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
-#include <kernel/libc/util.h>
+#include "../../../../kernel/libc/util.h"
 
 typedef const void* mb_info_ptr;
 

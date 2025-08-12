@@ -1,4 +1,4 @@
-#include "kernel/libc/stdio.h"
+#include <kernel/libc/stdio.h>
 
 #include "definition.h"
 #include "smbios.h"

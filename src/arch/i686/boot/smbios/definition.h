@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <kernel/libc/util.h>
+#include "../../../../kernel/libc/util.h"
 
 // ! SMBIOS STRUCTURE TYPE CONSTANTS
 #define SMBIOS_TYPE_BIOS_INFORMATION              0

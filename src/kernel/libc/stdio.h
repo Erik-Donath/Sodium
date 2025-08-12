@@ -27,6 +27,3 @@ void print_unsigned(uint32_t value, uint8_t radix);
 void print_hex32(uint32_t value, bool fill);
 void print_hex64(uint64_t value, bool fill);
 void printf(const char* fmt, ...);
-
-// FIXME: Delete printf_test() or add test system
-void printf_test();

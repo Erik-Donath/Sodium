@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <kernel/libc/stdint.h>
 
 #include <kernel/libc/stdio.h>
 #include <kernel/libc/util.h>

@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "kernel/libc/util.h"
+#include "../libc/util.h"
 
 typedef uint32_t error_t;
 #define ERROR_OK 0 // 0 = Success

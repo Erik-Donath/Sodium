@@ -1,5 +1,5 @@
 #pragma once
-#include "kernel/core/terminal.h"
+#include "../../../../kernel/core/terminal.h"
 
 extern const display_driver vga_driver;
 

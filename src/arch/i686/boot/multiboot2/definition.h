@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <kernel/libc/util.h>
+#include "../../../../kernel/libc/util.h"
 
 // ! MULTIBOOT2 INFO STRUCT DEFINITIONS
 #define MB_TAG_END_OF_MULTIBOOT_INFO            0

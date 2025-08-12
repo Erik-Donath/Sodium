@@ -1,41 +1,39 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
+#include "../drivers/display.h"
 
-#define TERMINAL_COLOR_BLACK 0
-#define TERMINAL_COLOR_BLUE 4
-#define TERMINAL_COLOR_GREEN 2
-#define TERMINAL_COLOR_CYAN 6
-#define TERMINAL_COLOR_RED 1
-#define TERMINAL_COLOR_MAGENTA 5
-#define TERMINAL_COLOR_BROWN 3
-#define TERMINAL_COLOR_LIGHT_GREY 7
-#define TERMINAL_COLOR_DARK_GREY 8
-#define TERMINAL_COLOR_LIGHT_BLUE 12
-#define TERMINAL_COLOR_LIGHT_GREEN 10
-#define TERMINAL_COLOR_LIGHT_CYAN 14
-#define TERMINAL_COLOR_LIGHT_RED 9
-#define TERMINAL_COLOR_LIGHT_MAGENTA 13
-#define TERMINAL_COLOR_LIGHT_BROWN 11
-#define TERMINAL_COLOR_WHITE 15
+// Legacy compatibility - redirect to display driver interface
+#define TERMINAL_COLOR_BLACK DISPLAY_COLOR_BLACK
+#define TERMINAL_COLOR_BLUE DISPLAY_COLOR_BLUE
+#define TERMINAL_COLOR_GREEN DISPLAY_COLOR_GREEN
+#define TERMINAL_COLOR_CYAN DISPLAY_COLOR_CYAN
+#define TERMINAL_COLOR_RED DISPLAY_COLOR_RED
+#define TERMINAL_COLOR_MAGENTA DISPLAY_COLOR_MAGENTA
+#define TERMINAL_COLOR_BROWN DISPLAY_COLOR_BROWN
+#define TERMINAL_COLOR_LIGHT_GREY DISPLAY_COLOR_LIGHT_GREY
+#define TERMINAL_COLOR_DARK_GREY DISPLAY_COLOR_DARK_GREY
+#define TERMINAL_COLOR_LIGHT_BLUE DISPLAY_COLOR_LIGHT_BLUE
+#define TERMINAL_COLOR_LIGHT_GREEN DISPLAY_COLOR_LIGHT_GREEN
+#define TERMINAL_COLOR_LIGHT_CYAN DISPLAY_COLOR_LIGHT_CYAN
+#define TERMINAL_COLOR_LIGHT_RED DISPLAY_COLOR_LIGHT_RED
+#define TERMINAL_COLOR_LIGHT_MAGENTA DISPLAY_COLOR_LIGHT_MAGENTA
+#define TERMINAL_COLOR_LIGHT_BROWN DISPLAY_COLOR_LIGHT_BROWN
+#define TERMINAL_COLOR_WHITE DISPLAY_COLOR_WHITE
 
-// Escape Sequenz for colorization
-#define TS(x) #x
-#define Color(fg, bg) "\033[38;5;" TS(fg) ";48;5;" TS(bg) "m"
+// Standard color combinations used throughout the system
+#define DEFAULT_COLOR Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
+#define ERROR_COLOR Color(TERMINAL_COLOR_RED, TERMINAL_COLOR_BLACK)
+#define SUCCESS_COLOR Color(TERMINAL_COLOR_GREEN, TERMINAL_COLOR_BLACK)
+#define WARNING_COLOR Color(TERMINAL_COLOR_LIGHT_BROWN, TERMINAL_COLOR_BLACK)
+#define INFO_COLOR Color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK)
+#define SODIUM_COLOR Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
 
-typedef struct {
-    const char* name;
-    bool (*check)(void);
-    void (*activate)(void);
-    void (*deactivate)(void);
+// Legacy compatibility - redirect to display driver interface
+typedef display_driver_t display_driver;
 
-    // ASCII (Byte Stream) Driver
-    void (*putc)(char c);
-    void (*clear)(void);
-} display_driver;
-
-void terminal_init();
+void terminal_init(void);
 void terminal_putc(char c);
 void terminal_puts(const char* str);
-void terminal_clear();
-void terminal_testColor();
+void terminal_clear(void);
+void terminal_testColor(void);

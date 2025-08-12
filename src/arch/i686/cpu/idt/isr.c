@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <kernel/libc/stdint.h>
 #include "idt.h"
 #include "../gdt/gdt.h"
 

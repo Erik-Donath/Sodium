@@ -1,5 +1,5 @@
-#include <stddef.h>
-#include "kernel/libc/stdio.h"
+#include <kernel/libc/stddef.h>
+#include <kernel/libc/stdio.h>
 
 #include "definition.h"
 #include "multiboot.h"
