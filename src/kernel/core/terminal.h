@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "../drivers/display.h"
 
 // Legacy compatibility - redirect to display driver interface
@@ -29,10 +30,7 @@
 #define INFO_COLOR Color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK)
 #define SODIUM_COLOR Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
 
-// Legacy compatibility - redirect to display driver interface
-typedef display_driver_t display_driver;
-
-void terminal_init(void);
+void terminal_init(const display_driver_t** display_drivers, size_t arraySize);
 void terminal_putc(char c);
 void terminal_puts(const char* str);
 void terminal_clear(void);

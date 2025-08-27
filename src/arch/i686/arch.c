@@ -6,6 +6,9 @@
 #include "interrupts/irq/irq.h"
 #include "memory/heap/heap.h"
 
+#include "drivers/vga/vga.h"
+#include "drivers/debug/debug.h"
+
 #include <kernel/core/terminal.h>
 #include <kernel/libc/stdio.h>
 #include <kernel/memory/memory.h>
@@ -29,11 +32,23 @@ static void welcome() {
 
 static void irq_void(ISR_Registers*) {}
 
+static const display_driver_t* terminal_drivers[] = {&vga_driver, &debug_driver};
+
 extern char mb_header_start;
 
 void pre_main(mb_info_ptr mb) {
+    // Parse multiboot Information
+    MB_ERROR_t mb_err = mb_parse(mb);
+    if(mb_err) PANIC("Failed to load multiboot info");
+    //ok("Loaded multiboot info");
+
+    // Init Heap
+    MEM_ERROR_t mem_err = i686_memory_init();
+    if(mem_err) PANIC("Failed to allocate heap block");
+    //ok("Allocated heap block");
+
     // Setup Terminal
-    terminal_init();
+    terminal_init(terminal_drivers, 2);
     welcome();
     ok("Terminal initialized");
     terminal_initialized = true;
@@ -55,20 +70,10 @@ void pre_main(mb_info_ptr mb) {
     i686_IRQ_RegisterHandler(INT_KEYBOARD, irq_void);
     ok("IRQ initialized");
 
-    // Parse multiboot Information
-    MB_ERROR_t mb_err = mb_parse(mb);
-    if(mb_err) PANIC("Failed to load multiboot info");
-    ok("Loaded multiboot info");
-
     // Print multiboot Information
     puts(INFO_COLOR);
     mb_print(mb);
     puts(DEFAULT_COLOR);
-
-    // Init Heap
-    MEM_ERROR_t mem_err = i686_memory_init();
-    if(mem_err) PANIC("Failed to allocate heap block");
-    ok("Allocated heap block");
 
     // Print Heap Information
     puts(INFO_COLOR);

@@ -1,7 +1,7 @@
 #include "../../cpu/ports.h"
 #include "debug.h"
 
-const display_driver debug_driver = {
+const display_driver_t debug_driver = {
     .name       = "Debug Driver",
     .check      = i686_debug_check,
     .activate   = i686_debug_activate,

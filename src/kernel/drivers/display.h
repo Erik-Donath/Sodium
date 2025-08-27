@@ -16,13 +16,6 @@ typedef struct {
     void (*clear)(void);
 } display_driver_t;
 
-// Display driver registration and management
-void display_register_driver(display_driver_t* driver);
-void display_init(void);
-void display_putc(char c);
-void display_puts(const char* str);
-void display_clear(void);
-
 // Color definitions for display drivers
 #define DISPLAY_COLOR_BLACK 0
 #define DISPLAY_COLOR_BLUE 4

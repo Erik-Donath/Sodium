@@ -1,36 +1,35 @@
 #include <kernel/libc/util.h>
+#include <kernel/memory/memory.h>
 #include "terminal.h"
+
 _Static_assert(sizeof(char) == sizeof(uint8_t), "char and uint8_t must be the same size!");
 
-#include <arch/i686/drivers/vga/vga.h>
-#include <arch/i686/drivers/debug/debug.h>
+static display_driver_t** drivers;
+static bool* active_drivers;
+static size_t driver_count;
 
-static const display_driver* terminal_drivers[] = {
-    &vga_driver, &debug_driver
-};
 
-static display_driver* terminal_active_drivers[ARRAY_SIZE(terminal_drivers)];
-static uint32_t terminal_active_driver_count;
-
-void terminal_init() {
-    terminal_active_driver_count = 0;
-    for(uint32_t i = 0; i < ARRAY_SIZE(terminal_active_drivers); i++) {
-        if(terminal_drivers[i]->check()) {
-            display_driver* driver = terminal_active_drivers[terminal_active_driver_count++] = (display_driver*)terminal_drivers[i];
-            driver->activate();
+void terminal_init(const display_driver_t** display_drivers, size_t arraySize) {
+    display_drivers = display_drivers;
+    active_drivers = malloc(arraySize * sizeof(bool));
+    driver_count = arraySize;
+    for(size_t i = 0; i < arraySize; i++) {
+        active_drivers[i] = display_drivers[i]->check();
+        if(active_drivers[i]) {
+            display_drivers[i]->activate();
+            display_drivers[i]->clear();
         }
     }
-    for(uint32_t i = terminal_active_driver_count; i < ARRAY_SIZE(terminal_active_drivers); i++)
-        terminal_active_drivers[i] = 0;
 }
 
 
 #define TS(x) #x
 #define FOR_ALL_ACTIVE_DRIVERS(var, func) { \
-    for(uint32_t i = 0; i < terminal_active_driver_count; i++) { \
-        display_driver* var = terminal_active_drivers[i]; \
+    for(uint32_t i = 0; i < driver_count; i++) { \
+        if(active_drivers[i]) { \
+        display_driver_t* var = drivers[i]; \
         func ;\
-    } \
+    }} \
 }
 
 void terminal_putc(char c) {

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sodium OS Demo on v86</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>Sodium OS Browser Demo</h1>
+    <div id="screen-container"></div>
+    <button id="runBtn">Run Sodium OS</button>
+    <div id="status"></div>
+  </main>
+
+  <script src="v86_all.js"></script>
+  <script>
+    const screen = document.getElementById("screen-container");
+    const statusDiv = document.getElementById("status");
+    const runBtn = document.getElementById("runBtn");
+    let emulator = null;
+
+    runBtn.onclick = () => {
+      if (emulator) return;
+      runBtn.disabled = true;
+      statusDiv.textContent = "Starting emulator and loading ISO from server...";
+
+      emulator = new V86({
+        wasm_path: "v86.wasm",
+        bios: { url: "bios/seabios.bin" },
+        vga_bios: { url: "bios/vgabios.bin" },
+        cdrom: { url: "iso/Sodium.iso", async: true },
+        autostart: true,
+        screen_container: screen,
+      });
+
+      emulator.add_listener("emulator-error", (e) => {
+        statusDiv.textContent = "Emulator error: " + e.message;
+        runBtn.disabled = false;
+      });
+
+      emulator.add_listener("download-progress", (e) => {
+        const percent = e.total ? ((e.loaded * 100) / e.total).toFixed(1) : '???';
+        statusDiv.textContent = "Loading ISO... " + percent + "%";
+      });
+
+      emulator.add_listener("emulator-ready", () => {
+        statusDiv.textContent = "Emulator is running!";
+      });
+    };
+  </script>
+</body>
+</html>

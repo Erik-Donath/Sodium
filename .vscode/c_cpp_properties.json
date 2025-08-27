@@ -3,14 +3,15 @@
     {
       "name": "Sodium Kernel",
       "includePath": [
+        "${workspaceFolder}/src",
         "${workspaceFolder}/src/**"
+      ],
+      "systemIncludePath": [
+        "${workspaceFolder}/src"
       ],
       "defines": [
         "__KERNEL__",
-        "__i386__",
-        "PACKED=__attribute__((packed))",
-        "NORETURN=__attribute__((noreturn))",
-        "ASM_CALL=__attribute__((cdecl))"
+        "__i386__"
       ],
       "compilerPath": "gcc",
       "cStandard": "c11",
@@ -18,13 +19,12 @@
       "compilerArgs": [
         "-m32",
         "-ffreestanding",
-        "-nostdlib",
         "-fno-builtin",
         "-fno-stack-protector",
-        "-nostartfiles",
-        "-nodefaultlibs",
         "-Wall",
-        "-Wextra"
+        "-Wextra",
+        "-isystem",
+        "${workspaceFolder}/src"
       ],
       "browse": {
         "path": [

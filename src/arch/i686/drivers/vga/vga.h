@@ -1,7 +1,8 @@
 #pragma once
-#include "../../../../kernel/core/terminal.h"
+#include <kernel/drivers/display.h>
+#include <kernel/core/terminal.h>
 
-extern const display_driver vga_driver;
+extern const display_driver_t vga_driver;
 
 bool i686_VGA_check();
 void i686_VGA_activate();

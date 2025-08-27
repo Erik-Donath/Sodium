@@ -1,7 +1,8 @@
 #pragma once
-#include "../../../../kernel/core/terminal.h"
+#include <kernel/drivers/display.h>
+#include <kernel/core/terminal.h>
 
-extern const display_driver debug_driver;
+extern const display_driver_t debug_driver;
 
 bool i686_debug_check(void);
 void i686_debug_activate(void);

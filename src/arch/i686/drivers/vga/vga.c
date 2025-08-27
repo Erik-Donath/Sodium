@@ -431,7 +431,7 @@ void i686_VGA_cursor_set(uint8_t x, uint8_t y) {
     vga_cursor_y = y;
 }
 
-const display_driver vga_driver = {
+const display_driver_t vga_driver = {
     .name       = "ASCII VGA Driver",
     .check      = i686_VGA_check,
     .activate   = i686_VGA_activate,

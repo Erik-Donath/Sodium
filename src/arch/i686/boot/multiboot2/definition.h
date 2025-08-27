@@ -188,19 +188,19 @@ typedef struct {
 typedef struct {
     mb2_tag head;
     uint8_t rsdp[0];
-    // FIXME: Impement RSDPv1 definiton(s)
+    // FIXME: Implement RSDPv1 definiton(s)
 } PACKED mb2_tag_acpi_old_rsdp;
 
 typedef struct {
     mb2_tag head;
     uint8_t rsdp[0];
-    // FIXME: Impement RSDPv2 definiton(s)
+    // FIXME: Implement RSDPv2 definiton(s)
 } PACKED mb2_tag_acpi_new_rsdp;
 
 typedef struct {
     mb2_tag head;
     uint8_t dhcp_ack[0];
-    // FIXME: Impement DHCP ACK definiton(s)
+    // FIXME: Implement DHCP ACK definiton(s)
 } PACKED mb2_tag_network_info;
 
 typedef struct {
@@ -208,7 +208,7 @@ typedef struct {
     uint32_t descriptor_size;
     uint32_t descriptor_version;
     uint8_t efi_memory_map[0];
-    // FIXME: Impement EFI memory map definiton(s)
+    // FIXME: Implement EFI memory map definiton(s)
 } PACKED mb2_tag_efi_memory_map;
 
 typedef struct {
