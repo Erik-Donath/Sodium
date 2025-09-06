@@ -32,7 +32,7 @@ void terminal_init(const display_driver_t** display_drivers, size_t arraySize) {
 #define FOR_ALL_ACTIVE_DRIVERS(var, func) { \
     for(uint32_t i = 0; i < driver_count; i++) { \
         if(active_drivers[i]) { \
-            display_driver_t* var = drivers[i]; \
+            const display_driver_t* var = drivers[i]; \
             func ;\
         } \
     } \
