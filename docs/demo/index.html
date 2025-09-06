@@ -1,51 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sodium OS Demo on v86</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>v86 Emulator Demo</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #emulator {
+    width: 800px;
+    height: 600px;
+    border: 2px solid #333;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Prevent any resizing of contents */
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  #emulator canvas {
+    /* Force fixed pixel size, no scaling */
+    width: 800px !important;
+    height: 600px !important;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    background: #000;
+    object-fit: contain;
+  }
+</style>
 </head>
 <body>
-  <main>
-    <h1>Sodium OS Browser Demo</h1>
-    <div id="screen-container"></div>
-    <button id="runBtn">Run Sodium OS</button>
-    <div id="status"></div>
-  </main>
+  <div id="emulator">
+    <canvas width="800" height="600"></canvas>
+    <div></div>
+  </div>
 
-  <script src="v86_all.js"></script>
+  <script src="libv86.js"></script>
   <script>
-    const screen = document.getElementById("screen-container");
-    const statusDiv = document.getElementById("status");
-    const runBtn = document.getElementById("runBtn");
-    let emulator = null;
-
-    runBtn.onclick = () => {
-      if (emulator) return;
-      runBtn.disabled = true;
-      statusDiv.textContent = "Starting emulator and loading ISO from server...";
-
-      emulator = new V86({
+    window.onload = function() {
+      var emulator = new V86({
+        screen_container: document.getElementById("emulator"),
         wasm_path: "v86.wasm",
+        memory_size: 64 * 1024 * 1024,
         bios: { url: "bios/seabios.bin" },
         vga_bios: { url: "bios/vgabios.bin" },
-        cdrom: { url: "iso/Sodium.iso", async: true },
-        autostart: true,
-        screen_container: screen,
-      });
-
-      emulator.add_listener("emulator-error", (e) => {
-        statusDiv.textContent = "Emulator error: " + e.message;
-        runBtn.disabled = false;
-      });
-
-      emulator.add_listener("download-progress", (e) => {
-        const percent = e.total ? ((e.loaded * 100) / e.total).toFixed(1) : '???';
-        statusDiv.textContent = "Loading ISO... " + percent + "%";
-      });
-
-      emulator.add_listener("emulator-ready", () => {
-        statusDiv.textContent = "Emulator is running!";
+        cdrom: { url: "iso/Sodium.iso" },
+        autostart: true
       });
     };
   </script>
