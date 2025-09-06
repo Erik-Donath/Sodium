@@ -1,3 +1,26 @@
+
+# Sodium
+
+## Initialization Order
+1. Parse multiboot information
+2. Initialize heap/memory management
+3. Initialize terminal and display drivers
+4. Set up CPU tables (FPU, GDT, IDT)
+5. Initialize IRQs and register handlers
+6. Start kernel
+
+## Architecture
+- src/arch/i686: Architecture-specific implementations
+- src/kernel: Kernel logic and interfaces
+- src/kernel/core: Core functions like terminal, error handling
+- src/kernel/drivers: Display drivers and hardware abstraction
+- src/kernel/libc: Standard and utility functions
+- src/arch/i686/memory/heap: Heap and memory management
+
+## Notes
+- Memory management MUST be initialized before using malloc!
+- Display drivers (e.g. VGA) must be initialized after heap setup.
+- See ARCHITECTURE.md for more details.
 # Sodium
 
 A small, hobbyist-grade x86 operating system which uses Multiboot2 with the GRUB bootloader.
