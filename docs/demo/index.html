@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>v86 Emulator Demo</title>
 <style>
   html, body {
@@ -14,34 +14,37 @@
     justify-content: center;
     align-items: center;
   }
+
   #emulator {
-    width: 800px;
-    height: 600px;
-    border: 2px solid #333;
-    background: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* Prevent any resizing of contents */
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-  #emulator canvas {
-    /* Force fixed pixel size, no scaling */
-    width: 800px !important;
-    height: 600px !important;
-    max-width: 100%;
-    max-height: 100%;
     display: block;
-    background: #000;
-    object-fit: contain;
+    background-color: black;
+    padding: 8px;
+    box-sizing: content-box;
+  }
+
+  #screen {
+    font-family: monospace;
+    font-size: 16px;
+    line-height: 1.2em;
+    width: calc(80ch);
+    height: calc(25 * 1.2em);
+    white-space: pre;
+    overflow: hidden;
+    user-select: none;
+    color: #0f0;
+    background-color: black;
+    box-sizing: content-box;
+  }
+
+  #vga {
+    display: none;
   }
 </style>
 </head>
 <body>
   <div id="emulator">
-    <canvas width="800" height="600"></canvas>
-    <div></div>
+    <div id="screen"></div>
+    <canvas id="vga"></canvas>
   </div>
 
   <script src="libv86.js"></script>
@@ -51,10 +54,11 @@
         screen_container: document.getElementById("emulator"),
         wasm_path: "v86.wasm",
         memory_size: 64 * 1024 * 1024,
-        bios: { url: "bios/seabios.bin" },
-        vga_bios: { url: "bios/vgabios.bin" },
+        bios: { url: "bios/bochs-bios.bin" },
+        vga_bios: { url: "bios/bochs-vgabios.bin" },
         cdrom: { url: "iso/Sodium.iso" },
-        autostart: true
+        autostart: true,
+        default_screen: "screen"
       });
     };
   </script>
