@@ -1,5 +1,7 @@
-
 # Sodium
+
+[![Demo](https://img.shields.io/badge/demo-online-green)](https://erik-donath.github.io/Sodium/demo/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Initialization Order
 1. Parse multiboot information
