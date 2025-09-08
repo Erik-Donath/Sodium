@@ -1,0 +1,51 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#emulator {
+    position: relative;
+    display: block;
+    background-color: black;
+    padding: 8px;
+    box-sizing: content-box;
+}
+
+#screen {
+    position: relative;
+    font-family: monospace;
+    font-size: 16px;
+    line-height: 1.2em;
+    width: calc(80ch);
+    height: calc(25 * 1.2em);
+    white-space: pre;
+    overflow: hidden;
+    user-select: none;
+    color: #0f0;
+    background-color: black;
+    box-sizing: content-box;
+}
+
+#vga {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: calc(80ch);
+    height: calc(25 * 1.2em);
+    pointer-events: none;
+    background-color: transparent;
+}
+
+#debug-output {
+    color: #fff;
+    background: #222;
+    padding: 8px;
+    font-family: monospace;
+    min-height: 1em;
+}

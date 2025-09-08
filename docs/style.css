@@ -1,0 +1,109 @@
+/* Sodium Docs - Modern & Simple Style */
+
+:root {
+    --primary: #2d6cdf;
+    --background: #f8f9fb;
+    --text: #222;
+    --nav-bg: #fff;
+    --nav-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --footer-bg: #f0f1f3;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--background);
+    color: var(--text);
+    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    background: #fff;
+}
+
+section {
+    width: 100%;
+    max-width: 900px;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+}
+
+h1, h2 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+p, li {
+    line-height: 1.7;
+}
+
+footer {
+    background: var(--footer-bg);
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 1rem;
+    color: #888;
+    margin-top: auto;
+    width: 100vw;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    section {
+        max-width: 100vw;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin: 1rem 0;
+    }
+}
+
+@media (max-width: 600px) {
+    main {
+        padding: 0;
+    }
+    section {
+        padding: 0.5rem;
+        margin: 0.5rem 0;
+        border-radius: 0.3rem;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
+    h2 {
+        font-size: 1.1rem;
+    }
+}
+        margin: 0.5rem;
+        border-radius: 0.5rem;
+    }
+
+    nav {
+        padding: 0.5rem;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+    }
+}

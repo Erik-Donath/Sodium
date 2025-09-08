@@ -6,51 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <title>v86 Emulator Demo</title>
-  <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #emulator {
-      position: relative;
-      display: block;
-      background-color: black;
-      padding: 8px;
-      box-sizing: content-box;
-    }
-
-    #screen {
-      position: relative;
-      font-family: monospace;
-      font-size: 16px;
-      line-height: 1.2em;
-      width: calc(80ch);
-      height: calc(25 * 1.2em);
-      white-space: pre;
-      overflow: hidden;
-      user-select: none;
-      color: #0f0;
-      background-color: black;
-      box-sizing: content-box;
-    }
-
-    #vga {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      width: calc(80ch);
-      height: calc(25 * 1.2em);
-      pointer-events: none;
-      background-color: transparent;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -58,24 +14,9 @@
     <div id="screen"></div>
     <canvas id="vga"></canvas>
   </div>
-  <div id="debug-output" style="color: #fff; background: #222; padding: 8px; font-family: monospace; min-height: 1em;">
-  </div>
 
   <script src="libv86.js"></script>
-  <script>
-    window.onload = function () {
-      var emulator = new V86({
-        screen_container: document.getElementById("emulator"),
-        wasm_path: "v86.wasm",
-        memory_size: 64 * 1024 * 1024,
-        bios: { url: "bios/seabios.bin" },
-        vga_bios: { url: "bios/vgabios.bin" },
-        cdrom: { url: "iso/Sodium.iso" },
-        autostart: true,
-        default_screen: "screen"
-      });
-    };
-  </script>
+  <script src="main.js"></script>
 </body>
 
 </html>
