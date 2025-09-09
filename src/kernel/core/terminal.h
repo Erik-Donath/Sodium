@@ -1,8 +1,8 @@
 
 #pragma once
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
+#include <kernel/libc/stdint.h>
+#include <kernel/libc/stdbool.h>
+#include <kernel/libc/stddef.h>
 #include "../drivers/display.h"
 
 // Terminal color definitions (mapped to display driver colors)
