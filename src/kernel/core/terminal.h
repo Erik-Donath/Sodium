@@ -1,0 +1,39 @@
+
+#pragma once
+#include <kernel/libc/stdint.h>
+#include <kernel/libc/stdbool.h>
+#include <kernel/libc/stddef.h>
+#include "../drivers/display.h"
+
+// Terminal color definitions (mapped to display driver colors)
+#define TERMINAL_COLOR_BLACK DISPLAY_COLOR_BLACK
+#define TERMINAL_COLOR_BLUE DISPLAY_COLOR_BLUE
+#define TERMINAL_COLOR_GREEN DISPLAY_COLOR_GREEN
+#define TERMINAL_COLOR_CYAN DISPLAY_COLOR_CYAN
+#define TERMINAL_COLOR_RED DISPLAY_COLOR_RED
+#define TERMINAL_COLOR_MAGENTA DISPLAY_COLOR_MAGENTA
+#define TERMINAL_COLOR_BROWN DISPLAY_COLOR_BROWN
+#define TERMINAL_COLOR_LIGHT_GREY DISPLAY_COLOR_LIGHT_GREY
+#define TERMINAL_COLOR_DARK_GREY DISPLAY_COLOR_DARK_GREY
+#define TERMINAL_COLOR_LIGHT_BLUE DISPLAY_COLOR_LIGHT_BLUE
+#define TERMINAL_COLOR_LIGHT_GREEN DISPLAY_COLOR_LIGHT_GREEN
+#define TERMINAL_COLOR_LIGHT_CYAN DISPLAY_COLOR_LIGHT_CYAN
+#define TERMINAL_COLOR_LIGHT_RED DISPLAY_COLOR_LIGHT_RED
+#define TERMINAL_COLOR_LIGHT_MAGENTA DISPLAY_COLOR_LIGHT_MAGENTA
+#define TERMINAL_COLOR_LIGHT_BROWN DISPLAY_COLOR_LIGHT_BROWN
+#define TERMINAL_COLOR_WHITE DISPLAY_COLOR_WHITE
+
+// Standard color macros for status and info messages
+#define DEFAULT_COLOR Color(TERMINAL_COLOR_WHITE, TERMINAL_COLOR_BLACK)
+#define ERROR_COLOR Color(TERMINAL_COLOR_RED, TERMINAL_COLOR_BLACK)
+#define SUCCESS_COLOR Color(TERMINAL_COLOR_GREEN, TERMINAL_COLOR_BLACK)
+#define WARNING_COLOR Color(TERMINAL_COLOR_LIGHT_BROWN, TERMINAL_COLOR_BLACK)
+#define INFO_COLOR Color(TERMINAL_COLOR_LIGHT_GREY, TERMINAL_COLOR_BLACK)
+#define SODIUM_COLOR Color(TERMINAL_COLOR_CYAN, TERMINAL_COLOR_BLACK)
+
+// Terminal interface for multi-driver output
+void terminal_init(const display_driver_t** display_drivers, size_t arraySize);
+void terminal_putc(char c);
+void terminal_puts(const char* str);
+void terminal_clear(void);
+void terminal_testColor(void);

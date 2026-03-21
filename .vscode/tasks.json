@@ -2,32 +2,111 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build Docker Image",
       "type": "shell",
-      "windows": {
-        "command": "cmd.exe",
-        "args": [
-          "/C",
-          "git status --porcelain buildenv | findstr . && docker build buildenv -t sodium-buildenv || echo No changes in buildenv, skipping Docker build"
-        ]
+      "label": "build-buildenv",
+      "command": "docker",
+      "args": [
+        "build",
+        "-t",
+        "sodium-buildenv",
+        "-f",
+        "${workspaceFolder}/buildenv/Dockerfile",
+        "${workspaceFolder}"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
       },
-      "linux": {
-        "command": "/bin/bash",
-        "args": [
-          "-c",
-          "git status --porcelain buildenv | grep -q . && docker build buildenv -t sodium-buildenv || echo 'No changes in buildenv, skipping Docker build'"
-        ]
-      }
+      "problemMatcher": []
     },
     {
-      "label": "Build Sodium",
       "type": "shell",
-      "command": "docker run --rm -it -v ${workspaceFolder}:/root/env sodium-buildenv",
+      "label": "build",
+      "dependsOn": ["docker-build-buildenv"],
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-v",
+        "${workspaceFolder}:/root/env:Z",
+        "sodium-buildenv"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
       "problemMatcher": [
         {
-          "owner": "custom",
+          "owner": "gcc",
+          "fileLocation": ["relative", "${workspaceFolder}"],
           "pattern": {
-            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error|note):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          }
+        },
+        {
+          "owner": "nasm",
+          "fileLocation": ["relative", "${workspaceFolder}"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):\\s+(error|warning):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "severity": 3,
+            "message": 4
+          }
+        },
+        {
+          "owner": "ld",
+          "fileLocation": ["relative", "${workspaceFolder}"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "message": 3
+          }
+        }
+      ]
+    },
+    {
+      "type": "shell",
+      "label": "build-debug",
+      "dependsOn": ["docker-build-buildenv"],
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-v",
+        "${workspaceFolder}:/root/env:Z",
+        "--entrypoint=make",
+        "sodium-buildenv",
+        "debug"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [
+        {
+          "owner": "gcc",
+          "fileLocation": ["relative", "${workspaceFolder}"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error|note):\\s+(.*)$",
             "file": 1,
             "line": 2,
             "column": 3,
@@ -35,14 +114,68 @@
             "message": 5
           }
         }
+      ]
+    },
+    {
+      "type": "shell",
+      "label": "clean-build",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-v",
+        "${workspaceFolder}:/root/env:Z",
+        "--entrypoint=make",
+        "sodium-buildenv",
+        "clean"
       ],
-      "dependsOn": "Build Docker Image",
-      "dependsOrder": "sequence",
-      "group": {
-        "kind": "build",
-        "isDefault": true
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "type": "shell",
+      "label": "run-qemu",
+      "command": "qemu-system-x86_64",
+      "args": [
+        "-debugcon",
+        "stdio",
+        "-cdrom",
+        "${workspaceFolder}/dist/Sodium.iso"
+      ],
+      "group": "test",
+      "dependsOn": ["Build Sodium"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "type": "shell",
+      "label": "info",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-v",
+        "${workspaceFolder}:/root/env:Z",
+        "--entrypoint=make",
+        "sodium-buildenv",
+        "info"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
       }
     }
   ]
 }
-  

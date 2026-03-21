@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# THIS FILE IS CURRENTLY NOT USED!!!!
+
 # Convert line endings to Unix format (for all shell scripts in /root/env/script)
 # echo "--> Converting line endings to Unix format"
 # find /root/env/script -type f -name "*.sh" -exec dos2unix {} +

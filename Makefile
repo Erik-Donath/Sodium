@@ -96,10 +96,36 @@ info:
 all: $(ISO)
 	@echo "--> DONE"
 
+.PHONY: debug
+debug: CFLAGS += -g -DDEBUG
+debug: $(ISO)
+	@echo "--> DEBUG BUILD DONE"
+
+.PHONY: release
+release: CFLAGS += -O2 -DNDEBUG
+release: $(ISO)
+	@echo "--> RELEASE BUILD DONE"
+
 .PHONY: clean
 clean:
 	@echo "--> Clearing builds"
 	rm -rf $(BUILD_DIR)
-	rm -rf $(KERNEL_BIN)
+	rm -rf $(DIST_DIR)
 	rm -f $(KERNEL_DIR)/arch/i686/isr_gen.inc
 	rm -f $(KERNEL_DIR)/arch/i686/isr_gen.c
+
+.PHONY: help
+help:
+	@echo "Sodium OS Build System"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  all      - Build the OS (default)"
+	@echo "  debug    - Build with debug symbols and DEBUG defined"
+	@echo "  release  - Build optimized release version"
+	@echo "  clean    - Clean all build artifacts"
+	@echo "  info     - Show source file information"
+	@echo "  help     - Show this help message"
+	@echo ""
+	@echo "Output files:"
+	@echo "  $(KERNEL_BIN) - Kernel binary"
+	@echo "  $(ISO)        - Bootable ISO image"
