@@ -14,7 +14,9 @@ build-buildsystem:
 	docker build buildsystem -t $(IMAGE)
 
 build: build-buildsystem
-	docker run --rm -v $(PWD):/root/env $(IMAGE) $(ARCH) $(BUILD)
+	docker run --rm \
+	    --user $(shell id -u):$(shell id -g) \
+	    -v $(PWD):/workspace $(IMAGE) $(ARCH) $(BUILD)
 
 run:
 	qemu-system-i386 -debugcon stdio \
@@ -22,10 +24,11 @@ run:
 	    -cdrom $(DIST_DIR)/Sodium.iso
 
 debug:
-	qemu-system-i386 -debugcon file:$(DIST_DIR)/debug.log \
+	qemu-system-i386 -debugcon stdio \
 	    -no-reboot \
 	    -cdrom $(DIST_DIR)/Sodium.iso -s -S &
-	gdb -ex "target remote :1234" \
+	gdb -ex "set architecture i386" \
+	    -ex "target remote :1234" \
 	    -ex "symbol-file $(DIST_DIR)/sodium.dbg"
 
 clean:

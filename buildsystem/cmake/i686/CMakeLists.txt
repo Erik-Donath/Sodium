@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_ASM_NASM_OBJECT_FORMAT "elf32")
 set(CMAKE_ASM_NASM_FLAGS         "")
@@ -10,7 +11,7 @@ set(CMAKE_ASM_NASM_FLAGS_RELEASE "")
 project(Sodium C ASM_NASM)
 
 set(SRC ${SRC} CACHE PATH "Path to src/ directory")
-set(DIST /root/env/dist)
+set(DIST /workspace/dist)
 
 # Toolchain
 set(CMAKE_C_COMPILER x86_64-elf-gcc)

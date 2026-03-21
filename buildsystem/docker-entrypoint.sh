@@ -6,12 +6,12 @@ BUILD_TYPE=${2:-Debug}
 
 echo "--> Configuring for arch=${ARCH} build=${BUILD_TYPE}"
 
-cmake -S /root/env/buildsystem/cmake/${ARCH} \
-      -B /root/env/build \
+cmake -S /workspace/buildsystem/cmake/${ARCH} \
+      -B /workspace/build \
       -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-      -DSRC=/root/env/src
+      -DSRC=/workspace/src
 
 echo "--> Building"
-cmake --build /root/env/build --target sodium.iso
+cmake --build /workspace/build --target sodium.iso
 
 echo "--> Done"
