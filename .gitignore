@@ -1,7 +1,0 @@
-# Editor directories
-.vs/
-.idea/
-
-# Build directories
-build/
-dist/

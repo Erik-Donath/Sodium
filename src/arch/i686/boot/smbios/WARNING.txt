@@ -1,3 +1,0 @@
-This struct seems to not be stored in the mb2 tag even when provided from qemu. GRUB seems to not care about it.
-
-There is currently no easy way for checking if this code actually works. Please keep that in mind when using.
