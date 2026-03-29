@@ -1,18 +1,11 @@
 #include "pre_kernel.h"
 #include "io.h"
 
-static void e9_print(const char *str) {
-  while (*str)
-    outb(0xE9, (uint8_t)*str++);
-}
-
 void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   (void)mb_info;
-  e9_print("pre_kernel reached\n");
 
-  for (;;) {
-    e9_print("Hi\n");
-    e9_print("Ho\n");
-  }
+  // Printing Sodium in aqua using ASCII Escape Seqenz to qemu debug output
+  i686_io_debug("\033[38;5;6;48;5;0mSODIUM\033[0m\n");
+
   return; // Shutdown via booloader/i686/shutdown.asm
 }
