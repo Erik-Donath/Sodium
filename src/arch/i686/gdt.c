@@ -54,8 +54,8 @@ typedef enum i686_gdt_access : uint8_t {
 
 typedef enum i686_gdt_flags : uint8_t {
   // 3: G (Granularity flag)
-  GDT_FLAG_GRANUALITY_1B = 0x00,
-  GDT_FLAG_GRANUALITY_4K = 0x08,
+  GDT_FLAG_GRANULARITY_1B = 0x00,
+  GDT_FLAG_GRANULARITY_4K = 0x08,
 
   // 2: DB (Size Flag)
   GDT_FLAG_16BIT = 0x00,
@@ -83,7 +83,7 @@ typedef struct __attribute__((packed)) i686_gdt_pointer {
   i686_gdt_entry *base;
 } i686_gdt_pointer;
 
-#define GDT_ENTRY_COUNT 6
+#define GDT_ENTRY_COUNT 5
 static i686_gdt_entry gdt[GDT_ENTRY_COUNT] = {0};
 
 static i686_gdt_pointer gdt_ptr = {
@@ -109,4 +109,35 @@ extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer *gdt_ptr,
                                                   uint16_t kernel_code_segment,
                                                   uint16_t kernel_data_segment);
 
-void i686_gdt_init(void) { return; }
+void i686_gdt_init(void) {
+  // Null Descriptior
+  i686_gdt_set(0, 0, 0, 0, 0);
+
+  // Kernel 32-bit Code Segment
+  i686_gdt_set(1, 0x00000, 0xFFFFF,
+               GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_DATA |
+                   GDT_ACCESS_EXECUTABLE | GDT_ACCESS_CODE_READABLE,
+               GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
+
+  // Kernel 32-bit Data Segment
+  i686_gdt_set(2, 0x00000, 0xFFFFF,
+               GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_DATA |
+                   GDT_ACCESS_DATA_WRITEABLE,
+               GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
+
+  // User 32-bit Code Segment
+  i686_gdt_set(3, 0x00000, 0xFFFFF,
+               GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_DATA |
+                   GDT_ACCESS_EXECUTABLE | GDT_ACCESS_CODE_READABLE,
+               GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
+
+  // User 32-bit Data Segment
+  i686_gdt_set(4, 0x00000, 0xFFFFF,
+               GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_DATA |
+                   GDT_ACCESS_DATA_WRITEABLE,
+               GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
+
+  // Flush GDT
+  i686_gdt_flush(&gdt_ptr, i686_GDT_KERNEL_CODE_SEGMENT,
+                 i686_GDT_KERNEL_DATA_SEGMENT);
+}
