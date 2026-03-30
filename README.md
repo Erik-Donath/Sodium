@@ -1,9 +1,12 @@
 # Sodium
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A small, hobbyist-grade x86 operating system which uses Multiboot2 with the GRUB bootloader.
+A small, hobbyist-grade x86 operating system which uses Multiboot2 with the GRUB
+bootloader.
 
 ## Structure of the project
+
 ```txt
 .
 ├── buildsystem
@@ -18,6 +21,10 @@ A small, hobbyist-grade x86 operating system which uses Multiboot2 with the GRUB
 └── src
     ├── arch
     │   └── i686
+    │       ├── gdt.asm
+    │       ├── gdt.c
+    │       ├── gdt.h
+    │       ├── io.h
     │       ├── pre_kernel.c
     │       └── pre_kernel.h
     ├── bootloader
@@ -25,7 +32,10 @@ A small, hobbyist-grade x86 operating system which uses Multiboot2 with the GRUB
     │       ├── boot.asm
     │       ├── grub
     │       │   └── grub.cfg
-    │       └── linker.ld
+    │       ├── linker.ld
+    │       └── shutdown.asm
     ├── kernel
     └── libk
+
+12 directories, 16 files
 ```
