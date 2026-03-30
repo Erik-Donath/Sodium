@@ -23,7 +23,7 @@ Global Decriptor Table Entry:
 | 56-63   | Base Address (upper 8 bits)               |
 */
 
-#define i686_TSS_TABLE_SIZE 0x68
+#define i686_TSS_TABLE_SIZE 0x6C
 struct i686_tss_table;
 extern struct i686_tss_table tss;
 
@@ -138,7 +138,9 @@ void i686_gdt_init(void) {
 
   // TSS Segment
   i686_gdt_set(5, (uint32_t)&tss, i686_TSS_TABLE_SIZE - 1,
-               GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_SYSTEM, 0x0);
+               GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_SYSTEM |
+                   GDT_ACCESS_ACCESSED,
+               GDT_FLAG_32BIT);
 }
 
 // Defined in Assembly

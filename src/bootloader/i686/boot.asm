@@ -54,6 +54,9 @@ start:
     call pre_kernel
     jmp i686_shutdown
 
+global stack_top
+global stack_bottom
+
 section .bss
     stack_bottom:
     align 16

@@ -44,14 +44,5 @@ static inline uint32_t i686_io_inl(uint16_t port) {
   return value;
 }
 
-// QEMU DEBUG PORT
-// #FIXME: Move to new location
-#define i686_QEMU_DEBUG_PORT 0xE9
-static inline void i686_io_debug(char *str) {
-  _Static_assert(sizeof(char) == sizeof(uint8_t),
-                 "char and uint8_t must be the same lenght!");
-
-  while (*str) {
-    i686_io_outb(i686_QEMU_DEBUG_PORT, *(str++));
-  }
-}
+void i686_io_debug(char *str);
+void i686_io_debug_hex(uint32_t value);
