@@ -1,5 +1,5 @@
 #include "pre_kernel.h"
-#include "io.h"
+#include <stdio.h>
 
 // CPU Setup
 #include "gdt.h"
@@ -24,7 +24,7 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   }
 
   // Printing Sodium in aqua using ASCII Escape Seqenz to qemu debug output
-  i686_io_debug("\033[38;5;6;48;5;0mSODIUM\033[0m\n");
+  printf("\033[38;5;6;48;5;0mSODIUM\033[0m\n");
 
   return;
 }

@@ -43,6 +43,3 @@ static inline uint32_t i686_io_inl(uint16_t port) {
   __asm__ volatile("inl %w1, %l0" : "=a"(value) : "Nd"(port) : "memory");
   return value;
 }
-
-void i686_io_debug(char *str);
-void i686_io_debug_hex(uint32_t value);
