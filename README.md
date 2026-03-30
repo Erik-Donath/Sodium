@@ -24,9 +24,13 @@ bootloader.
     │       ├── gdt.asm
     │       ├── gdt.c
     │       ├── gdt.h
+    │       ├── io.c
     │       ├── io.h
     │       ├── pre_kernel.c
-    │       └── pre_kernel.h
+    │       ├── pre_kernel.h
+    │       ├── tss.asm
+    │       ├── tss.c
+    │       └── tss.h
     ├── bootloader
     │   └── i686
     │       ├── boot.asm
@@ -37,5 +41,5 @@ bootloader.
     ├── kernel
     └── libk
 
-12 directories, 16 files
+12 directories, 20 files
 ```
