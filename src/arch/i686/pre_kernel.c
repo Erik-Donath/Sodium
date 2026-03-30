@@ -3,6 +3,7 @@
 
 // CPU Setup
 #include "gdt.h"
+#include "tss.h"
 #include <stdint.h>
 
 void __attribute__((cdecl)) pre_kernel(void *mb_info) {
@@ -10,6 +11,9 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
 
   // Seting up the CPU
   i686_gdt_init();
+  i686_tss_init();
+  i686_gdt_load();
+  i686_tss_load();
 
   // Printing Sodium in aqua to VGA Output
   static char *i686_vga = (char *)0xB8000;

@@ -23,6 +23,10 @@ Global Decriptor Table Entry:
 | 56-63   | Base Address (upper 8 bits)               |
 */
 
+#define i686_TSS_TABLE_SIZE 0x68
+struct i686_tss_table;
+extern struct i686_tss_table tss;
+
 typedef enum i686_gdt_access : uint8_t {
   // 7: P (Present) bit
   GDT_ACCESS_PRESENT = 0x80,
@@ -83,7 +87,7 @@ typedef struct __attribute__((packed)) i686_gdt_pointer {
   i686_gdt_entry *base;
 } i686_gdt_pointer;
 
-#define GDT_ENTRY_COUNT 5
+#define GDT_ENTRY_COUNT 6
 static i686_gdt_entry gdt[GDT_ENTRY_COUNT] = {0};
 
 static i686_gdt_pointer gdt_ptr = {
@@ -103,11 +107,6 @@ void i686_gdt_set(uint8_t segnum, uint32_t base, uint32_t limit, uint8_t access,
       .base_high = (uint8_t)((base >> 24) & 0xFF),
   };
 }
-
-// Defined in Assembly
-extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer *gdt_ptr,
-                                                  uint16_t kernel_code_segment,
-                                                  uint16_t kernel_data_segment);
 
 void i686_gdt_init(void) {
   // Null Descriptior
@@ -137,6 +136,17 @@ void i686_gdt_init(void) {
                    GDT_ACCESS_DATA_WRITEABLE,
                GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
 
+  // TSS Segment
+  i686_gdt_set(5, (uint32_t)&tss, i686_TSS_TABLE_SIZE - 1,
+               GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_SYSTEM, 0x0);
+}
+
+// Defined in Assembly
+extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer *gdt_ptr,
+                                                  uint16_t kernel_code_segment,
+                                                  uint16_t kernel_data_segment);
+
+void i686_gdt_load(void) {
   // Flush GDT
   i686_gdt_flush(&gdt_ptr, i686_GDT_KERNEL_CODE_SEGMENT,
                  i686_GDT_KERNEL_DATA_SEGMENT);
