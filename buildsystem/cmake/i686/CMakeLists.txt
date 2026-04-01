@@ -56,8 +56,6 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-message(STATUS "Using libgcc: ${LIBGCC_PATH}")
-
 target_link_options(sodium.bin PRIVATE
     -m32
     -Wl,-m,elf_i386

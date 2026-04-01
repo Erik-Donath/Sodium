@@ -8,7 +8,6 @@
 
 static void test_printf(void) {
   printf("%%d: %d\n", 10);
-  printf("%%d: %d\n", 10);
 }
 
 void __attribute__((cdecl)) pre_kernel(void *mb_info) {
