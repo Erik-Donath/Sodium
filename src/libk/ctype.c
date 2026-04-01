@@ -1,5 +1,4 @@
 #include "ctype.h"
-
 #include <stdint.h>
 
 typedef enum ctype_type : uint8_t {

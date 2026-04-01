@@ -75,5 +75,3 @@ bits 16
     dd 0x0000FFFF, 0x00CF9A00
     dd 0x0000FFFF, 0x00CF9200
 .gdt_end:
-
-section .note.GNU-stack noalloc noexec nowrite progbits

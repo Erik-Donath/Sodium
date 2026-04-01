@@ -10,5 +10,3 @@ i686_tss_flush:
     ltr ax
 
     ret
-
-section .note.GNU-stack noalloc noexec nowrite progbits

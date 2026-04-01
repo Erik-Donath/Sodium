@@ -36,5 +36,3 @@ i686_gdt_flush:
     mov esp, ebp
     pop ebp
     ret
-
-section .note.GNU-stack noalloc noexec nowrite progbits

@@ -59,6 +59,7 @@ message(STATUS "Using libgcc: ${LIBGCC_PATH}")
 target_link_options(sodium.bin PRIVATE
     -nostartfiles
     -nodefaultlibs
+    -Wl,-z,noexecstack
     -T ${SRC}/bootloader/i686/linker.ld
 )
 target_link_libraries(sodium.bin PRIVATE ${LIBGCC_PATH})
