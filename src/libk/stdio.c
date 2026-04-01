@@ -20,6 +20,18 @@ typedef enum exec_flags : uint8_t {
   FLAGS_ALTERNATE = 0x10, // #
 } exec_flags_t;
 
+typedef enum exec_lenght : uint8_t {
+  LENGHT_NONE = 0,        // Not given
+  LENGHT_SHORT = 1,       // h
+  LENGHT_SIGNED_CHAR = 2, // hh
+  LENGHT_LONG = 3,        // l
+  LENGHT_LONGLONG = 4,    // ll
+  LENGHT_LONGDOUBLE = 5,  // L
+  LENGHT_SIZE = 6,        // z
+  LENGHT_INTMAX = 7,      // j
+  LENGHT_PTRDIFF = 8,     // t
+} exec_lenght_t;
+
 typedef enum number_type : uint8_t {
   NUMBER_DECIMAL_POSITIV = 0,  // %d
   NUMBER_DECIMAL_NEGATIV = 1,  // %d
@@ -98,21 +110,68 @@ uint32_t _print_number(uint64_t value, number_type_t type, bool uppercase, exec_
   return content_length + number_spaces;
 }
 
+typedef union {
+  uint64_t    u;
+  int64_t     s;
+  long double f;
+  void*       p;
+} printf_value_t;
+
+typedef enum {
+  ARG_SIGNED_INT = 1,
+  ARG_UNSIGNED_INT = 2,
+  ARG_FLOAT = 3,
+  ARG_POINTER = 4,
+} printf_arg_type_t;
+
+static printf_value_t _get_argument(va_list args, exec_lenght_t len, printf_arg_type_t type) {
+  printf_value_t val = {0};
+
+  switch (type) {
+    case ARG_SIGNED_INT:
+      switch (len) {
+        case LENGHT_SIGNED_CHAR: val.s = (int8_t)va_arg(args, int); break;
+        case LENGHT_SHORT:       val.s = (int16_t)va_arg(args, int); break;
+        case LENGHT_LONG:        val.s = va_arg(args, long); break;
+        case LENGHT_LONGLONG:    val.s = va_arg(args, long long); break;
+        case LENGHT_SIZE:        val.s = (int64_t)va_arg(args, size_t); break;
+        case LENGHT_INTMAX:      val.s = va_arg(args, intmax_t); break;
+        case LENGHT_PTRDIFF:     val.s = va_arg(args, ptrdiff_t); break;
+        default:                 val.s = va_arg(args, int); break;
+      }
+      break;
+
+    case ARG_UNSIGNED_INT:
+      switch (len) {
+        case LENGHT_SIGNED_CHAR: val.u = (uint8_t)va_arg(args, unsigned int); break;
+        case LENGHT_SHORT:       val.u = (uint16_t)va_arg(args, unsigned int); break;
+        case LENGHT_LONG:        val.u = va_arg(args, unsigned long); break;
+        case LENGHT_LONGLONG:    val.u = va_arg(args, unsigned long long); break;
+        case LENGHT_SIZE:        val.u = va_arg(args, size_t); break;
+        case LENGHT_INTMAX:      val.u = va_arg(args, uintmax_t); break;
+        case LENGHT_PTRDIFF:     val.u = (uint64_t)va_arg(args, ptrdiff_t); break;
+        default:                 val.u = va_arg(args, unsigned int); break;
+      }
+      break;
+
+    case ARG_FLOAT:
+      if (len == LENGHT_LONGDOUBLE)
+        val.f = va_arg(args, long double);
+      else
+        val.f = (long double)va_arg(args, double);  // float promotes to double
+      break;
+
+    case ARG_POINTER:
+      val.p = va_arg(args, void *);
+      break;
+  }
+
+  return val;
+}
+
 // Expects fmt to be at the char behind %.
 // Returns fmt after the last char of the expression.
 const char *_vprintf_exec(const char *fmt, va_list args, printf_sink_t *sink, uint32_t *written) {
-  typedef enum exec_lenght : uint8_t {
-    LENGHT_NONE = 0,        // Not given
-    LENGHT_SHORT = 1,       // h
-    LENGHT_SIGNED_CHAR = 2, // hh
-    LENGHT_LONG = 3,        // l
-    LENGHT_LONGLONG = 4,    // ll
-    LENGHT_LONGDOUBLE = 5,  // L
-    LENGHT_SIZE = 6,        // z
-    LENGHT_INTMAX = 7,      // j
-    LENGHT_PTRDIFF = 8,     // t
-  } exec_lenght_t;
-
   exec_flags_t flags = FLAGS_NONE;
   exec_lenght_t lenght = LENGHT_NONE;
   uint32_t width = 0;
@@ -208,18 +267,38 @@ const char *_vprintf_exec(const char *fmt, va_list args, printf_sink_t *sink, ui
   }
 
   // Specifier Stage
-  if(*fmt == '%') {
+  if (*fmt == '%') {
     sink->putc_fn('%', sink->ctx);
     (*written)++;
     return fmt + 1;
   }
 
-  if(*fmt == 'd' || *fmt == 'i') {
-    _print_number(10, NUMBER_DECIMAL_POSITIV, false, flags, width, prec, sink);
+  else if (*fmt == 'd' || *fmt == 'i') {
+    printf_value_t v = _get_argument(args, lenght, ARG_SIGNED_INT);
+    uint64_t absval = (v.s < 0) ? (uint64_t)(-v.s) : (uint64_t)v.s;
+    number_type_t t = (v.s < 0) ? NUMBER_DECIMAL_NEGATIV : NUMBER_DECIMAL_POSITIV;
+    *written += _print_number(absval, t, false, flags, width, prec, sink);
   }
 
-  (void)args;
-  (void)lenght;
+  else if (*fmt == 'u') {
+    printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
+    *written += _print_number(v.u, NUMBER_DECIMAL_UNSIGNED, false, flags, width, prec, sink);
+  }
+
+  else if (*fmt == 'o') {
+    printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
+    *written += _print_number(v.u, NUMBER_OCTAL, false, flags, width, prec, sink);
+  }
+
+  else if (*fmt == 'x' || *fmt == 'X') {
+    printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
+    *written += _print_number(v.u, NUMBER_HEX, (*fmt == 'X'), flags, width, prec, sink);
+  }
+
+  else if (*fmt == 'p') {
+    printf_value_t v = _get_argument(args, LENGHT_NONE, ARG_POINTER);
+    *written += _print_number((uintptr_t)v.p, NUMBER_HEX, false, FLAGS_ALTERNATE, width, prec, sink);
+  }
 
   return fmt + 1;
 }
