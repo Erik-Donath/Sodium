@@ -1,7 +1,7 @@
 # Build artifacts
 build/
 dist/
-.docker-stamp
+*.docker-stamp
 
 # Object files
 *.o

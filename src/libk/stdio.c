@@ -34,7 +34,7 @@ static char digits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a'
 // Returns how many chars have been written
 // prec = -1 => No precision
 // width = 0 => No width
-uint32_t _print_number(uint32_t value, number_type_t type, bool uppercase, exec_flags_t flags, uint32_t width, int32_t precision, printf_sink_t *sink) {
+uint32_t _print_number(uint64_t value, number_type_t type, bool uppercase, exec_flags_t flags, uint32_t width, int32_t precision, printf_sink_t *sink) {
   char strnum[64];
   uint8_t strnum_count = 0;
   uint8_t radix = number_type_radix[type];
@@ -46,7 +46,7 @@ uint32_t _print_number(uint32_t value, number_type_t type, bool uppercase, exec_
     strnum[strnum_count++] = '0';
   }
   else {
-    uint32_t v = value;
+    uint64_t v = value;
     while(v) {
       char digit = digits[v % radix];
       strnum[strnum_count++] = (uppercase && digit >= 'a') ? (char)toupper(digit) : digit;

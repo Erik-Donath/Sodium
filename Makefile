@@ -1,24 +1,18 @@
-ARCH      ?= i686
-BUILD     ?= Debug
+ARCH  ?= i686
+BUILD ?= Debug
 
 DIST_DIR  = dist
 BUILD_DIR = build
 
-IMAGE        = sodium-buildenv
-DOCKER_STAMP = .docker-stamp
-
-.PHONY: all build run debug clean help
+.PHONY: all build rebuild-image run debug clean help
 
 all: build
 
-$(DOCKER_STAMP): buildsystem/Dockerfile
-	docker build buildsystem -t $(IMAGE)
-	docker inspect --format='{{.Id}}' $(IMAGE) > $(DOCKER_STAMP)
+build:
+	$(MAKE) --no-print-directory -C buildsystem/$(ARCH) build BUILD=$(BUILD)
 
-build: $(DOCKER_STAMP)
-	docker run --rm \
-	    --user $(shell id -u):$(shell id -g) \
-	    -v $(PWD):/workspace $(IMAGE) $(ARCH) $(BUILD)
+rebuild-image:
+	$(MAKE) --no-print-directory -C buildsystem/$(ARCH) rebuild-image
 
 run:
 	qemu-system-i386 -debugcon stdio \
@@ -34,11 +28,8 @@ debug:
 	    -ex "symbol-file $(DIST_DIR)/sodium.dbg"
 
 clean:
-	rm -rf $(BUILD_DIR) $(DIST_DIR) $(DOCKER_STAMP)
-
-rebuild-image:
-	docker build --no-cache buildsystem -t $(IMAGE)
-	docker inspect --format='{{.Id}}' $(IMAGE) > $(DOCKER_STAMP)
+	$(MAKE) --no-print-directory -C buildsystem/$(ARCH) clean
+	rm -rf $(BUILD_DIR) $(DIST_DIR)
 
 help:
 	@echo "Sodium OS Build System"
@@ -47,7 +38,7 @@ help:
 	@echo "  build          - Build the OS (default)"
 	@echo "  run            - Run in QEMU"
 	@echo "  debug          - Run in QEMU with GDB attached"
-	@echo "  clean          - Remove build artifacts and Docker stamp"
+	@echo "  clean          - Remove build artifacts"
 	@echo "  rebuild-image  - Force a full Docker image rebuild"
 	@echo ""
 	@echo "Options:"

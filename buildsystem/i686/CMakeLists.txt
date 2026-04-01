@@ -4,7 +4,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_ASM_NASM_OBJECT_FORMAT "elf32")
-set(CMAKE_ASM_NASM_FLAGS         "")
+set(CMAKE_ASM_NASM_FLAGS "")
 set(CMAKE_ASM_NASM_FLAGS_DEBUG "-g -F dwarf -DSODIUM_DEBUG")
 set(CMAKE_ASM_NASM_FLAGS_RELEASE "")
 
@@ -13,12 +13,11 @@ project(Sodium C ASM_NASM)
 set(SRC ${SRC} CACHE PATH "Path to src/ directory")
 set(DIST /workspace/dist)
 
-# Toolchain
-set(CMAKE_C_COMPILER x86_64-elf-gcc)
+set(CMAKE_C_COMPILER i686-elf-gcc)
 set(CMAKE_ASM_NASM_COMPILER nasm)
 
 # Compiler flags
-set(BASE_FLAGS "-m32 -ffreestanding -std=c11 -nostartfiles -nodefaultlibs -Wall -Wextra -Wa,--noexecstack")
+set(BASE_FLAGS "-ffreestanding -std=c11 -nostartfiles -nodefaultlibs -Wall -Wextra -Wa,--noexecstack")
 set(CMAKE_C_FLAGS "${BASE_FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "-g -DSODIUM_DEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -51,24 +50,23 @@ add_executable(sodium.bin
 )
 
 execute_process(
-    COMMAND x86_64-elf-gcc -m32 -print-libgcc-file-name
+    COMMAND i686-elf-gcc -print-libgcc-file-name
     OUTPUT_VARIABLE LIBGCC_PATH
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+message(STATUS "Using libgcc: ${LIBGCC_PATH}")
 
 target_link_options(sodium.bin PRIVATE
-    -m32
-    -Wl,-m,elf_i386
     -nostartfiles
     -nodefaultlibs
     -T ${SRC}/bootloader/i686/linker.ld
-    ${LIBGCC_PATH}
 )
+target_link_libraries(sodium.bin PRIVATE ${LIBGCC_PATH})
 
 # Target: sodium.dbg
 add_custom_command(TARGET sodium.bin POST_BUILD
-    COMMAND objcopy --only-keep-debug sodium.bin ${CMAKE_BINARY_DIR}/sodium.dbg
-    COMMAND objcopy --strip-debug sodium.bin
+    COMMAND i686-elf-objcopy --only-keep-debug sodium.bin ${CMAKE_BINARY_DIR}/sodium.dbg
+    COMMAND i686-elf-objcopy --strip-debug sodium.bin
     COMMENT "--> Extracting debug symbols"
 )
 

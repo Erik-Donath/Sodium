@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-ARCH=${1:-i686}
-BUILD_TYPE=${2:-Debug}
+BUILD_TYPE=${1:-Debug}
 
-echo "--> Configuring for arch=${ARCH} build=${BUILD_TYPE}"
+echo "--> Configuring for arch=i686 build=${BUILD_TYPE}"
 
-cmake -S /workspace/buildsystem/cmake/${ARCH} \
+cmake -S /workspace/buildsystem/i686 \
       -B /workspace/build \
       -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
       -DSRC=/workspace/src
