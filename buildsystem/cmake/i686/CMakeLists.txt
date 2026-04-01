@@ -51,10 +51,12 @@ add_executable(sodium.bin
 )
 
 execute_process(
-    COMMAND gcc -m32 -print-libgcc-file-name
+    COMMAND x86_64-elf-gcc -m32 -print-libgcc-file-name
     OUTPUT_VARIABLE LIBGCC_PATH
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
+message(STATUS "Using libgcc: ${LIBGCC_PATH}")
 
 target_link_options(sodium.bin PRIVATE
     -m32

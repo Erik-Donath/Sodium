@@ -7,7 +7,8 @@
 #include "tss.h"
 
 static void test_printf(void) {
-  printf("%%-+ 0#123.456llf: %-+ 0#123.456llf\n", 20.0f);
+  printf("%%d: %d\n", 10);
+  printf("%%d: %d\n", 10);
 }
 
 void __attribute__((cdecl)) pre_kernel(void *mb_info) {
