@@ -124,45 +124,45 @@ typedef enum {
   ARG_POINTER = 4,
 } printf_arg_type_t;
 
-static printf_value_t _get_argument(va_list args, exec_lenght_t len, printf_arg_type_t type) {
+static printf_value_t _get_argument(va_list* args, exec_lenght_t len, printf_arg_type_t type) {
   printf_value_t val = {0};
 
   switch (type) {
     case ARG_SIGNED_INT:
       switch (len) {
-        case LENGHT_SIGNED_CHAR: val.s = (int8_t)va_arg(args, int); break;
-        case LENGHT_SHORT:       val.s = (int16_t)va_arg(args, int); break;
-        case LENGHT_LONG:        val.s = va_arg(args, long); break;
-        case LENGHT_LONGLONG:    val.s = va_arg(args, long long); break;
-        case LENGHT_SIZE:        val.s = (int64_t)va_arg(args, size_t); break;
-        case LENGHT_INTMAX:      val.s = va_arg(args, intmax_t); break;
-        case LENGHT_PTRDIFF:     val.s = va_arg(args, ptrdiff_t); break;
-        default:                 val.s = va_arg(args, int); break;
+        case LENGHT_SIGNED_CHAR: val.s = (int8_t)va_arg(*args, int); break;
+        case LENGHT_SHORT:       val.s = (int16_t)va_arg(*args, int); break;
+        case LENGHT_LONG:        val.s = va_arg(*args, long); break;
+        case LENGHT_LONGLONG:    val.s = va_arg(*args, long long); break;
+        case LENGHT_SIZE:        val.s = (int64_t)va_arg(*args, size_t); break;
+        case LENGHT_INTMAX:      val.s = va_arg(*args, intmax_t); break;
+        case LENGHT_PTRDIFF:     val.s = va_arg(*args, ptrdiff_t); break;
+        default:                 val.s = va_arg(*args, int); break;
       }
       break;
 
     case ARG_UNSIGNED_INT:
       switch (len) {
-        case LENGHT_SIGNED_CHAR: val.u = (uint8_t)va_arg(args, unsigned int); break;
-        case LENGHT_SHORT:       val.u = (uint16_t)va_arg(args, unsigned int); break;
-        case LENGHT_LONG:        val.u = va_arg(args, unsigned long); break;
-        case LENGHT_LONGLONG:    val.u = va_arg(args, unsigned long long); break;
-        case LENGHT_SIZE:        val.u = va_arg(args, size_t); break;
-        case LENGHT_INTMAX:      val.u = va_arg(args, uintmax_t); break;
-        case LENGHT_PTRDIFF:     val.u = (uint64_t)va_arg(args, ptrdiff_t); break;
-        default:                 val.u = va_arg(args, unsigned int); break;
+        case LENGHT_SIGNED_CHAR: val.u = (uint8_t)va_arg(*args, unsigned int); break;
+        case LENGHT_SHORT:       val.u = (uint16_t)va_arg(*args, unsigned int); break;
+        case LENGHT_LONG:        val.u = va_arg(*args, unsigned long); break;
+        case LENGHT_LONGLONG:    val.u = va_arg(*args, unsigned long long); break;
+        case LENGHT_SIZE:        val.u = va_arg(*args, size_t); break;
+        case LENGHT_INTMAX:      val.u = va_arg(*args, uintmax_t); break;
+        case LENGHT_PTRDIFF:     val.u = (uint64_t)va_arg(*args, ptrdiff_t); break;
+        default:                 val.u = va_arg(*args, unsigned int); break;
       }
       break;
 
     case ARG_FLOAT:
       if (len == LENGHT_LONGDOUBLE)
-        val.f = va_arg(args, long double);
+        val.f = va_arg(*args, long double);
       else
-        val.f = (long double)va_arg(args, double);  // float promotes to double
+        val.f = (long double)va_arg(*args, double);  // float promotes to double
       break;
 
     case ARG_POINTER:
-      val.p = va_arg(args, void *);
+      val.p = va_arg(*args, void *);
       break;
   }
 
@@ -171,7 +171,7 @@ static printf_value_t _get_argument(va_list args, exec_lenght_t len, printf_arg_
 
 // Expects fmt to be at the char behind %.
 // Returns fmt after the last char of the expression.
-const char *_vprintf_exec(const char *fmt, va_list args, printf_sink_t *sink, uint32_t *written) {
+const char *_vprintf_exec(const char *fmt, va_list* args, printf_sink_t *sink, uint32_t *written) {
   exec_flags_t flags = FLAGS_NONE;
   exec_lenght_t lenght = LENGHT_NONE;
   uint32_t width = 0;
@@ -267,43 +267,61 @@ const char *_vprintf_exec(const char *fmt, va_list args, printf_sink_t *sink, ui
   }
 
   // Specifier Stage
-  if (*fmt == '%') {
-    sink->putc_fn('%', sink->ctx);
-    (*written)++;
-    return fmt + 1;
-  }
-
-  else if (*fmt == 'd' || *fmt == 'i') {
-    printf_value_t v = _get_argument(args, lenght, ARG_SIGNED_INT);
-    uint64_t absval = (v.s < 0) ? (uint64_t)(-v.s) : (uint64_t)v.s;
-    number_type_t t = (v.s < 0) ? NUMBER_DECIMAL_NEGATIV : NUMBER_DECIMAL_POSITIV;
-    *written += _print_number(absval, t, false, flags, width, prec, sink);
-  }
-
-  else if (*fmt == 'u') {
-    printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
-    *written += _print_number(v.u, NUMBER_DECIMAL_UNSIGNED, false, flags, width, prec, sink);
-  }
-
-  else if (*fmt == 'o') {
-    printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
-    *written += _print_number(v.u, NUMBER_OCTAL, false, flags, width, prec, sink);
-  }
-
-  else if (*fmt == 'x' || *fmt == 'X') {
-    printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
-    *written += _print_number(v.u, NUMBER_HEX, (*fmt == 'X'), flags, width, prec, sink);
-  }
-
-  else if (*fmt == 'p') {
-    printf_value_t v = _get_argument(args, LENGHT_NONE, ARG_POINTER);
-    *written += _print_number((uintptr_t)v.p, NUMBER_HEX, false, FLAGS_ALTERNATE, width, prec, sink);
+  switch(*fmt) {
+    case '%': {
+      sink->putc_fn('%', sink->ctx);
+      (*written)++;
+    } break;
+    case 'c': {
+      printf_value_t v = _get_argument(args, LENGHT_NONE, ARG_SIGNED_INT);
+      sink->putc_fn((char)v.s, sink->ctx);
+      (*written)++;
+    } break;
+    case 's': {
+      printf_value_t v = _get_argument(args, LENGHT_NONE, ARG_POINTER);
+      char* str = (char*)v.p;
+      str = str ? str : "(null)";
+      while (*str) {
+          sink->putc_fn(*str++, sink->ctx);
+          (*written)++;
+      }
+    } break;
+    case 'n': {
+      printf_value_t v = _get_argument(args, LENGHT_NONE, ARG_POINTER);
+      *((uint32_t*)v.p) = *written; 
+    } break;
+    case 'd':
+    case 'i': {
+      printf_value_t v = _get_argument(args, lenght, ARG_SIGNED_INT);
+      uint64_t absval = (v.s < 0) ? (uint64_t)(-v.s) : (uint64_t)v.s;
+      number_type_t t = (v.s < 0) ? NUMBER_DECIMAL_NEGATIV : NUMBER_DECIMAL_POSITIV;
+      *written += _print_number(absval, t, false, flags, width, prec, sink);
+    } break;
+    case 'u': {
+      printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
+      *written += _print_number(v.u, NUMBER_DECIMAL_UNSIGNED, false, flags, width, prec, sink);
+    } break;
+    case 'o': {
+      printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
+      *written += _print_number(v.u, NUMBER_OCTAL, false, flags, width, prec, sink);
+    } break;
+    case 'x':
+    case 'X': {
+      printf_value_t v = _get_argument(args, lenght, ARG_UNSIGNED_INT);
+      *written += _print_number(v.u, NUMBER_HEX, (*fmt == 'X'), flags, width, prec, sink);
+    } break;
+    case 'p': {
+      printf_value_t v = _get_argument(args, LENGHT_NONE, ARG_POINTER);
+      *written += _print_number((uintptr_t)v.p, NUMBER_HEX, false, FLAGS_ALTERNATE, width, prec, sink);
+    } break;
+    default:
+      break;
   }
 
   return fmt + 1;
 }
 
-uint32_t _vprintf_core(const char *fmt, va_list args, printf_sink_t *sink) {
+uint32_t _vprintf_core(const char *fmt, va_list* args, printf_sink_t *sink) {
   uint32_t written = 0;
 
   while (*fmt) {
@@ -323,7 +341,7 @@ uint32_t _vprintf_core(const char *fmt, va_list args, printf_sink_t *sink) {
 void putc(char c) { i686_debug_putc(c); }
 
 // printf
-void _printf_sink(char c, void *ctx) {
+static void _printf_putc(char c, void *ctx) {
   (void)ctx;
   putc(c);
 }
@@ -332,19 +350,76 @@ uint32_t printf(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
   printf_sink_t sink = {
-      .putc_fn = _printf_sink,
+      .putc_fn = _printf_putc,
       .ctx = NULL,
   };
-  uint32_t written = _vprintf_core(fmt, args, &sink);
+  uint32_t written = _vprintf_core(fmt, &args, &sink);
   va_end(args);
   return written;
 }
 
-uint32_t vprintf(const char *fmt, va_list args) {
+uint32_t vprintf(const char *fmt, va_list* args) {
   printf_sink_t sink = {
-      .putc_fn = _printf_sink,
+      .putc_fn = _printf_putc,
       .ctx = NULL,
   };
 
   return _vprintf_core(fmt, args, &sink);
+}
+
+typedef struct {
+  char   *buf;
+  size_t  pos;
+  size_t  max;
+} snprintf_ctx_t;
+
+static void _snprintf_putc(char c, void *ctx) {
+  snprintf_ctx_t *s = (snprintf_ctx_t *)ctx;
+  if (s->max == 0) {
+    s->buf[s->pos] = c;
+  } else {
+    if (s->pos + 1 < s->max)
+      s->buf[s->pos] = c;
+  }
+  s->pos++;
+}
+
+uint32_t sprintf(char *buf, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  uint32_t written = vsprintf(buf, fmt, &args);
+  va_end(args);
+  return written;
+}
+
+uint32_t vsprintf(char *buf, const char *fmt, va_list *args) {
+  snprintf_ctx_t sctx = { .buf = buf, .pos = 0, .max = 0 };
+  printf_sink_t  sink = { .putc_fn = _snprintf_putc, .ctx = &sctx };
+  uint32_t written = _vprintf_core(fmt, args, &sink);
+  buf[sctx.pos] = '\0';
+  return written;
+}
+
+uint32_t snprintf(char *buf, size_t size, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  uint32_t written = vsnprintf(buf, size, fmt, &args);
+  va_end(args);
+  return written;
+}
+
+uint32_t vsnprintf(char *buf, size_t size, const char *fmt, va_list *args) {
+  if (size == 0) {
+    char dummy[1];
+    snprintf_ctx_t sctx = { .buf = dummy, .pos = 0, .max = 1 };
+    printf_sink_t  sink = { .putc_fn = _snprintf_putc, .ctx = &sctx };
+    return _vprintf_core(fmt, args, &sink);
+  }
+ 
+  snprintf_ctx_t sctx = { .buf = buf, .pos = 0, .max = size };
+  printf_sink_t  sink = { .putc_fn = _snprintf_putc, .ctx = &sctx };
+  uint32_t written = _vprintf_core(fmt, args, &sink);
+ 
+  buf[sctx.pos < size ? sctx.pos : size - 1] = '\0';
+  return written;
 }
