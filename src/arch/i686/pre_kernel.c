@@ -4,8 +4,8 @@
 #include <stddef.h>
 
 // CPU Setup
-#include "gdt.h"
-#include "tss.h"
+#include "cpu/gdt.h"
+#include "cpu/tss.h"
 
 void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   (void)mb_info;
