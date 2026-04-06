@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "gdb",
+            "request": "attach",
+            "name": "Debug Sodium (QEMU)",
+            "executable": "${workspaceFolder}/dist/sodium.dbg",
+            "target": "localhost:1234",
+            "remote": true,
+            "cwd": "${workspaceFolder}",
+            "gdbpath": "gdb",
+            "autorun": [
+                "set architecture i386",
+                "set substitute-path /workspace ${workspaceFolder}"
+            ],
+            "preLaunchTask": "qemu: start debug server",
+            "postDebugTask":  "qemu: kill"
+        }
+    ]
+}

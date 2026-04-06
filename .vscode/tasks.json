@@ -1,0 +1,69 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // Build
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make build",
+            "group": { "kind": "build", "isDefault": true },
+            "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+            "problemMatcher": []
+        },
+        {
+            "label": "build: release",
+            "type": "shell",
+            "command": "make build BUILD=Release",
+            "group": "build",
+            "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+            "problemMatcher": []
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "make clean",
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": []
+        },
+
+        // Run
+        {
+            "label": "run",
+            "type": "shell",
+            "command": "make run",
+            "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+            "problemMatcher": []
+        },
+
+        {
+            "label": "qemu: start debug server",
+            "type": "shell",
+            "command": "test -f dist/Sodium.iso || { echo 'ERROR: dist/Sodium.iso not found — run the build task first'; exit 1; } && echo 'QEMU_STARTING' && echo 'QEMU_READY' && exec qemu-system-i386 -debugcon stdio -no-reboot -cdrom dist/Sodium.iso -s -S",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^QEMU_READY$"
+                },
+                "background": {
+                    "activeOnStart": false,
+                    "beginsPattern": "^QEMU_STARTING$",
+                    "endsPattern":   "^QEMU_READY$"
+                }
+            }
+        },
+
+        // Debug: stop QEMU
+        {
+            "label": "qemu: kill",
+            "type": "shell",
+            "command": "pkill -f 'qemu-system-i386.*Sodium.iso' || true",
+            "presentation": { "reveal": "never", "close": true },
+            "problemMatcher": []
+        }
+    ]
+}

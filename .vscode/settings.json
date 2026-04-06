@@ -1,0 +1,17 @@
+{
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "files.associations": {
+        "*.asm": "asm-intel-x86-generic",
+        "*.nasm": "asm-intel-x86-generic",
+        "*.h": "c",
+        "*.c": "c"
+    },
+    "editor.formatOnSave": true,
+    "[c]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/build",
+        "--path-mappings=/workspace=${workspaceFolder}"
+    ]
+}

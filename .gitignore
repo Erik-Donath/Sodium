@@ -19,9 +19,6 @@ CMakeFiles/
 cmake_install.cmake
 
 # Editor
-.vscode/
-.idea/
-.vs/
 *.swp
 *.swo
 .DS_Store
