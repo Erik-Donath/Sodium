@@ -6,9 +6,10 @@
 #include "debug.h"
 
 // CPU Setup
-#include "cpu/fpu.h"
 #include "cpu/gdt.h"
 #include "cpu/tss.h"
+#include "cpu/fpu.h"
+#include "cpu/idt.h"
 
 void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   (void)mb_info;
@@ -20,6 +21,9 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   i686_gdt_load();
   i686_tss_load();
   i686_fpu_init();
+
+  i686_idt_init();
+  i686_idt_load();
 
 
   // Printing Sodium in aqua to VGA Output

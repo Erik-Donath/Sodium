@@ -1,5 +1,5 @@
 #include "tss.h"
-#include "gdt.h"
+#include "segments.h"
 #include <stdint.h>
 
 // Defined in boot.asm:
@@ -7,7 +7,7 @@ extern uint32_t stack_top;
 
 // See: https://wiki.osdev.org/Task_State_Segment
 
-typedef struct __attribute__((packed)) i686_tss_table {
+typedef struct i686_tss_table {
   uint16_t link;
   uint16_t reserved0;
 
@@ -63,40 +63,26 @@ typedef struct __attribute__((packed)) i686_tss_table {
   uint16_t iopb;
 
   uint32_t ssp;
-} i686_tss_table;
+} __attribute__((packed)) i686_tss_table_t;
 
-// See: https://wiki.osdev.org/Segment_Selector
-typedef enum i686_tss_rpl : uint16_t {
-  RPL0 = 0x00,
-  RPL1 = 0x01,
-  RPL2 = 0x02,
-  RPL3 = 0x03,
-} i686_tss_rpl;
-
-// See: https://wiki.osdev.org/Segment_Selector
-typedef enum i686_tss_ti : uint16_t {
-  TI_GDT = 0x00,
-  TI_LDT = 0x04,
-} i686_tss_ti;
-
-_Static_assert(sizeof(i686_tss_table) == 0x6C,
+_Static_assert(sizeof(i686_tss_table_t) == 0x6C,
                "TSS Table musst be the Size of 0x68 bytes!");
 
-i686_tss_table tss = {0};
+i686_tss_table_t tss = {0};
 
 void i686_tss_init(void) {
-  tss = (i686_tss_table){
+  tss = (i686_tss_table_t){
       .link = 0x0,
 
       .esp0 = (uint32_t)&stack_top,
-      .ss0 = i686_GDT_KERNEL_DATA_SEGMENT | RPL0 | TI_GDT,
+      .ss0 = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
 
-      .cs = i686_GDT_KERNEL_CODE_SEGMENT | RPL0 | TI_GDT,
-      .es = i686_GDT_KERNEL_DATA_SEGMENT | RPL0 | TI_GDT,
-      .ss = i686_GDT_KERNEL_DATA_SEGMENT | RPL0 | TI_GDT,
-      .ds = i686_GDT_KERNEL_DATA_SEGMENT | RPL0 | TI_GDT,
-      .fs = i686_GDT_KERNEL_DATA_SEGMENT | RPL0 | TI_GDT,
-      .gs = i686_GDT_KERNEL_DATA_SEGMENT | RPL0 | TI_GDT,
+      .cs = SEGMENT(i686_GDT_KERNEL_CODE_SEGMENT, RPL0, TI_GDT),
+      .es = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .ss = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .ds = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .fs = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .gs = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
 
       .ldtr = 0x0,
       .iopb = sizeof(tss),
@@ -104,8 +90,7 @@ void i686_tss_init(void) {
   };
 }
 
-void __attribute__((cdecl)) i686_tss_flush(
-    uint16_t segment); // segment number from gdt; Defined in Assembly
+void __attribute__((cdecl)) i686_tss_flush(uint16_t segment); // segment number from gdt; Defined in Assembly
 
 void i686_tss_load(void) {
   // Flush TSS

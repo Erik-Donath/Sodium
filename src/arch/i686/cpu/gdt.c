@@ -1,4 +1,5 @@
 #include "gdt.h"
+#include "segments.h"
 
 #include <stdint.h>
 
@@ -24,8 +25,8 @@ Global Decriptor Table Entry:
 */
 
 #define i686_TSS_TABLE_SIZE 0x6C
-struct i686_tss_table;
-extern struct i686_tss_table tss;
+struct i686_tss_table_t;
+extern struct i686_tss_table_t tss;
 
 typedef enum i686_gdt_access : uint8_t {
   // 7: P (Present) bit
@@ -54,7 +55,7 @@ typedef enum i686_gdt_access : uint8_t {
 
   // 0: A (Accessed) bit
   GDT_ACCESS_ACCESSED = 0x01,
-} i686_gdt_access;
+} i686_gdt_access_t;
 
 typedef enum i686_gdt_flags : uint8_t {
   // 3: G (Granularity flag)
@@ -70,9 +71,9 @@ typedef enum i686_gdt_flags : uint8_t {
 
   // 0: Reserved
   GDT_FLAG_AVAILABLE = 0x1, // #FIXME: Might be removed in the future
-} i686_gdt_flags;
+} i686_gdt_flags_t;
 
-typedef struct __attribute__((packed)) i686_gdt_entry {
+typedef struct i686_gdt_entry {
   uint16_t limit_low;
   uint16_t base_low;
   uint8_t base_middle;
@@ -80,24 +81,27 @@ typedef struct __attribute__((packed)) i686_gdt_entry {
   uint8_t limit_high : 4;
   uint8_t flags : 4;
   uint8_t base_high;
-} i686_gdt_entry;
+} __attribute__((packed)) i686_gdt_entry_t;
 
-typedef struct __attribute__((packed)) i686_gdt_pointer {
+typedef struct i686_gdt_pointer {
   uint16_t limit;
-  i686_gdt_entry *base;
-} i686_gdt_pointer;
+  i686_gdt_entry_t *base;
+} __attribute__((packed)) i686_gdt_pointer_t;
+
+_Static_assert(sizeof(i686_gdt_entry_t) == 8, "i686_gdt_entry_t musst be 8 bytes long");
+_Static_assert(sizeof(i686_gdt_pointer_t) == 6, "i686_gdt_pointer_t musst be 6 bytes long");
 
 #define GDT_ENTRY_COUNT 6
-static i686_gdt_entry gdt[GDT_ENTRY_COUNT] = {0};
+static i686_gdt_entry_t gdt[GDT_ENTRY_COUNT] = {0};
 
-static i686_gdt_pointer gdt_ptr = {
+static i686_gdt_pointer_t gdt_ptr = {
     .limit = sizeof(gdt) - 1,
     .base = gdt,
 };
 
 void i686_gdt_set(uint8_t segnum, uint32_t base, uint32_t limit, uint8_t access,
                   uint8_t flags) {
-  gdt[segnum] = (i686_gdt_entry){
+  gdt[segnum] = (i686_gdt_entry_t){
       .limit_low = (uint16_t)((limit) & 0xFFFF),
       .base_low = (uint16_t)((base) & 0xFFFF),
       .base_middle = (uint8_t)((base >> 16) & 0xFF),
@@ -144,7 +148,7 @@ void i686_gdt_init(void) {
 }
 
 // Defined in Assembly
-extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer *gdt_ptr,
+extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer_t *gdt_ptr,
                                                   uint16_t kernel_code_segment,
                                                   uint16_t kernel_data_segment);
 
