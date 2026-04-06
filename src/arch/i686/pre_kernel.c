@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "debug.h"
+
 // CPU Setup
 #include "cpu/fpu.h"
 #include "cpu/gdt.h"
@@ -13,10 +15,12 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
 
   // Seting up the CPU
   i686_gdt_init();
+  i686_debug_puts("Hello\n");
   i686_tss_init();
   i686_gdt_load();
   i686_tss_load();
   i686_fpu_init();
+
 
   // Printing Sodium in aqua to VGA Output
   static char *i686_vga = (char *)0xB8000;
