@@ -1,11 +1,11 @@
 bits 32
 section .text
 
+%include "arch/i686/cpu/segments.inc"
+
 global i686_gdt_flush
 i686_gdt_flush:
     ; [ebp + 8] = gdt pointer
-    ; [ebp + 12] = code segment
-    ; [ebp + 16] = data segment
 
     ; Setup Stack Frame
     push ebp
@@ -16,16 +16,11 @@ i686_gdt_flush:
     lgdt [eax]
 
     ; reload code segment
-    ; Im using the far return instruction to reload the code segment. Therefor the code segment and return adress need to be pushed on the stack. 
-    ; The retf instruction will then pop those values of the stack and perform a far jump and reload the code segment.
-    mov eax, [esp + 12]
-    push eax
-    push .code_reloaded
-    retf
+    jmp i686_KERNEL_CODE_SEGMENT:.code_reloaded
 
 .code_reloaded:
     ; reload data segment
-    mov eax, [esp + 16]
+    mov eax, i686_KERNEL_DATA_SEGMENT
     mov ds, ax
     mov es, ax
     mov fs, ax

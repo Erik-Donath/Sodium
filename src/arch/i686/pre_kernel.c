@@ -16,15 +16,25 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
 
   // Seting up the CPU
   i686_gdt_init();
-  i686_debug_puts("Hello\n");
+  i686_debug_puts("[OK] GDT Initialized\n");
   i686_tss_init();
+  i686_debug_puts("[OK] TSS Initialized\n");
   i686_gdt_load();
+  i686_debug_puts("[OK] GDT Loaded\n");
   i686_tss_load();
+  i686_debug_puts("[OK] TSS Loaded\n");
   i686_fpu_init();
+  i686_debug_puts("[OK] FPU Initialized\n");
 
   i686_idt_init();
+  i686_debug_puts("[OK] IDT Initialized\n");
+  // Setup ISR Default Handlers (isr init)
   i686_idt_load();
-
+  i686_debug_puts("[OK] IDT Loaded\n");
+  // Setup PIC
+  
+  // Setup Early ISR Handlers
+  // Call set interrupt
 
   // Printing Sodium in aqua to VGA Output
   static char *i686_vga = (char *)0xB8000;

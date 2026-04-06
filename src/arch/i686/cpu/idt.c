@@ -3,14 +3,18 @@
 
 #include <stdint.h>
 
+// This File works together with the ISR definisions and the PIC. Please refear to those if missing some information.
+
+// See: https://wiki.osdev.org/Interrupt_Descriptor_Table
+
 /*
-Instruction Dectrior Table Pointer:
+Interrupt Dectrior Table Pointer:
 | Bits    | Description                               |
 |---------|-------------------------------------------|
 | 0-15    | Table limit                               |
 | 16-47   | Pointer to the first Entry                |
 
-Instruction Decriptor Table Entry:
+Interrupt Decriptor Table Entry:
 | Bits    | Description                             |
 |---------|-----------------------------------------|
 | 0-15    | Offset (lower 16 bits)                  |
@@ -42,5 +46,19 @@ typedef struct i686_idt_pointer {
 _Static_assert(sizeof(i686_idt_entry_t) == 8, "i686_idt_entry_t musst be 8 bytes long");
 _Static_assert(sizeof(i686_idt_pointer_t) == 6, "i686_idt_pointer_t musst be 6 bytes long");
 
-void i686_idt_init(void) { ; }
-void i686_idt_load(void) { ; }
+static i686_idt_entry_t idt[256] = { 0 };
+
+static i686_idt_pointer_t idt_ptr = {
+    .size = sizeof(idt) - 1,
+    .base = idt,
+};
+
+void i686_idt_init(void) {
+    (void)idt_ptr;
+}
+
+extern void __attribute__((cdecl)) i686_idt_flush(i686_idt_pointer_t* ptr);
+
+void i686_idt_load(void) {
+    i686_idt_flush(&idt_ptr);
+}

@@ -1,12 +1,14 @@
 bits 32
 section .text
 
-global i686_tss_flush
-i686_tss_flush:
-    ; [esp + 4] = tss segment
+%include "arch/i686/cpu/segments.inc"
+
+global i686_tss_load
+i686_tss_load:
+    ; no parameters given
 
     ; Loading TSS via ltr instruction
-    mov ax, [esp + 4]
+    mov ax, i686_TSS_SEGMENT
     ltr ax
 
     ret

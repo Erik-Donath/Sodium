@@ -75,24 +75,17 @@ void i686_tss_init(void) {
       .link = 0x0,
 
       .esp0 = (uint32_t)&stack_top,
-      .ss0 = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .ss0 = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
 
-      .cs = SEGMENT(i686_GDT_KERNEL_CODE_SEGMENT, RPL0, TI_GDT),
-      .es = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-      .ss = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-      .ds = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-      .fs = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-      .gs = SEGMENT(i686_GDT_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .cs = SEGMENT(i686_KERNEL_CODE_SEGMENT, RPL0, TI_GDT),
+      .es = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .ss = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .ds = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .fs = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+      .gs = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
 
       .ldtr = 0x0,
       .iopb = sizeof(tss),
       .ssp = 0x0,
   };
-}
-
-void __attribute__((cdecl)) i686_tss_flush(uint16_t segment); // segment number from gdt; Defined in Assembly
-
-void i686_tss_load(void) {
-  // Flush TSS
-  i686_tss_flush(i686_GDT_TSS_SEGMENT);
 }

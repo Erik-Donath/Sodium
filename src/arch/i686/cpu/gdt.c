@@ -148,12 +148,9 @@ void i686_gdt_init(void) {
 }
 
 // Defined in Assembly
-extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer_t *gdt_ptr,
-                                                  uint16_t kernel_code_segment,
-                                                  uint16_t kernel_data_segment);
+extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer_t *gdt_ptr);
 
 void i686_gdt_load(void) {
   // Flush GDT
-  i686_gdt_flush(&gdt_ptr, i686_GDT_KERNEL_CODE_SEGMENT,
-                 i686_GDT_KERNEL_DATA_SEGMENT);
+  i686_gdt_flush(&gdt_ptr);
 }
