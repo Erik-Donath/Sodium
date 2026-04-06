@@ -12,6 +12,7 @@
     },
     "clangd.arguments": [
         "--compile-commands-dir=${workspaceFolder}/build",
-        "--path-mappings=/workspace=${workspaceFolder}"
+        "--path-mappings=/workspace=${workspaceFolder}",
+        "-target=i686-elf"
     ]
 }

@@ -56,6 +56,9 @@ execute_process(
 )
 message(STATUS "Using libgcc: ${LIBGCC_PATH}")
 
+add_compile_options(-msse -msse2 -mfpmath=sse)
+add_compile_options(-mno-mmx)
+
 target_link_options(sodium.bin PRIVATE
     -nostartfiles
     -nodefaultlibs
