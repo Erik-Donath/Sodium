@@ -31,6 +31,9 @@ clean:
 	$(MAKE) --no-print-directory -C buildsystem/$(ARCH) clean
 	rm -rf $(BUILD_DIR) $(DIST_DIR)
 
+vnc:
+	websockify --web /usr/share/novnc/ 6080 localhost:5900
+
 help:
 	@echo "Sodium OS Build System"
 	@echo ""
@@ -39,6 +42,7 @@ help:
 	@echo "  run            - Run in QEMU"
 	@echo "  debug          - Run in QEMU with GDB attached"
 	@echo "  clean          - Remove build artifacts"
+	@echo "  vnc            - Starts a novnc webserver that connects to QEMU"
 	@echo "  rebuild-image  - Force a full Docker image rebuild"
 	@echo ""
 	@echo "Options:"

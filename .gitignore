@@ -1,6 +1,7 @@
 # Build artifacts
 build/
 dist/
+.devcontainer/
 *.docker-stamp
 
 # Object files

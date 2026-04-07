@@ -15,7 +15,23 @@
                 "set substitute-path /workspace ${workspaceFolder}"
             ],
             "preLaunchTask": "qemu: start debug server",
-            "postDebugTask":  "qemu: kill"
+            "postDebugTask": "qemu: kill"
+        },
+        {
+            "type": "gdb",
+            "request": "attach",
+            "name": "Debug Sodium (QEMU VNC)",
+            "executable": "${workspaceFolder}/dist/sodium.dbg",
+            "target": "localhost:1234",
+            "remote": true,
+            "cwd": "${workspaceFolder}",
+            "gdbpath": "gdb",
+            "autorun": [
+                "set architecture i386",
+                "set substitute-path /workspace ${workspaceFolder}"
+            ],
+            "preLaunchTask": "qemu: start debug server vnc",
+            "postDebugTask": "qemu: kill"
         }
     ]
 }
