@@ -14,6 +14,14 @@
 #define outl(port, value) i686_io_outl((port), (value))
 #define inl(port) (i686_io_inl((port)))
 
+static inline void i686_io_disable_interrupts(void) {
+  __asm__ volatile("cli" : : :);
+}
+
+static inline void i686_io_enable_interrupts(void) {
+  __asm__ volatile("sti" : : :);
+}
+
 static inline void i686_io_outb(uint16_t port, uint8_t value) {
   __asm__ volatile("outb %b0, %w1" : : "a"(value), "Nd"(port) : "memory");
 }

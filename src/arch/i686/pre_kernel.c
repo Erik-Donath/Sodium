@@ -10,6 +10,7 @@
 #include "cpu/tss.h"
 #include "cpu/fpu.h"
 #include "cpu/idt.h"
+#include "cpu/isr.h"
 
 void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   (void)mb_info;
@@ -26,15 +27,20 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   i686_fpu_init();
   i686_debug_puts("[OK] FPU Initialized\n");
 
+  i686_io_disable_interrupts();
   i686_idt_init();
   i686_debug_puts("[OK] IDT Initialized\n");
-  // Setup ISR Default Handlers (isr init)
+  i686_isr_init();
+  i686_debug_puts("[OK] ISR Initialized\n");
   i686_idt_load();
   i686_debug_puts("[OK] IDT Loaded\n");
-  // Setup PIC
-  
-  // Setup Early ISR Handlers
-  // Call set interrupt
+
+  // #FIXME: Deaktivate PIC1 and PIC2
+  outb(0x21, 0xFF);
+  outb(0xA1, 0xFF);
+
+  i686_io_enable_interrupts();
+  i686_debug_puts("[OK] IDT Interrupts Enabled\n");
 
   // Printing Sodium in aqua to VGA Output
   static char *i686_vga = (char *)0xB8000;
