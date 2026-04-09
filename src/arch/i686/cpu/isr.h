@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef struct i686_isr_cpu_state {
@@ -13,5 +14,5 @@ typedef void (*i686_isr_handler_t)(i686_isr_cpu_state_t* state);
  
 void i686_isr_init(void);
 
-void i686_isr_set_handler(uint8_t int_num, i686_isr_handler_t handler);
+bool i686_isr_set_handler(uint8_t int_num, i686_isr_handler_t handler);
 void i686_isr_clear_handler(uint8_t int_num);

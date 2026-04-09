@@ -72,14 +72,12 @@ void i686_isr_init(void) {
         i686_isr_clear_handler(i);
 }
 
-void i686_isr_set_handler(uint8_t int_num, i686_isr_handler_t handler) {
-    if(i686_isr_handlers[int_num] == i686_isr_default_handler || i686_isr_handlers[int_num] == i686_isr_unhandled_exception) {
+bool i686_isr_set_handler(uint8_t int_num, i686_isr_handler_t handler) {
+    bool set = i686_isr_handlers[int_num] == i686_isr_default_handler || i686_isr_handlers[int_num] == i686_isr_unhandled_exception;
+    
+    if(set)
         i686_isr_handlers[int_num] = handler;
-    }
-    else {
-        printf("Tried Overwritting existing Interrupt %d (CANCELD)\n", int_num);
-        // #FIXME: Add kernel logging.
-    }
+    return set;
 }
 
 void i686_isr_clear_handler(uint8_t int_num) {

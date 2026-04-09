@@ -12,6 +12,9 @@
 #include "cpu/idt.h"
 #include "cpu/isr.h"
 
+// PIC
+#include "i8259A/pic.h"
+
 void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   (void)mb_info;
 
@@ -35,10 +38,11 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   i686_idt_load();
   i686_debug_puts("[OK] IDT Loaded\n");
 
-  // #FIXME: Deaktivate PIC1 and PIC2
-  outb(0x21, 0xFF);
-  outb(0xA1, 0xFF);
-
+  // #FIXME: Assuming that there is an i8259A controller. Implement a real check against ACPIMADT when implementing APCI driver
+  i686_debug_puts("[OK] Found Interrupt Controller: i8259A\n");
+  i8259A_enable();
+  i686_debug_puts("[OK] Enabled PIC i8259A\n");
+  
   i686_io_enable_interrupts();
   i686_debug_puts("[OK] IDT Interrupts Enabled\n");
 
@@ -52,6 +56,8 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
 
   // Printing Sodium in aqua using ASCII Escape Seqenz to qemu debug output
   printf("\033[38;5;6;48;5;0mSODIUM\033[0m\n");
+
+  while(1) ;
 
   return;
 }
