@@ -14,5 +14,6 @@
         "--compile-commands-dir=${workspaceFolder}/build",
         "--path-mappings=/workspace=${workspaceFolder}",
         "-target=i686-elf"
-    ]
+    ],
+    "cmake.sourceDirectory": "/workspaces/Sodium/buildsystem/i686"
 }
