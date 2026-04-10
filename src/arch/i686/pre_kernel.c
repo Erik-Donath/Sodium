@@ -15,11 +15,11 @@
 // PIC
 #include "pic/i8259A.h"
 
-static void timer(i686_isr_cpu_state_t *state) {
+static void i686_timer(i686_isr_cpu_state_t *state) {
   i686_i8259A_send_eoi(state->int_num - i686_i8259A_irq_master);
 }
 
-void __attribute__((cdecl)) pre_kernel(void *mb_info) {
+void __attribute__((cdecl)) i686_pre_kernel(void *mb_info) {
   (void)mb_info;
 
   // Seting up the CPU
@@ -49,7 +49,7 @@ void __attribute__((cdecl)) pre_kernel(void *mb_info) {
   i686_debug_puts("[OK] Enabled PIC i8259A\n");
 
   i686_isr_clear_handler(i686_i8259A_irq_master + 0);
-  if(i686_isr_set_handler(i686_i8259A_irq_master + 0, timer))
+  if(i686_isr_set_handler(i686_i8259A_irq_master + 0, i686_timer))
     i686_debug_puts("[OK] Timer setup\n");
   else {
     i686_debug_puts("[ERR] Failed to setup Timer\n");

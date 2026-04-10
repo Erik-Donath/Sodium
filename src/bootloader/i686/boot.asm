@@ -25,7 +25,7 @@ mb_header_end:
 
 ; Boot code
 section .text
-    extern pre_kernel
+    extern i686_pre_kernel
     extern i686_shutdown
     extern bss_start
     extern bss_end
@@ -51,7 +51,7 @@ start:
 
     ; Call pre_kernel(mb_info*)
     push ebx
-    call pre_kernel
+    call i686_pre_kernel
     jmp i686_shutdown
 
 global stack_top
