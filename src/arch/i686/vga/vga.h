@@ -120,12 +120,12 @@ static inline void i686_vga_gc_write(uint8_t index, uint8_t value) {
     i686_io_outb(i686_VGA_PORT_GC_DATA,  value);
 }
 
-// This methode is used to reset the ac read flip flop used to send index and value data to ac. By reading the port the flip flop always jumps to the index state.
+// This method is used to reset the ac read flip flop used to send index and value data to ac. By reading the port the flip flop always jumps to the index state.
 static inline void i686_vga_ac_reset_flipflop(void) {
     i686_io_inb(i686_VGA_PORT_INSTAT1);
 }
 
-// The methode asumes that ac is in index mode. Please use i686_vga_ac_reset_flipflop if unsure about the current state.
+// The method asumes that ac is in index mode. Please use i686_vga_ac_reset_flipflop if unsure about the current state.
 static inline void i686_vga_ac_write(uint8_t index, uint8_t value) {
     i686_io_outb(i686_VGA_PORT_AC_INDEX, index | i686_VGA_AC_PALETTE_ENABLE);
     i686_io_outb(i686_VGA_PORT_AC_INDEX, value);

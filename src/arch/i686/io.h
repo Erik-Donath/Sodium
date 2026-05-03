@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 // Please use with caution:
-// Note that it is allways cleaner to use the Function names instead of these
-// Macros. Use in quick testing should be the primary usecase here!
+// Note that it is allways cleaner to use the Function names instead of these Macros. 
+// Use in testing should be the primary usecase here!
 
 #define outb(port, value) i686_io_outb((port), (value))
 #define inb(port) (i686_io_inb((port)))
@@ -52,7 +52,7 @@ static inline uint32_t i686_io_inl(uint16_t port) {
   return value;
 }
 
-#define i686_IO_DELAY 0x80
+#define i686_IO_DELAY 0x80 // Port 0x80 is used on POST but later disabled by the BIOS (Or UEFI). Therfore we can safly write to it without messing something up.
 static inline void i686_io_wait(void) {
     i686_io_outb(i686_IO_DELAY, 0x00);
 }

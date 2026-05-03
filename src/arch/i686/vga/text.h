@@ -33,7 +33,7 @@ typedef struct i686_vga_text_mode {
 } i686_vga_text_mode_t;
 
 #define i686_VGA_TEXT_MODE_80x25 ((i686_vga_text_mode_t){ 80, 25, 16, false })
-#define i686_VGA_TEXT_MODE_80x50 ((i686_vga_text_mode_t){ 80, 50,  8, false })
+#define i686_VGA_TEXT_MODE_80x50 ((i686_vga_text_mode_t){ 80, 50,  8, false }) // #FIXME: Do not use since it contains a graphicle bug that could potentionaly fry old Monitors!
 #define i686_VGA_TEXT_MODE_40x25 ((i686_vga_text_mode_t){ 40, 25, 16, false })
 
 #define i686_VGA_TEXT_MODE_MAX_COLS 80
