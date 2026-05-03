@@ -66,7 +66,7 @@ typedef struct i686_tss_table {
 } __attribute__((packed)) i686_tss_table_t;
 
 _Static_assert(sizeof(i686_tss_table_t) == 0x6C,
-               "TSS Table musst be the Size of 0x68 bytes!");
+               "TSS Table musst be the Size of 0x6C bytes!");
 
 i686_tss_table_t tss = {0};
 

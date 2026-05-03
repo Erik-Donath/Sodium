@@ -1,33 +1,33 @@
 #include <string.h>
 
 void *memmove(void *dest, const void *src, size_t n) {
-    uint8_t *d = (uint8_t*)dest;
-    const uint8_t *s = (const uint8_t*)src;
- 
+    uint8_t       *d = (uint8_t *)dest;
+    const uint8_t *s = (const uint8_t *)src;
+
     if (n == 0 || d == s)
         return dest;
-    if (d < s || d >= s + n) {
+
+    if (d < s || d >= s + n)
         return memcpy(dest, src, n);
-    }
- 
+
     d += n;
     s += n;
     while (n--)
         *--d = *--s;
- 
+
     return dest;
 }
 
 void *memchr(const void *s, int c, size_t n) {
-    const uint8_t *p = (const uint8_t*)s;
+    const uint8_t *p   = (const uint8_t *)s;
     const uint8_t  val = (uint8_t)c;
- 
+
     while (n--) {
         if (*p == val)
             return (void *)p;
         p++;
     }
-    return (void *)0;
+    return NULL;
 }
 
 size_t strnlen(const char *s, size_t maxlen) {
@@ -47,7 +47,6 @@ char *strncpy(char *dest, const char *src, size_t n) {
     size_t i;
     for (i = 0; i < n && src[i] != '\0'; i++)
         dest[i] = src[i];
-
     for (; i < n; i++)
         dest[i] = '\0';
     return dest;
@@ -76,16 +75,15 @@ int strcmp(const char *s1, const char *s2) {
 }
 
 int strncmp(const char *s1, const char *s2, size_t n) {
-    if (n == 0)
-        return 0;
-    while (n-- && *s1 != '\0' && *s1 == *s2) {
-        s1++;
-        s2++;
+    for (; n != 0; n--) {
+        unsigned char c1 = (unsigned char)*s1++;
+        unsigned char c2 = (unsigned char)*s2++;
+        if (c1 != c2)
+            return (int)c1 - (int)c2;
+        if (c1 == '\0')
+            return 0;
     }
-    
-    if (n == (size_t)-1)
-        return 0;
-    return (int)(unsigned char)*s1 - (int)(unsigned char)*s2;
+    return 0;
 }
 
 char *strchr(const char *s, int c) {
@@ -95,44 +93,43 @@ char *strchr(const char *s, int c) {
             return (char *)s;
         s++;
     }
-    
-    return (ch == '\0') ? (char *)s : (char *)0;
+    return (ch == '\0') ? (char *)s : NULL;
 }
 
 char *strrchr(const char *s, int c) {
     const char  ch   = (char)c;
-    const char *last = (char *)0;
- 
+    const char *last = NULL;
+
     do {
         if (*s == ch)
             last = s;
     } while (*s++ != '\0');
- 
+
     return (char *)last;
 }
 
 char *strstr(const char *haystack, const char *needle) {
     if (*needle == '\0')
         return (char *)haystack;
- 
+
     for (; *haystack != '\0'; haystack++) {
         const char *h = haystack;
         const char *n = needle;
- 
+
         while (*h != '\0' && *n != '\0' && *h == *n) {
             h++;
             n++;
         }
- 
+
         if (*n == '\0')
             return (char *)haystack;
     }
-    return (char *)0;
+    return NULL;
 }
 
 size_t strspn(const char *s, const char *accept) {
     size_t n = 0;
-    while (*s != '\0' && strchr(accept, *s) != (char *)0) {
+    while (*s != '\0' && strchr(accept, *s) != NULL) {
         n++;
         s++;
     }
@@ -141,7 +138,7 @@ size_t strspn(const char *s, const char *accept) {
 
 size_t strcspn(const char *s, const char *reject) {
     size_t n = 0;
-    while (*s != '\0' && strchr(reject, *s) == (char *)0) {
+    while (*s != '\0' && strchr(reject, *s) == NULL) {
         n++;
         s++;
     }
@@ -150,33 +147,31 @@ size_t strcspn(const char *s, const char *reject) {
 
 char *strpbrk(const char *s, const char *accept) {
     s += strcspn(s, accept);
-    return (*s != '\0') ? (char *)s : (char *)0;
+    return (*s != '\0') ? (char *)s : NULL;
 }
 
 char *strtok(char *s, const char *delim) {
-    static char *saved = (char *)0;
- 
-    if (s != (char *)0)
+    static char *saved = NULL;
+
+    if (s != NULL)
         saved = s;
- 
-    if (saved == (char *)0 || *saved == '\0')
-        return (char *)0;
- 
+
+    if (saved == NULL || *saved == '\0')
+        return NULL;
+
     saved += strspn(saved, delim);
     if (*saved == '\0') {
-        saved = (char *)0;
-        return (char *)0;
+        saved = NULL;
+        return NULL;
     }
- 
 
     char *token = saved;
     saved += strcspn(saved, delim);
- 
-    if (*saved != '\0') {
+
+    if (*saved != '\0')
         *saved++ = '\0';
-    } else {
-        saved = (char *)0;
-    }
- 
+    else
+        saved = NULL;
+
     return token;
 }

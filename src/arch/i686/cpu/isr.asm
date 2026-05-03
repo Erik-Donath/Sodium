@@ -33,7 +33,7 @@ extern i686_isr_handlers
 
     ; discard int_num + error_code
     add esp, 8
-    iret
+    iretd
 %endmacro
 
 ; Some interrupts dont provide an error code. Therefore we first need to push an dummy error code on the stack to not curropt the cpu_state struct.
