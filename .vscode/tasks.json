@@ -54,7 +54,7 @@
         {
             "label": "qemu: start debug server",
             "type": "shell",
-            "command": "test -f dist/Sodium.iso || { echo 'ERROR: dist/Sodium.iso not found — run the build task first'; exit 1; } && echo 'QEMU_STARTING' && echo 'QEMU_READY' && exec qemu-system-i386 -debugcon stdio -no-reboot -cdrom dist/Sodium.iso -s -S",
+            "command": "test -f dist/Sodium.iso || { echo 'ERROR: dist/Sodium.iso not found — run the build task first'; exit 1; } && echo 'QEMU_STARTING' && echo 'QEMU_READY' && exec qemu-system-i386 -debugcon stdio -no-reboot -cdrom dist/Sodium.iso -s -S -audiodev pa,id=speaker -machine pcspk-audiodev=speaker",
             "isBackground": true,
             "presentation": {
                 "reveal": "always",

@@ -19,6 +19,9 @@
 // VGA
 #include "vga/text.h"
 
+// Sound Test
+#include "sound.h"
+
 static void i686_timer(i686_isr_cpu_state_t *state) {
   i686_i8259A_send_eoi(state->int_num - i686_i8259A_irq_master);
 }
@@ -87,6 +90,10 @@ void __attribute__((cdecl)) i686_pre_kernel(void *mb_info) {
 
   // Printing Sodium in aqua using ASCII Escape Seqenz to qemu debug output
   printf("\033[38;5;6;48;5;0mSODIUM\033[0m\n");
+
+  // Play a Beep at Boot finish
+  nosound();
+  beep();
 
   while (1)
     ;

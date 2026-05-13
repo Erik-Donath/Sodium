@@ -17,7 +17,8 @@ rebuild-image:
 run:
 	qemu-system-i386 -debugcon stdio \
 	    -no-reboot \
-	    -cdrom $(DIST_DIR)/Sodium.iso
+	    -cdrom $(DIST_DIR)/Sodium.iso \
+		-audiodev pa,id=speaker -machine pcspk-audiodev=speaker
 
 debug:
 	qemu-system-i386 -debugcon stdio \
