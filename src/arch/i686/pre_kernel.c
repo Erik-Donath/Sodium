@@ -28,9 +28,7 @@ static void i686_timer(i686_isr_cpu_state_t *state) {
   i686_i8259A_send_eoi(state->int_num - i686_i8259A_irq_master);
 }
 
-void __attribute__((cdecl)) i686_pre_kernel(void *mb_info) {
-  (void)mb_info;
-
+void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t* mb_info) {
   // Seting up the CPU
   i686_gdt_init();
   i686_debug_puts("[OK] GDT Initialized\n");
@@ -42,6 +40,15 @@ void __attribute__((cdecl)) i686_pre_kernel(void *mb_info) {
   i686_debug_puts("[OK] TSS Loaded\n");
   i686_fpu_init();
   i686_debug_puts("[OK] FPU Initialized\n");
+
+  // Read Multiboot2 Info Struct
+  if(i686_mb2_parse(mb_info)) {
+    i686_debug_puts("[OK] MB2 Info parsed\n");
+  }
+  else {
+    i686_debug_puts("[ERR] Failed to parse MB2 Info\n");
+    return;
+  }
 
   i686_io_disable_interrupts();
   i686_idt_init();
