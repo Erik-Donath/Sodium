@@ -29,6 +29,18 @@ enum {
 #define MB2_NEXT_TAG(tag) \
     (i686_mb2_tag_t*)(((uintptr_t)(tag) + (tag)->size + 7) & ~7)
 
+typedef struct i686_mb2_tag_data_string {
+    char string[0];
+} __attribute__((packed)) i686_mb2_tag_data_string_t;
+
+typedef struct i686_mb2_tag_data_32ptr {
+    uint32_t ptr;
+} __attribute__((packed)) i686_mb2_tag_data_32ptr_t;
+
+typedef struct i686_mb2_tag_data_64ptr {
+    uint64_t ptr;
+} __attribute__((packed)) i686_mb2_tag_data_64ptr_t;
+
 bool i686_mb2_parse(i686_mb2_header_t* header) {
     uint8_t* end = (uint8_t*)header + header->total_size;
     i686_mb2_tag_t* tag = header->tags;
