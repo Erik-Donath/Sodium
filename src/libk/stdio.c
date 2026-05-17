@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "../kernel/hal.h"
+
 typedef struct printf_sink {
   void (*putc_fn)(char c, void *ctx);
   void *ctx;
@@ -335,9 +337,9 @@ static uint32_t _vprintf_core(const char *fmt, va_list *args, printf_sink_t *sin
   return written;
 }
 
-// #FIXME: Temporarly defining putc to output to debug port.
-#include "../arch/i686/debug.h"
-void putc(char c) { i686_debug_putc(c); }
+void putc(char c) { 
+  hal_debug_putc(c);
+}
 
 static void _printf_putc(char c, void *ctx) {
   (void)ctx;

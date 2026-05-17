@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../io.h"
+#include "../cpu/io.h"
 
 #define i686_VGA_TEXT_BASE    0xB8000
 #define i686_VGA_GRAPH_BASE   0xA0000

@@ -1,5 +1,5 @@
 #include "pc_speaker.h"
-#include "../io.h"
+#include "../cpu/io.h"
 
 // Heavaly inspired by https://wiki.osdev.org/PC_Speaker
 

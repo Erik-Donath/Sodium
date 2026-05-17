@@ -12,3 +12,5 @@
 // All Systems that are not Drivers but Arch spesific are labeled as infrastructor or platform spesifc. For Example the GDT implementation is not realy a Driver but a platform spesific Detail.
 
 // The File doesn't contain any Functions yet.
+
+void hal_debug_putc(char c);

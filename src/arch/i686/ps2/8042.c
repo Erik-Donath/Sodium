@@ -9,7 +9,7 @@
 #include "ps2_MF2_keyboard.h"
 #include "../pic/i8259A.h"
 #include "../cpu/isr.h"
-#include "../io.h"
+#include "../cpu/io.h"
 #include <stdio.h>
 #include <stddef.h>
 

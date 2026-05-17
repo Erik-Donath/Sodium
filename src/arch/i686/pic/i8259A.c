@@ -1,6 +1,6 @@
 #include "i8259A.h"
 #include "../cpu/isr.h"
-#include "../io.h"
+#include "../cpu/io.h"
 #include <stdint.h>
 #include <stdio.h>
 

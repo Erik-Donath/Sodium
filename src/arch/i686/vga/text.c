@@ -1,5 +1,6 @@
 #include "text.h"
 #include "vga.h"
+#include "../cpu/io.h"
 #include <string.h>
 
 static volatile uint16_t* const vga_buf = (volatile uint16_t*)i686_VGA_TEXT_BASE;
