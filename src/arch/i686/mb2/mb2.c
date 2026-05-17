@@ -74,12 +74,6 @@ bool i686_mb2_parse(i686_mb2_header_t* header) {
 
     while ((uint8_t*)tag < end) {
         switch(tag->type) {
-            case MB_TAG_END_OF_MULTIBOOT_INFO: {
-                bool failed = required != PARSE_REQ_ALL;
-                if(failed)
-                    printf("[ERR] MB2 Info does not contain required Entries. Missing: %#010b\n", (required ^ PARSE_REQ_ALL));
-                return !failed;
-            } break;
             case MB_TAG_BOOT_COMMAND_LINE: {
                 i686_mb2_tag_data_string_t* str = (i686_mb2_tag_data_string_t*)tag->data;
                 printf("[INFO] MB2 Boot Command line: %s\n", str->string);
@@ -97,6 +91,12 @@ bool i686_mb2_parse(i686_mb2_header_t* header) {
                 memory_info.map = (i686_mem_map_entry_t*)((uint8_t*)map + sizeof(i686_mb2_tag_data_memory_map_t)); // Calculate the map adress. #FIXME: This can be not aliged. Be carfull.
                 
                 required |= PARSE_REQ_MEM_MAP;
+            } break;
+            case MB_TAG_END_OF_MULTIBOOT_INFO: {
+                bool failed = required != PARSE_REQ_ALL;
+                if(failed)
+                    printf("[ERR] MB2 Info does not contain required Entries. Missing: %#010b\n", (required ^ PARSE_REQ_ALL));
+                return !failed;
             } break;
             default: {
                 printf("[WARN] Failed to identify MB2 Tag %u with size %u\n", tag->type, tag->size);
