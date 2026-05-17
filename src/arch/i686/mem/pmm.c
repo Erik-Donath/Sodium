@@ -3,6 +3,7 @@
 #include "map.h"
 #include "linker.h"
 #include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,9 +11,43 @@
 static uint32_t* pmm_bitmap = NULL;
 static size_t  pmm_total_pages = 0;
 
+static inline void i686_mem_pmm_set(uint32_t page) {
+    if(page < pmm_total_pages) {
+        pmm_bitmap[page / 32] |= (1u << (page % 32));
+    }
+}
+
+static inline void i686_mem_pmm_clear(uint32_t page) {
+    if(page < pmm_total_pages) {
+        pmm_bitmap[page / 32] &= ~(1u << (page % 32));
+    }
+}
+
+static inline bool i686_mem_pmm_test(uint32_t page) {
+    if(page < pmm_total_pages)
+        return (pmm_bitmap[page / 32] >> (page % 32)) & 1u;
+    return true;
+}
+
+static void i686_mem_pmm_region_reserve(uint64_t base, uint64_t length) {
+    uint32_t first_page = (uint32_t)(base / 4096);
+    uint32_t last_page  = (uint32_t)((base + length + 4095) / 4096);
+    for(uint32_t page = first_page; page < last_page; page++)
+        i686_mem_pmm_set(page);
+}
+
+static void i686_mem_pmm_region_free(uint64_t base, uint64_t length) {
+    uint32_t first_page = (uint32_t)((base + 4095) / 4096);
+    uint32_t last_page  = (uint32_t)((base + length) / 4096);
+    for(uint32_t page = first_page; page < last_page; page++) {
+        i686_mem_pmm_clear(page);
+    }
+}
+
+static const uintptr_t os_start_addr = (uintptr_t)&os_start;
+static const uintptr_t os_end_addr = (uintptr_t)&os_end;
+
 bool i686_mem_pmm_init(const i686_mem_info_t* info) {
-    uintptr_t os_start_addr = (uintptr_t)&os_start;
-    uintptr_t os_end_addr = (uintptr_t)&os_end;
 
     // Print Memory Info and Memory Map
     printf(
@@ -39,6 +74,11 @@ bool i686_mem_pmm_init(const i686_mem_info_t* info) {
             top = end;
         if((uint64_t)os_start_addr >= start && (uint64_t)os_end_addr <= end)
             os_entry = i;
+    }
+
+    if(os_entry == info->entry_count) {
+        printf("[ERR] Failed to find OS Entry in Memory Map\n");
+        return false;
     }
 
     // Calculate Page count and Bitmap size
@@ -74,10 +114,41 @@ bool i686_mem_pmm_init(const i686_mem_info_t* info) {
     // Reserve everything
     memset(pmm_bitmap, 0xFF, bitmap_bytes);
 
-    // #TODO:
     // Walk Map and free ever available entry
-    // Mark OS Page(s)
-    // Mark Bitmap Page(s)
+    for(size_t i = 0; i < info->entry_count; i++) {
+        if(info->map[i].type == MEMORY_INFO_AVAILABLE) {
+            i686_mem_pmm_region_free(info->map[i].base_addr, info->map[i].length);
+        }
+    }
+
+    // Mark first Megabyte, Kernel, and Bitmap as reserved
+    i686_mem_pmm_region_reserve(0, 0x100000); 
+    i686_mem_pmm_region_reserve(os_start_addr, os_end_addr - os_start_addr);
+    i686_mem_pmm_region_reserve((uint32_t)(uintptr_t)pmm_bitmap, (uint64_t)bitmap_bytes);
 
     return true;
+}
+
+void* i686_mem_pmm_alloc(void) {
+    size_t array_size = (pmm_total_pages + 31) / 32;
+    for(size_t w = 0; w < array_size; w++) {
+        if(pmm_bitmap[w] == 0xFFFFFFFF) continue;
+        for(uint32_t bit = 0; bit < 32; bit++) {
+            uint32_t page = w * 32 + bit;
+            if(page >= pmm_total_pages) return NULL;
+            if(!i686_mem_pmm_test(page)) {
+                i686_mem_pmm_set(page);
+                return (void*)(uintptr_t)(page * 4096);
+            }
+        }
+    }
+    return NULL;
+}
+
+void i686_mem_pmm_free(void* ptr) {
+    uintptr_t addr = (uintptr_t)ptr;
+    if(addr < 0x100000) return;
+    if(addr >= os_start_addr && addr < os_end_addr) return;
+    if(addr >= (uintptr_t)pmm_bitmap && addr < (uintptr_t)pmm_bitmap + (pmm_total_pages + 31) / 32) return;
+    i686_mem_pmm_clear((uint32_t)addr / 4096);
 }

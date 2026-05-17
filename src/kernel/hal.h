@@ -14,3 +14,6 @@
 // The File doesn't contain any Functions yet.
 
 void hal_debug_putc(char c);
+
+void* hal_phy_page_alloc(void);
+void hal_phy_page_free(void* ptr);
