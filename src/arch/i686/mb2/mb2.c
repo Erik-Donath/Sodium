@@ -1,5 +1,7 @@
 #include "mb2.h"
 
+#include <stdio.h>
+
 enum {
     MB_TAG_END_OF_MULTIBOOT_INFO            = 0,
     MB_TAG_BOOT_COMMAND_LINE                = 1,
@@ -49,6 +51,10 @@ bool i686_mb2_parse(i686_mb2_header_t* header) {
         switch(tag->type) {
             case MB_TAG_END_OF_MULTIBOOT_INFO:
                 return true;
+            case MB_TAG_BOOT_COMMAND_LINE: {
+                i686_mb2_tag_data_string_t* str = (i686_mb2_tag_data_string_t*)tag->data;
+                printf("[INFO] MB2 Boot Command line: %s\n", str->string);
+            } break;
             default:
                 // Unknown MB2 Info so just skip it. #FIXME: Add Debugging
                 break;

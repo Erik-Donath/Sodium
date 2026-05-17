@@ -42,6 +42,7 @@ void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t* mb_info) {
   i686_debug_puts("[OK] FPU Initialized\n");
 
   // Read Multiboot2 Info Struct
+  i686_debug_puts("[INFO] Trying to read MB2 info\n");
   if(i686_mb2_parse(mb_info)) {
     i686_debug_puts("[OK] MB2 Info parsed\n");
   }
