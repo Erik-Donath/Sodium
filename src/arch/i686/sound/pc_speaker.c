@@ -1,10 +1,9 @@
-#pragma once
+#include "pc_speaker.h"
+#include "../io.h"
 
-#include "io.h"
+// Heavaly inspired by https://wiki.osdev.org/PC_Speaker
 
-// Copied from https://wiki.osdev.org/PC_Speaker
-
-static void play_sound(uint32_t nFrequence) {
+void i686_pcspeaker_play_sound(uint32_t nFrequence) {
     uint32_t Div;
 	uint8_t tmp;
  
@@ -19,17 +18,16 @@ static void play_sound(uint32_t nFrequence) {
   	if (tmp != (tmp | 3)) {
  	    i686_io_outb(0x61, tmp | 3);
  	}
- }
+}
 
-static void nosound() {
+void i686_pcspeaker_stop_sound() {
  	uint8_t tmp = i686_io_inb(0x61) & 0xFC;
-     
  	i686_io_outb(0x61, tmp);
 }
 
-void beep() {
- 	play_sound(1000);
+void i686_pcspeaker_beep() {
+ 	i686_pcspeaker_play_sound(1000);
  	for(int x = 0; x < 4000000; x++)
         i686_io_wait();
- 	nosound();
+ 	i686_pcspeaker_stop_sound();
 }

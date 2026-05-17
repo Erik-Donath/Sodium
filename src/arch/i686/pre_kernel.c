@@ -19,7 +19,7 @@
 #include "vga/text.h"
 
 // Sound Test
-#include "sound.h"
+#include "sound/pc_speaker.h"
 
 // Kernel
 #include <kernel/kernel.h>
@@ -92,8 +92,8 @@ void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t* mb_info) {
   i686_debug_puts("[OK] VGA Initialized\n");
 
   // Play a Beep at Boot finish
-  nosound();
-  beep();
+  i686_pcspeaker_stop_sound();
+  i686_pcspeaker_beep();
 
   // Launch high Kernel
   k_main();
