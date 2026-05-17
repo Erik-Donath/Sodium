@@ -55,9 +55,9 @@ bool i686_mb2_parse(i686_mb2_header_t* header) {
                 i686_mb2_tag_data_string_t* str = (i686_mb2_tag_data_string_t*)tag->data;
                 printf("[INFO] MB2 Boot Command line: %s\n", str->string);
             } break;
-            default:
-                // Unknown MB2 Info so just skip it. #FIXME: Add Debugging
-                break;
+            default: {
+                printf("[WARN] Failed to identify MB2 Tag %u with size %u\n", tag->type, tag->size);
+            } break;
         }
 
         tag = MB2_NEXT_TAG(tag);
