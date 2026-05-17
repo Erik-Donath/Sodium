@@ -109,6 +109,6 @@ bool i686_mb2_parse(i686_mb2_header_t* header) {
     return false;
 }
 
-const i686_mem_info_t* i686_mb2_mem_info() {
+const i686_mem_info_t* i686_mb2_get_mem_info() {
     return &memory_info;
 }

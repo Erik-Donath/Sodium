@@ -20,4 +20,4 @@ typedef struct i686_mb2_header {
 bool i686_mb2_parse(i686_mb2_header_t* header);
 
 // All getter function only return usefull information after the parse has finished succesfully.
-const i686_mem_info_t* i686_mb2_mem_info();
+const i686_mem_info_t* i686_mb2_get_mem_info();
