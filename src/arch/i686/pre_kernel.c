@@ -13,7 +13,7 @@
 
 // Important Systems
 #include "mb2/mb2.h"
-#include "mem/memory.h"
+#include "mem/pmm.h"
 
 // PIC
 #include "pic/i8259A.h"
@@ -57,8 +57,13 @@ void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t* mb_info) {
 
   // Setup Memory Managment
   const i686_mem_info_t* info = i686_mb2_get_mem_info();
-  i686_mem_init(info);
-  printf("[OK] Memory Managment initialized\n");
+  if(i686_mem_pmm_init(info)) {
+    printf("[OK] PMM initialized\n");
+  }
+  else {
+    printf("[ERR] PMM initialization failed\n");
+    return;
+  }
 
   // Setup Interrupts
   i686_io_disable_interrupts();

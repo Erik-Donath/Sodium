@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "../mem/memory.h"
+#include "../mem/map.h"
 
 typedef struct i686_mb2_tag {
     uint32_t type;

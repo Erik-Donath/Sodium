@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+// Just defining the Memory Map layout
+
 enum {
     MEMORY_INFO_AVAILABLE           = 1,
     MEMORY_INFO_RESERVED            = 2,
@@ -24,7 +26,4 @@ typedef struct i686_mem_info {
     size_t   entry_count;
     i686_mem_map_entry_t* map;
 } i686_mem_info_t;
-
-// The mem info struct and map musst be available when calling the function. After the call the memory info is stored.
-void i686_mem_init(const i686_mem_info_t* info);
 
