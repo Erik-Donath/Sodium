@@ -20,6 +20,7 @@ typedef struct i686_mem_map_entry {
 typedef struct i686_mem_info {
     uint32_t lower;
     uint32_t upper;
+    uint32_t phy_addr;
     size_t   entry_count;
     i686_mem_map_entry_t* map;
 } i686_mem_info_t;

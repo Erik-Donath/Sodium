@@ -1,5 +1,6 @@
 #include "mb2.h"
 
+#include "../mem/linker.h"
 #include <stdio.h>
 
 enum {
@@ -57,6 +58,7 @@ typedef struct i686_mb2_tag_data_memory_map {
 static i686_mem_info_t memory_info = (i686_mem_info_t){
     .lower = 0x00,
     .upper = 0x00,
+    .phy_addr = (uint32_t)&os_start, // Should be start of os by default
     .entry_count = 0,
     .map = NULL,
 };
@@ -91,6 +93,10 @@ bool i686_mb2_parse(i686_mb2_header_t* header) {
                 memory_info.map = (i686_mem_map_entry_t*)((uint8_t*)map + sizeof(i686_mb2_tag_data_memory_map_t)); // Calculate the map adress. #FIXME: This can be not aliged. Be carfull.
                 
                 required |= PARSE_REQ_MEM_MAP;
+            } break;
+            case MB_TAG_IMAGE_LOAD_BASE_PHYSICAL_ADDRESS: {
+                i686_mb2_tag_data_32ptr_t* addr = (i686_mb2_tag_data_32ptr_t*)tag->data;
+                memory_info.phy_addr = addr->ptr;
             } break;
             case MB_TAG_END_OF_MULTIBOOT_INFO: {
                 bool failed = required != PARSE_REQ_ALL;
