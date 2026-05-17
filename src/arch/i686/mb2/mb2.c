@@ -43,17 +43,60 @@ typedef struct i686_mb2_tag_data_64ptr {
     uint64_t ptr;
 } __attribute__((packed)) i686_mb2_tag_data_64ptr_t;
 
+typedef struct i686_mb2_tag_data_memory_basic_info {
+    uint32_t mem_lower;
+    uint32_t mem_upper;
+} __attribute__((packed)) i686_mb2_tag_data_memory_basic_info_t;
+
+typedef struct i686_mb2_tag_data_memory_map {
+    uint32_t entry_size;
+    uint32_t entry_version;
+    i686_mem_map_entry_t map[0];
+} __attribute__((packed)) i686_mb2_tag_data_memory_map_t;
+
+static i686_mem_info_t memory_info = (i686_mem_info_t){
+    .lower = 0x00,
+    .upper = 0x00,
+    .entry_count = 0,
+    .map = NULL,
+};
+
 bool i686_mb2_parse(i686_mb2_header_t* header) {
     uint8_t* end = (uint8_t*)header + header->total_size;
     i686_mb2_tag_t* tag = header->tags;
 
+    enum {
+        PARSE_REQ_MEM_BASIC_INFO = 0b00000001,
+        PARSE_REQ_MEM_MAP        = 0b00000010,
+        PARSE_REQ_ALL            = PARSE_REQ_MEM_BASIC_INFO | PARSE_REQ_MEM_MAP,
+    };
+    uint8_t required = 0;
+
     while ((uint8_t*)tag < end) {
         switch(tag->type) {
-            case MB_TAG_END_OF_MULTIBOOT_INFO:
-                return true;
+            case MB_TAG_END_OF_MULTIBOOT_INFO: {
+                bool failed = required != PARSE_REQ_ALL;
+                if(failed)
+                    printf("[ERR] MB2 Info does not contain required Entries. Missing: %#010b\n", (required ^ PARSE_REQ_ALL));
+                return !failed;
+            } break;
             case MB_TAG_BOOT_COMMAND_LINE: {
                 i686_mb2_tag_data_string_t* str = (i686_mb2_tag_data_string_t*)tag->data;
                 printf("[INFO] MB2 Boot Command line: %s\n", str->string);
+            } break;
+            case MB_TAG_BASIC_MEMORY_INFORMATION: {
+                i686_mb2_tag_data_memory_basic_info_t* info = (i686_mb2_tag_data_memory_basic_info_t*)tag->data;
+                memory_info.lower = info->mem_lower;
+                memory_info.upper = info->mem_upper;
+
+                required |= PARSE_REQ_MEM_BASIC_INFO;
+            } break;
+            case MB_TAG_MEMORY_MAP: {
+                i686_mb2_tag_data_memory_map_t* map = (i686_mb2_tag_data_memory_map_t*)tag->data;
+                memory_info.entry_count = (tag->size - sizeof(i686_mb2_tag_t) - sizeof(i686_mb2_tag_data_memory_map_t)) / map->entry_size;
+                memory_info.map = (i686_mem_map_entry_t*)((uint8_t*)map + sizeof(i686_mb2_tag_data_memory_map_t)); // Calculate the map adress. #FIXME: This can be not aliged. Be carfull.
+                
+                required |= PARSE_REQ_MEM_MAP;
             } break;
             default: {
                 printf("[WARN] Failed to identify MB2 Tag %u with size %u\n", tag->type, tag->size);
@@ -64,4 +107,8 @@ bool i686_mb2_parse(i686_mb2_header_t* header) {
     }
 
     return false;
+}
+
+const i686_mem_info_t* i686_mb2_mem_info() {
+    return &memory_info;
 }

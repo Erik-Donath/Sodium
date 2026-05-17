@@ -38,12 +38,13 @@ typedef enum number_type : uint8_t {
   NUMBER_UNSIGNED    = 2,   // %u
   NUMBER_OCTAL       = 3,   // %o
   NUMBER_HEX         = 4,   // %x / %X
+  NUMBER_BINARY      = 5,   // %b / %B
 } number_type_t;
 
-static const uint8_t _radix[5]   = { 10, 10, 10, 8, 16 };
+static const uint8_t _radix[6]   = { 10, 10, 10, 8, 16, 2 };
 static const char    _digits[16] = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f' };
 
-// Resolved argument type — length modifier and conversion kind combined.
+// Resolved argument type: length modifier and conversion kind combined.
 typedef enum va_type : uint8_t {
   VA_INT,      // int
   VA_UINT,     // unsigned int
@@ -159,6 +160,8 @@ static uint32_t _print_number(uint64_t value, number_type_t type, bool uppercase
   else if (type == NUMBER_OCTAL       && (flags & FLAGS_ALTERNATE))               prefix = "0";
   else if (type == NUMBER_HEX         && (flags & FLAGS_ALTERNATE) && !uppercase) prefix = "0x";
   else if (type == NUMBER_HEX         && (flags & FLAGS_ALTERNATE) &&  uppercase) prefix = "0X";
+  else if (type == NUMBER_BINARY      && (flags & FLAGS_ALTERNATE) && !uppercase) prefix = "0b";
+  else if (type == NUMBER_BINARY      && (flags & FLAGS_ALTERNATE) &&  uppercase) prefix = "0B";
 
   uint32_t prefix_len  = prefix ? (uint32_t)strlen(prefix) : 0;
   uint32_t digit_zeros = (prec > 0 && (uint32_t)prec > strnum_count) ? ((uint32_t)prec - strnum_count) : 0;
@@ -295,6 +298,11 @@ static const char *_vprintf_exec(const char *fmt, va_list *args, printf_sink_t *
     case 'X': {
       printf_value_t v = _pop_arg(args, _unsigned_type(length));
       *written += _print_number(v.u, NUMBER_HEX, (*fmt == 'X'), flags, width, prec, sink);
+    } break;
+    case 'b':
+    case 'B': {
+      printf_value_t v = _pop_arg(args, _unsigned_type(length));
+      *written += _print_number(v.u, NUMBER_BINARY, (*fmt == 'B'), flags, width, prec, sink);
     } break;
     case 'p': {
       printf_value_t v = _pop_arg(args, VA_PTR);
