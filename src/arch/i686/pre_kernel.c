@@ -60,6 +60,7 @@ void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t* mb_info) {
   i686_mem_init(info);
   i686_debug_puts("[OK] Memory Managment initialized\n");
 
+  // Setup Interrupts
   i686_io_disable_interrupts();
   i686_idt_init();
   i686_debug_puts("[OK] IDT initialized\n");

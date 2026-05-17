@@ -4,7 +4,7 @@
 
 enum {
     MEMORY_INFO_AVAILABLE           = 1,
-    MEMORY_INFOY_RESERVED           = 2,
+    MEMORY_INFO_RESERVED            = 2,
     MEMORY_INFO_ACPI_RECLAIMABLE    = 3,
     MEMORY_INFO_NVS                 = 4,
     MEMORY_INFO_BADRAM              = 5
@@ -12,7 +12,7 @@ enum {
 
 typedef struct i686_mem_map_entry {
     uint64_t base_addr;
-    uint64_t lenght;
+    uint64_t length;
     uint32_t type;
     uint32_t reserved;
 } i686_mem_map_entry_t;
