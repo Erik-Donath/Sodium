@@ -56,9 +56,11 @@ void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t* mb_info) {
   }
 
   // Setup Memory Managment
+  printf("[INFO] Initializing PMM\n");
   const i686_mem_info_t* info = i686_mb2_get_mem_info();
   if(i686_mem_pmm_init(info)) {
     printf("[OK] PMM initialized\n");
+    mb_info = NULL; // The MB2 Info Struct and Bootloader is in unprotected memory after pmm initialised.
   }
   else {
     printf("[ERR] PMM initialization failed\n");

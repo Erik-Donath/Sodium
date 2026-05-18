@@ -20,4 +20,7 @@ typedef struct i686_mb2_header {
 bool i686_mb2_parse(i686_mb2_header_t* header);
 
 // All getter function only return usefull information after the parse has finished succesfully.
+
+// #WARNING: The map pointer is only valid until i686_mem_pmm_init() completes.
+// The MB2 struct lives in unprotected memory and may be overwritten after that.
 const i686_mem_info_t* i686_mb2_get_mem_info();
