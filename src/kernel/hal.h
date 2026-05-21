@@ -15,5 +15,7 @@
 
 void hal_debug_putc(char c);
 
+// Returns pointer to the page base
 void* hal_phy_page_alloc(void);
+// Expects pointer to page base
 void hal_phy_page_free(void* ptr);

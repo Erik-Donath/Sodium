@@ -36,17 +36,28 @@ static inline bool i686_mem_pmm_test(uint32_t page) {
 }
 
 static void i686_mem_pmm_region_reserve(uint64_t base, uint64_t length) {
-    uint32_t first_page = (uint32_t)(base / PMM_PAGE_SIZE);
-    uint32_t last_page  = (uint32_t)((base + length + PMM_PAGE_SIZE - 1) / PMM_PAGE_SIZE);
-    for(uint32_t page = first_page; page < last_page; page++)
-        i686_mem_pmm_set(page);
+    if(length == 0) return;
+
+    size_t first_page = (size_t)(base / PMM_PAGE_SIZE);
+    size_t last_page  = (size_t)((base + length + PMM_PAGE_SIZE - 1) / PMM_PAGE_SIZE);
+
+    for(size_t page = first_page; page < last_page; page++) {
+        i686_mem_pmm_set((uint32_t)page);
+    }
 }
 
+
 static void i686_mem_pmm_region_free(uint64_t base, uint64_t length) {
-    uint32_t first_page = (uint32_t)((base + PMM_PAGE_SIZE - 1) / PMM_PAGE_SIZE);
-    uint32_t last_page  = (uint32_t)((base + length) / PMM_PAGE_SIZE);
-    for(uint32_t page = first_page; page < last_page; page++) {
-        i686_mem_pmm_clear(page);
+    if(base >= 0x100000000ull) return;
+    if(base + length > 0x100000000ull)
+        length = 0x100000000ull - base;
+    if(length == 0) return;
+
+    size_t first_page = (size_t)(base / PMM_PAGE_SIZE);
+    size_t last_page  = (size_t)((base + length + PMM_PAGE_SIZE - 1) / PMM_PAGE_SIZE);
+
+    for(size_t page = first_page; page < last_page; page++) {
+        i686_mem_pmm_clear((uint32_t)page);
     }
 }
 
@@ -62,7 +73,7 @@ bool i686_mem_pmm_init(const i686_mem_info_t* info) {
     );
     printf("[INFO] Memory Map(%u): \n", info->entry_count);
     for(size_t i = 0; i < info->entry_count; i++) {
-        i686_mem_map_entry_t* entry = &info->map[i];
+        const i686_mem_map_entry_t* entry = &info->map[i];
         printf(
             "\t%u: {type = %u, base = %#018llx, length = %#018llx}\n",
             i, entry->type, (unsigned long long)entry->base_addr, (unsigned long long)entry->length
@@ -73,9 +84,14 @@ bool i686_mem_pmm_init(const i686_mem_info_t* info) {
     uint64_t top = 0;
     uint32_t os_entry = info->entry_count; // Invalid Entry before start
     for(size_t i = 0; i < info->entry_count; i++) {
-        if(info->map[i].type != MEMORY_INFO_AVAILABLE) continue;
+        if(info->map[i].type != MEMORY_INFO_AVAILABLE)
+            continue;
         uint64_t start = info->map[i].base_addr;
+        if(start >= 0x100000000ull)
+            continue;
         uint64_t end = start + info->map[i].length;
+        if(end > 0x100000000ull)
+            end = 0x100000000ull;
         if(end > top)
             top = end;
         if((uint64_t)os_start_addr >= start && (uint64_t)os_end_addr <= end)
@@ -93,7 +109,7 @@ bool i686_mem_pmm_init(const i686_mem_info_t* info) {
     printf("[INFO] Highest available Address: %#018llx, Total Pages: %zu\n", top, total_pages);
 
     // Find location for pmm bitmap. Prefer using the os entry
-    uint32_t os_bitmap_addr = (uint32_t)((os_end_addr + PMM_PAGE_SIZE - 1) & ~(PMM_PAGE_SIZE - 1));
+    uintptr_t os_bitmap_addr = (uintptr_t)((os_end_addr + PMM_PAGE_SIZE - 1) & ~(PMM_PAGE_SIZE - 1));
     if((uint64_t)os_bitmap_addr + bitmap_bytes <= info->map[os_entry].base_addr + info->map[os_entry].length) {
         pmm_bitmap = (uint32_t*)os_bitmap_addr;
     }
@@ -131,7 +147,7 @@ bool i686_mem_pmm_init(const i686_mem_info_t* info) {
     // Mark first Megabyte, Kernel, and Bitmap as reserved
     i686_mem_pmm_region_reserve(0, 0x100000u); 
     i686_mem_pmm_region_reserve(os_start_addr, os_end_addr - os_start_addr);
-    i686_mem_pmm_region_reserve((uint32_t)(uintptr_t)pmm_bitmap, (uint64_t)bitmap_bytes);
+    i686_mem_pmm_region_reserve((uint64_t)(uintptr_t)pmm_bitmap, (uint64_t)bitmap_bytes);
 
     pmm_hint_word = 0x100000u / PMM_PAGE_SIZE / PMM_WORD_SIZE;
     return true;
@@ -141,13 +157,14 @@ void* i686_mem_pmm_alloc(void) {
     size_t array_size = (pmm_total_pages + PMM_WORD_SIZE - 1) / PMM_WORD_SIZE;
     for(size_t w = pmm_hint_word; w < array_size; w++) {
         if(pmm_bitmap[w] == 0xFFFFFFFF) continue;
-        for(uint32_t bit = 0; bit < PMM_WORD_SIZE; bit++) {
-            uint32_t page = w * PMM_WORD_SIZE + bit;
+        for(uint8_t bit = 0; bit < PMM_WORD_SIZE; bit++) {
+            uint64_t page = w * PMM_WORD_SIZE + bit;
             if(page >= pmm_total_pages) return NULL;
             if(!i686_mem_pmm_test(page)) {
                 i686_mem_pmm_set(page);
                 pmm_hint_word = w;
-                return (void*)(uintptr_t)(page * PMM_PAGE_SIZE);
+                uint64_t phys = page * PMM_PAGE_SIZE;
+                return (void*)(uintptr_t)phys;
             }
         }
     }

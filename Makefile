@@ -18,12 +18,15 @@ run:
 	qemu-system-i386 -debugcon stdio \
 	    -no-reboot \
 	    -cdrom $(DIST_DIR)/Sodium.iso \
-		-audiodev pa,id=speaker -machine pcspk-audiodev=speaker
+		-audiodev pa,id=speaker -machine pcspk-audiodev=speaker \
+		-m 4G
 
 debug:
 	qemu-system-i386 -debugcon stdio \
 	    -no-reboot \
-	    -cdrom $(DIST_DIR)/Sodium.iso -s -S &
+	    -cdrom $(DIST_DIR)/Sodium.iso -s -S \
+		-audiodev pa,id=speaker -machine pcspk-audiodev=speaker \
+		-m 4G &
 	gdb -ex "set architecture i386" \
 	    -ex "target remote :1234" \
 	    -ex "symbol-file $(DIST_DIR)/sodium.dbg"

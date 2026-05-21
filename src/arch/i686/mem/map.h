@@ -19,11 +19,12 @@ typedef struct i686_mem_map_entry {
     uint32_t reserved;
 } i686_mem_map_entry_t;
 
+#define I686_MEM_MAP_MAX_ENTRIES 128
+
 typedef struct i686_mem_info {
     uint32_t lower;
     uint32_t upper;
     uint32_t phy_addr;
     size_t   entry_count;
-    i686_mem_map_entry_t* map;
+    i686_mem_map_entry_t map[I686_MEM_MAP_MAX_ENTRIES];
 } i686_mem_info_t;
-

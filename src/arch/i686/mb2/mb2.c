@@ -2,6 +2,7 @@
 
 #include "../mem/map.h"
 #include "../mem/linker.h"
+#include <string.h>
 #include <stdio.h>
 
 enum {
@@ -61,7 +62,6 @@ static i686_mem_info_t memory_info = (i686_mem_info_t){
     .upper = 0x00,
     .phy_addr = (uint32_t)&os_start, // Should be start of os by default
     .entry_count = 0,
-    .map = NULL,
 };
 
 bool i686_mb2_parse(i686_mb2_header_t* header) {
@@ -90,9 +90,18 @@ bool i686_mb2_parse(i686_mb2_header_t* header) {
             } break;
             case MB_TAG_MEMORY_MAP: {
                 i686_mb2_tag_data_memory_map_t* map = (i686_mb2_tag_data_memory_map_t*)tag->data;
-                memory_info.entry_count = (tag->size - sizeof(i686_mb2_tag_t) - sizeof(i686_mb2_tag_data_memory_map_t)) / map->entry_size;
-                memory_info.map = (i686_mem_map_entry_t*)((uint8_t*)map + sizeof(i686_mb2_tag_data_memory_map_t)); // Calculate the map adress. #FIXME: This can be not aliged. Be carfull.
-                
+                size_t entry_count = (tag->size - sizeof(i686_mb2_tag_t) - sizeof(i686_mb2_tag_data_memory_map_t)) / map->entry_size;
+                if(map->entry_version != 0) {
+                    printf("[ERR] The Memory Map uses a different Version than the Operating System supports (Used: %u, Supports: %u)\n", map->entry_version, 0);
+                    return false;
+                }
+                if(entry_count > I686_MEM_MAP_MAX_ENTRIES) {
+                    printf("[ERR] The Memory Map is bigger than the reserved Buffer. (Given: %u, Reserved: %u)\n", entry_count, I686_MEM_MAP_MAX_ENTRIES);
+                    return false;
+                }
+                memory_info.entry_count = entry_count;
+                memcpy(memory_info.map, (uint8_t*)map + sizeof(i686_mb2_tag_data_memory_map_t), entry_count * (tag->size - sizeof(i686_mb2_tag_t) - sizeof(i686_mb2_tag_data_memory_map_t)));
+
                 required |= PARSE_REQ_MEM_MAP;
             } break;
             case MB_TAG_IMAGE_LOAD_BASE_PHYSICAL_ADDRESS: {

@@ -27,6 +27,7 @@
 
 // Kernel
 #include <kernel/kernel.h>
+#include <kernel/memory/heap.h>
 
 static void i686_timer(i686_isr_cpu_state_t *state) {
   i686_i8259A_send_eoi(state->int_num - i686_i8259A_irq_master);
@@ -66,6 +67,9 @@ void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t* mb_info) {
     printf("[ERR] PMM initialization failed\n");
     return;
   }
+
+  k_heap_init();
+  printf("[OK] Kernel Heap initialized\n");
 
   // Setup Interrupts
   i686_io_disable_interrupts();
