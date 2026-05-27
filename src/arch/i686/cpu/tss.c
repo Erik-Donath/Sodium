@@ -1,91 +1,32 @@
 #include "tss.h"
 #include "segments.h"
+
 #include <stdint.h>
 
-// Defined in boot.asm:
-extern uint32_t stack_top;
+// Internal
 
-// See: https://wiki.osdev.org/Task_State_Segment
-
-typedef struct i686_tss_table {
-  uint16_t link;
-  uint16_t reserved0;
-
-  uint32_t esp0;
-
-  uint16_t ss0;
-  uint16_t reserved1;
-
-  uint32_t esp1;
-
-  uint16_t ss1;
-  uint16_t reserved2;
-
-  uint32_t esp2;
-
-  uint16_t ss2;
-  uint16_t reserved3;
-
-  uint32_t cr3;
-  uint32_t eip;
-  uint32_t eflags;
-  uint32_t eax;
-  uint32_t ecx;
-  uint32_t edx;
-  uint32_t ebx;
-  uint32_t esp;
-  uint32_t ebp;
-  uint32_t esi;
-  uint32_t edi;
-
-  uint16_t es;
-  uint16_t reserved4;
-
-  uint16_t cs;
-  uint16_t reserved5;
-
-  uint16_t ss;
-  uint16_t reserved6;
-
-  uint16_t ds;
-  uint16_t reserved7;
-
-  uint16_t fs;
-  uint16_t reserved8;
-
-  uint16_t gs;
-  uint16_t reserved9;
-
-  uint16_t ldtr;
-  uint16_t reserved10;
-
-  uint16_t reserved11;
-  uint16_t iopb;
-
-  uint32_t ssp;
-} __attribute__((packed)) i686_tss_table_t;
+extern uint32_t stack_top;  // top of kernel stack; defined in boot.asm
 
 _Static_assert(sizeof(i686_tss_table_t) == 0x6C,
-               "TSS Table musst be the Size of 0x6C bytes!");
+               "TSS table must be 0x6C bytes.");
 
 i686_tss_table_t tss = {0};
 
+// Definitions
+
 void i686_tss_init(void) {
-  tss = (i686_tss_table_t){
-      .link = 0x0,
-
-      .esp0 = (uint32_t)&stack_top,
-      .ss0 = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-
-      .cs = SEGMENT(i686_KERNEL_CODE_SEGMENT, RPL0, TI_GDT),
-      .es = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-      .ss = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-      .ds = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-      .fs = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-      .gs = SEGMENT(i686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
-
-      .ldtr = 0x0,
-      .iopb = sizeof(tss),
-      .ssp = 0x0,
-  };
+    tss = (i686_tss_table_t){
+        .link  = 0x0,
+        .esp0  = (uint32_t)&stack_top,
+        .ss0   = SEGMENT(I686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+        .cs    = SEGMENT(I686_KERNEL_CODE_SEGMENT, RPL0, TI_GDT),
+        .es    = SEGMENT(I686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+        .ss    = SEGMENT(I686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+        .ds    = SEGMENT(I686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+        .fs    = SEGMENT(I686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+        .gs    = SEGMENT(I686_KERNEL_DATA_SEGMENT, RPL0, TI_GDT),
+        .ldtr  = 0x0,
+        .iopb  = sizeof(tss),
+        .ssp   = 0x0,
+    };
 }

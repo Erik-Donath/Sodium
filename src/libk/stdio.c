@@ -8,6 +8,10 @@
 
 #include "../kernel/hal.h"
 
+// Internal
+// #FIXME: This File currently doesn't follow the Standard File Definition and leaks Documentation!
+// #FIXME: Currently this printf only support integers; Add floating point in the future!
+
 typedef struct printf_sink {
   void (*putc_fn)(char c, void *ctx);
   void *ctx;
@@ -43,10 +47,9 @@ typedef enum number_type : uint8_t {
   NUMBER_BINARY      = 5,   // %b / %B
 } number_type_t;
 
-static const uint8_t _radix[6]   = { 10, 10, 10, 8, 16, 2 };
-static const char    _digits[16] = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f' };
+static const uint8_t printf_radix[6]   = { 10, 10, 10, 8, 16, 2 };
+static const char    printf_digits[16] = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f' };
 
-// Resolved argument type: length modifier and conversion kind combined.
 typedef enum va_type : uint8_t {
   VA_INT,      // int
   VA_UINT,     // unsigned int
@@ -74,7 +77,7 @@ typedef union {
   void       *p;
 } printf_value_t;
 
-static printf_value_t _pop_arg(va_list *args, va_type_t type) {
+static printf_value_t printf_pop_arg(va_list *args, va_type_t type) {
   printf_value_t v = {0};
   switch (type) {
     case VA_INT:     v.s = va_arg(*args, int);                     break;
@@ -98,7 +101,7 @@ static printf_value_t _pop_arg(va_list *args, va_type_t type) {
   return v;
 }
 
-static va_type_t _signed_type(exec_length_t len) {
+static va_type_t printf_signed_type(exec_length_t len) {
   switch (len) {
     case LENGTH_SCHAR: return VA_SCHAR;
     case LENGTH_SHORT: return VA_SHORT;
@@ -111,7 +114,7 @@ static va_type_t _signed_type(exec_length_t len) {
   }
 }
 
-static va_type_t _unsigned_type(exec_length_t len) {
+static va_type_t printf_unsigned_type(exec_length_t len) {
   switch (len) {
     case LENGTH_SCHAR: return VA_UCHAR;
     case LENGTH_SHORT: return VA_USHORT;
@@ -124,7 +127,7 @@ static va_type_t _unsigned_type(exec_length_t len) {
   }
 }
 
-static uint32_t _emit_padded(printf_sink_t *sink, const char *str, uint32_t len, uint32_t width, bool left) {
+static uint32_t printf_emit_padded(printf_sink_t *sink, const char *str, uint32_t len, uint32_t width, bool left) {
   uint32_t spaces = (width > len) ? (width - len) : 0;
   if (!left) for (uint32_t i = 0; i < spaces; i++)
     sink->putc_fn(' ', sink->ctx);
@@ -137,10 +140,10 @@ static uint32_t _emit_padded(printf_sink_t *sink, const char *str, uint32_t len,
 
 // prec = -1 => no precision given
 // width = 0 => no width given
-static uint32_t _print_number(uint64_t value, number_type_t type, bool uppercase, exec_flags_t flags, uint32_t width, int32_t prec, printf_sink_t *sink) {
+static uint32_t printf_print_number(uint64_t value, number_type_t type, bool uppercase, exec_flags_t flags, uint32_t width, int32_t prec, printf_sink_t *sink) {
   char    strnum[64];
   uint8_t strnum_count = 0;
-  uint8_t radix = _radix[type];
+  uint8_t radix = printf_radix[type];
 
   if (prec == 0 && value == 0) {
     strnum_count = 0;
@@ -149,7 +152,7 @@ static uint32_t _print_number(uint64_t value, number_type_t type, bool uppercase
   } else {
     uint64_t v = value;
     while (v) {
-      char digit = _digits[v % radix];
+      char digit = printf_digits[v % radix];
       strnum[strnum_count++] = (uppercase && digit >= 'a') ? (char)toupper(digit) : digit;
       v /= radix;
     }
@@ -197,7 +200,7 @@ static uint32_t _print_number(uint64_t value, number_type_t type, bool uppercase
 
 // Expects fmt to be at the char behind %.
 // Returns fmt after the last char of the expression.
-static const char *_vprintf_exec(const char *fmt, va_list *args, printf_sink_t *sink, uint32_t *written) {
+static const char *printf_exec(const char *fmt, va_list *args, printf_sink_t *sink, uint32_t *written) {
   exec_flags_t  flags  = FLAGS_NONE;
   exec_length_t length = LENGTH_NONE;
   uint32_t      width  = 0;
@@ -265,10 +268,10 @@ static const char *_vprintf_exec(const char *fmt, va_list *args, printf_sink_t *
     } break;
     case 'c': {
       char ch = (char)(unsigned char)va_arg(*args, int);
-      *written += _emit_padded(sink, &ch, 1, width, (flags & FLAGS_ALIGN) != 0);
+      *written += printf_emit_padded(sink, &ch, 1, width, (flags & FLAGS_ALIGN) != 0);
     } break;
     case 's': {
-      printf_value_t v = _pop_arg(args, VA_PTR);
+      printf_value_t v = printf_pop_arg(args, VA_PTR);
       const char *str = v.p ? (const char *)v.p : "(null)";
       uint32_t len = 0;
       if (prec >= 0) {
@@ -279,40 +282,40 @@ static const char *_vprintf_exec(const char *fmt, va_list *args, printf_sink_t *
         while (str[len])
           len++;
       }
-      *written += _emit_padded(sink, str, len, width, (flags & FLAGS_ALIGN) != 0);
+      *written += printf_emit_padded(sink, str, len, width, (flags & FLAGS_ALIGN) != 0);
     } break;
     case 'd':
     case 'i': {
-      printf_value_t v = _pop_arg(args, _signed_type(length));
+      printf_value_t v = printf_pop_arg(args, printf_signed_type(length));
       uint64_t absval = (v.s < 0) ? ((uint64_t)0 - (uint64_t)v.s) : (uint64_t)v.s;
       number_type_t t = (v.s < 0) ? NUMBER_DECIMAL_NEG : NUMBER_DECIMAL_POS;
-      *written += _print_number(absval, t, false, flags, width, prec, sink);
+      *written += printf_print_number(absval, t, false, flags, width, prec, sink);
     } break;
     case 'u': {
-      printf_value_t v = _pop_arg(args, _unsigned_type(length));
-      *written += _print_number(v.u, NUMBER_UNSIGNED, false, flags, width, prec, sink);
+      printf_value_t v = printf_pop_arg(args, printf_unsigned_type(length));
+      *written += printf_print_number(v.u, NUMBER_UNSIGNED, false, flags, width, prec, sink);
     } break;
     case 'o': {
-      printf_value_t v = _pop_arg(args, _unsigned_type(length));
-      *written += _print_number(v.u, NUMBER_OCTAL, false, flags, width, prec, sink);
+      printf_value_t v = printf_pop_arg(args, printf_unsigned_type(length));
+      *written += printf_print_number(v.u, NUMBER_OCTAL, false, flags, width, prec, sink);
     } break;
     case 'x':
     case 'X': {
-      printf_value_t v = _pop_arg(args, _unsigned_type(length));
-      *written += _print_number(v.u, NUMBER_HEX, (*fmt == 'X'), flags, width, prec, sink);
+      printf_value_t v = printf_pop_arg(args, printf_unsigned_type(length));
+      *written += printf_print_number(v.u, NUMBER_HEX, (*fmt == 'X'), flags, width, prec, sink);
     } break;
     case 'b':
     case 'B': {
-      printf_value_t v = _pop_arg(args, _unsigned_type(length));
-      *written += _print_number(v.u, NUMBER_BINARY, (*fmt == 'B'), flags, width, prec, sink);
+      printf_value_t v = printf_pop_arg(args, printf_unsigned_type(length));
+      *written += printf_print_number(v.u, NUMBER_BINARY, (*fmt == 'B'), flags, width, prec, sink);
     } break;
     case 'p': {
-      printf_value_t v = _pop_arg(args, VA_PTR);
+      printf_value_t v = printf_pop_arg(args, VA_PTR);
       if (v.p == NULL) {
-        *written += _emit_padded(sink, "(nil)", 5, width, (flags & FLAGS_ALIGN) != 0);
+        *written += printf_emit_padded(sink, "(nil)", 5, width, (flags & FLAGS_ALIGN) != 0);
       } else {
         exec_flags_t p_flags = (exec_flags_t)(flags | FLAGS_ALTERNATE);
-        *written += _print_number((uintptr_t)v.p, NUMBER_HEX, false, p_flags, width, prec, sink);
+        *written += printf_print_number((uintptr_t)v.p, NUMBER_HEX, false, p_flags, width, prec, sink);
       }
     } break;
     default:
@@ -322,12 +325,12 @@ static const char *_vprintf_exec(const char *fmt, va_list *args, printf_sink_t *
   return fmt + 1;
 }
 
-static uint32_t _vprintf_core(const char *fmt, va_list *args, printf_sink_t *sink) {
+static uint32_t printf_core(const char *fmt, va_list *args, printf_sink_t *sink) {
   uint32_t written = 0;
 
   while (*fmt) {
     if (*fmt == '%') {
-      fmt = _vprintf_exec(fmt + 1, args, sink, &written);
+      fmt = printf_exec(fmt + 1, args, sink, &written);
     } else {
       sink->putc_fn(*fmt++, sink->ctx);
       written++;
@@ -341,7 +344,7 @@ void putc(char c) {
   hal_debug_putc(c);
 }
 
-static void _printf_putc(char c, void *ctx) {
+static void printf_debug_putc(char c, void *ctx) {
   (void)ctx;
   putc(c);
 }
@@ -349,15 +352,15 @@ static void _printf_putc(char c, void *ctx) {
 uint32_t printf(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
-  printf_sink_t sink = { .putc_fn = _printf_putc, .ctx = NULL };
-  uint32_t written = _vprintf_core(fmt, &args, &sink);
+  printf_sink_t sink = { .putc_fn = printf_debug_putc, .ctx = NULL };
+  uint32_t written = printf_core(fmt, &args, &sink);
   va_end(args);
   return written;
 }
 
 uint32_t vprintf(const char *fmt, va_list *args) {
-  printf_sink_t sink = { .putc_fn = _printf_putc, .ctx = NULL };
-  return _vprintf_core(fmt, args, &sink);
+  printf_sink_t sink = { .putc_fn = printf_debug_putc, .ctx = NULL };
+  return printf_core(fmt, args, &sink);
 }
 
 typedef struct {
@@ -366,7 +369,7 @@ typedef struct {
   size_t  max;  // 0 = sprintf (no limit)
 } snprintf_ctx_t;
 
-static void _snprintf_putc(char c, void *ctx) {
+static void printf_buf_putc(char c, void *ctx) {
   snprintf_ctx_t *s = (snprintf_ctx_t *)ctx;
   if (s->max == 0) {
     s->buf[s->pos] = c;
@@ -379,8 +382,8 @@ static void _snprintf_putc(char c, void *ctx) {
 
 uint32_t vsprintf(char *buf, const char *fmt, va_list *args) {
   snprintf_ctx_t sctx = { .buf = buf, .pos = 0, .max = 0 };
-  printf_sink_t  sink = { .putc_fn = _snprintf_putc, .ctx = &sctx };
-  uint32_t written = _vprintf_core(fmt, args, &sink);
+  printf_sink_t  sink = { .putc_fn = printf_buf_putc, .ctx = &sctx };
+  uint32_t written = printf_core(fmt, args, &sink);
   buf[sctx.pos] = '\0';
   return written;
 }
@@ -397,13 +400,13 @@ uint32_t vsnprintf(char *buf, size_t size, const char *fmt, va_list *args) {
   if (size == 0) {
     char dummy[1];
     snprintf_ctx_t sctx = { .buf = dummy, .pos = 0, .max = 1 };
-    printf_sink_t  sink = { .putc_fn = _snprintf_putc, .ctx = &sctx };
-    return _vprintf_core(fmt, args, &sink);
+    printf_sink_t  sink = { .putc_fn = printf_buf_putc, .ctx = &sctx };
+    return printf_core(fmt, args, &sink);
   }
 
   snprintf_ctx_t sctx = { .buf = buf, .pos = 0, .max = size };
-  printf_sink_t  sink = { .putc_fn = _snprintf_putc, .ctx = &sctx };
-  uint32_t written = _vprintf_core(fmt, args, &sink);
+  printf_sink_t  sink = { .putc_fn = printf_buf_putc, .ctx = &sctx };
+  uint32_t written = printf_core(fmt, args, &sink);
 
   buf[sctx.pos < size ? sctx.pos : size - 1] = '\0';
   return written;

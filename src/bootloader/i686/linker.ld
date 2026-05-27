@@ -5,13 +5,16 @@ SECTIONS {
     . = 0x00100000;
     os_start = .;
 
-    /* Multiboot2 header must appear in the first 32KB of the binary */
+    /* Multiboot2 header must appear in the first 32 KiB of the binary. */
     .multiboot_header ALIGN(8) : {
         KEEP(*(.multiboot_header))
     }
 
     .text ALIGN(4K) : {
         *(.text)
+    }
+
+    .rodata ALIGN(4K) : {
         *(.rodata)
     }
 

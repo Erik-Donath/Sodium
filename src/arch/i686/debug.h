@@ -2,11 +2,16 @@
 
 #include "cpu/io.h"
 #include <stdint.h>
-#define i686_DEBUG_PORT 0xE9
 
+// @brief The E9 Port is used to write to the stdio of a emulation engine such as QEMU. On real hardware this has no effect. Please compile in release mode for real hardware to safe io writes!
+#define I686_DEBUG_PORT  0xE9
+
+// @brief Print to Emulator stdio if compiled in Debug Mode
+// @param c The Char to print to stdio
+static inline void i686_debug_putc(char c) {
 #ifdef SODIUM_DEBUG
-  _Static_assert(sizeof(char) == sizeof(uint8_t), "char and uint8_t must be the same size!");
-  #define i686_debug_putc(c) i686_io_outb(i686_DEBUG_PORT, (uint8_t)(c))
+    i686_io_outb(I686_DEBUG_PORT, (uint8_t)c);
 #else
-  #define i686_debug_putc(c) (void)(c)
+    (void)c;
 #endif
+}

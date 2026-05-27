@@ -1,156 +1,134 @@
 #include "gdt.h"
+#include "tss.h"
 #include "segments.h"
 
 #include <stdint.h>
 
-/*
-See: https://wiki.osdev.org/Global_Descriptor_Table
+// Internal
+//
+// GDT entry layout:
+//  Bits  0-15  Segment limit  (low 16)
+//  Bits 16-31  Base address   (low 16)
+//  Bits 32-39  Base address   (mid  8)
+//  Bits 40-47  Access byte
+//  Bits 48-51  Segment limit  (high 4)
+//  Bits 52-55  Flags
+//  Bits 56-63  Base address   (high 8)
+// See: https://wiki.osdev.org/Global_Descriptor_Table
 
-Global Decriptor Table Pointer:
-| Bits    | Description                               |
-|---------|-------------------------------------------|
-| 0-15    | Table limit                               |
-| 16-47   | Pointer to the first Entry                |
+enum {
+    // Access byte bits
+    GDT_ACCESS_PRESENT              = 0x80,
+    GDT_ACCESS_RING0                = 0x00,
+    GDT_ACCESS_RING1                = 0x20,
+    GDT_ACCESS_RING2                = 0x40,
+    GDT_ACCESS_RING3                = 0x60,
+    GDT_ACCESS_SYSTEM               = 0x00,
+    GDT_ACCESS_CODE_DATA            = 0x10,
+    GDT_ACCESS_EXECUTABLE           = 0x08,
+    GDT_ACCESS_DATA_DIRECTION_DOWN  = 0x04,
+    GDT_ACCESS_CODE_CONFORMING      = 0x04,
+    GDT_ACCESS_CODE_READABLE        = 0x02,
+    GDT_ACCESS_DATA_WRITEABLE       = 0x02,
+    GDT_ACCESS_ACCESSED             = 0x01,
 
-Global Decriptor Table Entry:
-| Bits    | Description                               |
-|---------|-------------------------------------------|
-| 0-15    | Segment Limit (lower 16 bits)             |
-| 16-31   | Base Address (lower 16 bits)              |
-| 32-39   | Base Address (middle 8 bits)              |
-| 40-47   | Access Rights                             |
-| 48-51   | Segment Limit (upper 4 bits)              |
-| 52-55   | Flags                                     |
-| 56-63   | Base Address (upper 8 bits)               |
-*/
-
-#define i686_TSS_TABLE_SIZE 0x6C
-struct i686_tss_table_t;
-extern struct i686_tss_table_t tss;
-
-typedef enum i686_gdt_access : uint8_t {
-  // 7: P (Present) bit
-  GDT_ACCESS_PRESENT = 0x80,
-
-  // 5-6: DPL (Descriptor Privilege Level) bits
-  GDT_ACCESS_RING0 = 0x00,
-  GDT_ACCESS_RING1 = 0x20,
-  GDT_ACCESS_RING2 = 0x40,
-  GDT_ACCESS_RING3 = 0x60,
-
-  // 4: S (Descriptor type) bit
-  GDT_ACCESS_SYSTEM = 0x00,
-  GDT_ACCESS_CODE_DATA = 0x10,
-
-  // 3: E (Executable) bit
-  GDT_ACCESS_EXECUTABLE = 0x08,
-
-  // 2: DC (Direction/Conforming) bit
-  GDT_ACCESS_DATA_DIRECTION_DOWN = 0x04,
-  GDT_ACCESS_CODE_CONFORMING = 0x04,
-
-  // 1: RW (Readable/Writable) bit
-  GDT_ACCESS_CODE_READABLE = 0x02,
-  GDT_ACCESS_DATA_WRITEABLE = 0x02,
-
-  // 0: A (Accessed) bit
-  GDT_ACCESS_ACCESSED = 0x01,
-} i686_gdt_access_t;
-
-typedef enum i686_gdt_flags : uint8_t {
-  // 3: G (Granularity flag)
-  GDT_FLAG_GRANULARITY_1B = 0x00,
-  GDT_FLAG_GRANULARITY_4K = 0x08,
-
-  // 2: DB (Size Flag)
-  GDT_FLAG_16BIT = 0x00,
-  GDT_FLAG_32BIT = 0x04,
-
-  // 1: L (Long Mode)
-  GDT_FLAG_64BIT = 0x2,
-
-  // 0: Reserved
-  GDT_FLAG_AVAILABLE = 0x1, // #FIXME: Might be removed in the future
-} i686_gdt_flags_t;
+    // Flag nibble bits
+    GDT_FLAG_GRANULARITY_1B         = 0x00,
+    GDT_FLAG_GRANULARITY_4K         = 0x08,
+    GDT_FLAG_16BIT                  = 0x00,
+    GDT_FLAG_32BIT                  = 0x04,
+    GDT_FLAG_64BIT                  = 0x02,
+};
 
 typedef struct i686_gdt_entry {
-  uint16_t limit_low;
-  uint16_t base_low;
-  uint8_t base_middle;
-  uint8_t access;
-  uint8_t limit_high : 4;
-  uint8_t flags : 4;
-  uint8_t base_high;
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t  base_middle;
+    uint8_t  access;
+    uint8_t  limit_high : 4;
+    uint8_t  flags      : 4;
+    uint8_t  base_high;
 } __attribute__((packed)) i686_gdt_entry_t;
 
 typedef struct i686_gdt_pointer {
-  uint16_t limit;
-  i686_gdt_entry_t *base;
+    uint16_t         limit;
+    i686_gdt_entry_t *base;
 } __attribute__((packed)) i686_gdt_pointer_t;
 
-_Static_assert(sizeof(i686_gdt_entry_t) == 8, "i686_gdt_entry_t musst be 8 bytes long");
-_Static_assert(sizeof(i686_gdt_pointer_t) == 6, "i686_gdt_pointer_t musst be 6 bytes long");
+_Static_assert(sizeof(i686_gdt_entry_t)   == 8, "i686_gdt_entry_t must be 8 bytes.");
+_Static_assert(sizeof(i686_gdt_pointer_t) == 6, "i686_gdt_pointer_t must be 6 bytes.");
 
-#define GDT_ENTRY_COUNT 6
-static i686_gdt_entry_t gdt[GDT_ENTRY_COUNT] = {0};
+#define ENTRY_COUNT 6
 
+static i686_gdt_entry_t gdt[ENTRY_COUNT] = {0};
 static i686_gdt_pointer_t gdt_ptr = {
     .limit = sizeof(gdt) - 1,
-    .base = gdt,
+    .base  = gdt,
 };
 
-void i686_gdt_set(uint8_t segnum, uint32_t base, uint32_t limit, uint8_t access,
-                  uint8_t flags) {
-  gdt[segnum] = (i686_gdt_entry_t){
-      .limit_low = (uint16_t)((limit) & 0xFFFF),
-      .base_low = (uint16_t)((base) & 0xFFFF),
-      .base_middle = (uint8_t)((base >> 16) & 0xFF),
-      .access = (uint8_t)access,
-      .limit_high = (uint8_t)((limit >> 16) & 0x0F),
-      .flags = (uint8_t)(flags & 0x0F),
-      .base_high = (uint8_t)((base >> 24) & 0xFF),
-  };
+extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer_t *ptr);
+
+// @brief Write one GDT descriptor slot.
+// @param segnum  Slot index (0–5).
+// @param base    Segment base address.
+// @param limit   Segment limit (20-bit; granularity controls unit).
+// @param access  Access byte (present, DPL, type bits).
+// @param flags   Flag nibble (granularity, size, long-mode bits).
+static void i686_gdt_set(uint8_t segnum, uint32_t base, uint32_t limit, uint8_t access, uint8_t flags);
+
+// Definitions
+
+static void i686_gdt_set(uint8_t segnum, uint32_t base, uint32_t limit,
+                          uint8_t access, uint8_t flags) {
+    gdt[segnum] = (i686_gdt_entry_t){
+        .limit_low   = (uint16_t)(limit & 0xFFFF),
+        .base_low    = (uint16_t)(base  & 0xFFFF),
+        .base_middle = (uint8_t)((base  >> 16) & 0xFF),
+        .access      = access,
+        .limit_high  = (uint8_t)((limit >> 16) & 0x0F),
+        .flags       = (uint8_t)(flags & 0x0F),
+        .base_high   = (uint8_t)((base  >> 24) & 0xFF),
+    };
 }
 
 void i686_gdt_init(void) {
-  // Null Descriptior
-  i686_gdt_set(0, 0, 0, 0, 0);
+     // Null descriptor
+    i686_gdt_set(0, 0x00000, 0x00000,
+        0,
+        0
+    );
 
-  // Kernel 32-bit Code Segment
-  i686_gdt_set(1, 0x00000, 0xFFFFF,
-               GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_DATA |
-                   GDT_ACCESS_EXECUTABLE | GDT_ACCESS_CODE_READABLE,
-               GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
+    // Kernel code
+    i686_gdt_set(1, 0x00000, 0xFFFFF,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_DATA | GDT_ACCESS_EXECUTABLE | GDT_ACCESS_CODE_READABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    );
 
-  // Kernel 32-bit Data Segment
-  i686_gdt_set(2, 0x00000, 0xFFFFF,
-               GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_DATA |
-                   GDT_ACCESS_DATA_WRITEABLE,
-               GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
+    // Kernel data
+    i686_gdt_set(2, 0x00000, 0xFFFFF,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_CODE_DATA | GDT_ACCESS_DATA_WRITEABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    );
 
-  // User 32-bit Code Segment
-  i686_gdt_set(3, 0x00000, 0xFFFFF,
-               GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_DATA |
-                   GDT_ACCESS_EXECUTABLE | GDT_ACCESS_CODE_READABLE,
-               GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
+    // User code
+    i686_gdt_set(3, 0x00000, 0xFFFFF,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_DATA | GDT_ACCESS_EXECUTABLE | GDT_ACCESS_CODE_READABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    );
 
-  // User 32-bit Data Segment
-  i686_gdt_set(4, 0x00000, 0xFFFFF,
-               GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_DATA |
-                   GDT_ACCESS_DATA_WRITEABLE,
-               GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K);
+    // User data
+    i686_gdt_set(4, 0x00000, 0xFFFFF,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING3 | GDT_ACCESS_CODE_DATA | GDT_ACCESS_DATA_WRITEABLE,
+        GDT_FLAG_32BIT | GDT_FLAG_GRANULARITY_4K
+    );
 
-  // TSS Segment
-  i686_gdt_set(5, (uint32_t)&tss, i686_TSS_TABLE_SIZE - 1,
-               GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_SYSTEM |
-                   GDT_ACCESS_ACCESSED,
-               GDT_FLAG_32BIT);
+    // TSS
+    i686_gdt_set(5, (uint32_t)&tss, (uint32_t)(sizeof(i686_tss_table_t) - 1),
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_SYSTEM | GDT_ACCESS_ACCESSED,
+        GDT_FLAG_32BIT
+    );
 }
 
-// Defined in Assembly
-extern void __attribute__((cdecl)) i686_gdt_flush(i686_gdt_pointer_t *gdt_ptr);
-
 void i686_gdt_load(void) {
-  // Flush GDT
-  i686_gdt_flush(&gdt_ptr);
+    i686_gdt_flush(&gdt_ptr);
 }
