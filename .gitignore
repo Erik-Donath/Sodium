@@ -1,7 +1,25 @@
-# Editor directories
-.vs/
-.idea/
-
-# Build directories
+# Build artifacts
 build/
 dist/
+.devcontainer/
+*.docker-stamp
+
+# Object files
+*.o
+*.obj
+
+# Binaries
+*.bin
+*.iso
+*.dbg
+*.elf
+
+# CMake generated
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Editor
+*.swp
+*.swo
+.DS_Store

@@ -1,276 +1,167 @@
 # Sodium
 
-[![Demo](https://img.shields.io/badge/demo-online-green)](https://erik-donath.github.io/Sodium/demo/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Initialization Order
-1. Parse multiboot information
-2. Initialize heap/memory management
-3. Initialize terminal and display drivers
-4. Set up CPU tables (FPU, GDT, IDT)
-5. Initialize IRQs and register handlers
-6. Start kernel
+Sodium is a small, hobbyist-grade i686 operating system written from scratch. It boots via Multiboot2 using GRUB and is currently focused on low-level kernel development, hardware initialization, and basic runtime services.
+
+> **Warning:** Sodium is still in early development. Many parts are incomplete, unstable, or changing rapidly.
+
+## Features
+
+- Multiboot2 boot support through GRUB.
+- Early i686 CPU setup, including FPU, GDT, IDT, ISR, and TSS handling.
+- Physical memory management and kernel heap allocation.
+- VGA text mode output and debug output.
+- PS/2 controller support, including keyboard and mouse drivers.
+- PC speaker support.
+- A growing kernel support library with `ctype`, `stdio`, `stdlib`, and `string`.
+
+## Repository Layout
+
+```txt
+.
+├── buildsystem
+│   └── i686
+│       ├── CMakeLists.txt
+│       ├── docker-entrypoint.sh
+│       ├── Dockerfile
+│       └── Makefile
+├── LICENSE
+├── Makefile
+├── README.md
+└── src
+    ├── arch
+    │   └── i686
+    │       ├── cpu
+    │       │   ├── fpu.asm
+    │       │   ├── fpu.h
+    │       │   ├── gdt.asm
+    │       │   ├── gdt.c
+    │       │   ├── gdt.h
+    │       │   ├── idt.asm
+    │       │   ├── idt.c
+    │       │   ├── idt.h
+    │       │   ├── io.h
+    │       │   ├── isr.asm
+    │       │   ├── isr.c
+    │       │   ├── isr.h
+    │       │   ├── segments.h
+    │       │   ├── segments.inc
+    │       │   ├── tss.asm
+    │       │   ├── tss.c
+    │       │   └── tss.h
+    │       ├── debug.h
+    │       ├── hal.c
+    │       ├── libk
+    │       │   └── string.asm
+    │       ├── mb2
+    │       │   ├── mb2.c
+    │       │   └── mb2.h
+    │       ├── mem
+    │       │   ├── linker.h
+    │       │   ├── map.h
+    │       │   ├── pmm.c
+    │       │   └── pmm.h
+    │       ├── pic
+    │       │   ├── i8259A.c
+    │       │   └── i8259A.h
+    │       ├── pre_kernel.c
+    │       ├── pre_kernel.h
+    │       ├── ps2
+    │       │   ├── 8042.c
+    │       │   ├── 8042.h
+    │       │   ├── ps2_MF2_keyboard.c
+    │       │   ├── ps2_MF2_keyboard.h
+    │       │   ├── ps2_mouse.c
+    │       │   └── ps2_mouse.h
+    │       ├── sound
+    │       │   ├── pc_speaker.c
+    │       │   └── pc_speaker.h
+    │       └── vga
+    │           ├── text.c
+    │           ├── text.h
+    │           └── vga.h
+    ├── bootloader
+    │   └── i686
+    │       ├── boot.asm
+    │       ├── grub
+    │       │   └── grub.cfg
+    │       ├── linker.ld
+    │       └── shutdown.asm
+    ├── kernel
+    │   ├── hal.h
+    │   ├── kernel.c
+    │   ├── kernel.h
+    │   └── memory
+    │       ├── heap.c
+    │       └── heap.h
+    └── libk
+        ├── ctype.c
+        ├── ctype.h
+        ├── stdio.c
+        ├── stdio.h
+        ├── stdlib.c
+        ├── stdlib.h
+        ├── string.c
+        └── string.h
+```
 
 ## Architecture
-- src/arch/i686: Architecture-specific implementations
-- src/kernel: Kernel logic and interfaces
-- src/kernel/core: Core functions like terminal, error handling
-- src/kernel/drivers: Display drivers and hardware abstraction
-- src/kernel/libc: Standard and utility functions
-- src/arch/i686/memory/heap: Heap and memory management
 
-## Notes
-- Memory management MUST be initialized before using malloc!
-- Display drivers (e.g. VGA) must be initialized after heap setup.
-- See ARCHITECTURE.md for more details.
-# Sodium
+Sodium is split into three main layers:
 
-A small, hobbyist-grade x86 operating system which uses Multiboot2 with the GRUB bootloader.
+- `src/bootloader/i686`: Multiboot2 boot code, GRUB config, and initilizing Stack and BSS before jumping into C.
+- `src/arch/i686`: Architecture-specific hardware setup and drivers.
+- `src/kernel` and `src/libk`: Generic kernel code.
 
-> **Warning**: This system is still in early development. Many things can (and probably will) go wrong.
+This separation keeps hardware-specific code isolated from kernel logic and makes the project easier to extend over time.
 
-## What is an Operating System
+# OS Layer Stack
+![OS layer stack](assets/os-layer-stack.png)
 
-![EX1](EX1.png)
+## Initialization Flow
 
-## Quick Start
+1. Parse Multiboot2 information.
+2. Set up low-level CPU structures.
+3. Initialize memory management.
+4. Bring up the kernel heap.
+5. Initialize VGA and debug output.
+6. Set up interrupt handling and IRQ routing.
+7. Initialize input and device support.
+8. Enter the kernel main loop.
 
-### Prerequisites
+## Build
 
-- **Docker**: For consistent build environment
-- **QEMU** (optional): For running the OS in emulation
-- **VSCode** (recommended): For development with full IDE support
+Sodium uses a Docker-based build environment to keep builds reproducible across hosts.
 
-### Installation
+### Requirements
 
-#### Windows (10 & 11)
+- Docker
+- Make
+- QEMU for running the kernel in emulation
 
-```cmd
-winget install Docker.DockerDesktop
-```
+### Build Targets
 
-Visit [QEMU's website](https://www.qemu.org/) and install the binaries by _Stefan Weil_.
+Common targets exposed by the project Makefiles include:
 
-#### Linux (Debian/Ubuntu)
+- `make build` and `make build BUILD=Debug`
+- `make build BUILD=Release`
+- `make run`
+- `make debug` (gdb server support)
+- `make clean`
 
-```bash
-sudo apt install docker.io qemu-system-x86
-```
-
-### Building and Running
-
-#### Method 1: Using VSCode (Recommended)
-
-1. Open the project in VSCode
-2. Install recommended extensions when prompted
-3. Use **Ctrl+Shift+P** → "Tasks: Run Task" → "build-sodium"
-4. Use **F5** to run Sodium in QEMU
-
-#### Method 2: Using Scripts
-
-**Windows:**
-
-```cmd
-scripts\run-sodium.bat
-```
-
-**Linux:**
-
-```bash
-./scripts/run-sodium.sh
-```
-
-#### Method 3: Manual Build
-
-1. Build the Docker environment:
-
-```bash
-docker build buildenv -t sodium-buildenv
-```
-
-2. Build the OS:
-
-```bash
-# Windows
-docker run --rm -v %cd%:/root/env:Z sodium-buildenv
-
-# Linux
-sudo docker run --rm -it -v ./:/root/env:Z sodium-buildenv
-```
-
-3. Run in QEMU:
-
-```bash
-qemu-system-x86_64 -debugcon stdio -cdrom dist/Sodium.iso
-```
-
-## Development
-
-### Available Make Targets
-
-```bash
-make all      # Build the OS (default)
-make debug    # Build with debug symbols
-make release  # Build optimized version
-make clean    # Clean build artifacts
-make info     # Show source file information
-make help     # Show all available targets
-```
-
-### Project Structure
-
-```
-Sodium/
-├── .vscode/              # VSCode configuration
-├── buildenv/             # Docker build environment
-├── scripts/              # Helper scripts
-├── src/
-│   ├── boot/i686/        # Boot code and GRUB config
-│   ├── kernel/           # Generic kernel code
-│   │   ├── core/         # Core kernel functionality
-│   │   │   └── terminal.*# Terminal abstraction layer
-│   │   ├── libc/         # Standard library functions
-│   │   │   ├── stdio.*   # Standard I/O functions
-│   │   │   └── util.*    # Utility functions and macros
-│   │   ├── memory/       # Memory management interfaces
-│   │   │   └── memory.h  # Memory allocation interface
-│   │   ├── drivers/      # Driver interfaces (future expansion)
-│   │   └── process/      # Process management (future expansion)
-│   ├── arch/i686/        # i686-specific implementation
-│   │   ├── arch.c/h      # Architecture initialization
-│   │   ├── cpu/          # CPU management
-│   │   │   ├── gdt/      # Global Descriptor Table
-│   │   │   ├── idt/      # Interrupt Descriptor Table
-│   │   │   ├── fpu/      # Floating Point Unit
-│   │   │   └── ports.*   # Port I/O operations
-│   │   ├── interrupts/   # Interrupt handling
-│   │   │   └── irq/      # IRQ management and PIC
-│   │   ├── memory/       # Memory management
-│   │   │   └── heap/     # Heap allocator
-│   │   ├── drivers/      # Hardware drivers
-│   │   │   ├── vga/      # VGA text mode driver
-│   │   │   └── debug/    # Debug output driver
-│   │   └── boot/         # Multiboot2 support
-│   └── linker.ld         # Linker script
-├── build/                # Build artifacts (generated)
-├── dist/                 # Output files (generated)
-│   ├── kernel.bin        # Kernel binary
-│   └── Sodium.iso        # Bootable ISO
-└── Makefile              # Build system
-```
-
-## Architecture Overview
-
-Sodium follows a layered architecture with clear separation between generic kernel code and architecture-specific implementations:
-
-```
-┌─────────────────────────────────────┐
-│           User Programs             │  (Future)
-├─────────────────────────────────────┤
-│          System Calls               │  (Future)
-├─────────────────────────────────────┤
-│         Kernel Core                 │  ← kernel/core/
-│  (Terminal, Process, Memory, etc.)  │    kernel/libc/
-├─────────────────────────────────────┤
-│       Driver Interfaces             │  ← kernel/drivers/
-│   (Display, Input, Storage)         │
-├─────────────────────────────────────┤
-│    Architecture Abstraction         │  ← arch/i686/
-│        (i686 specific)              │
-├─────────────────────────────────────┤
-│         Hardware Layer              │  (Physical Hardware)
-│   (CPU, Memory, Devices)            │
-└─────────────────────────────────────┘
-```
-
-### **Generic Kernel Layer** (`src/kernel/`)
-
-- **Core functionality** that works across different architectures
-- **Driver interfaces** and abstractions
-- **Standard library** functions (stdio, string utilities)
-- **Terminal management** with multi-driver support
-
-### **Architecture Layer** (`src/arch/i686/`)
-
-- **Hardware-specific implementations** for i686 processors
-- **CPU management** (GDT, IDT, FPU setup)
-- **Interrupt handling** (IRQ routing, PIC management)
-- **Memory management** (heap allocation, future paging)
-- **Hardware drivers** (VGA, debug output, future keyboard/timer)
-- **Boot support** (Multiboot2 parsing and information)
-
-### **Boot Layer** (`src/boot/i686/`)
-
-- **Assembly boot code** and multiboot2 header
-- **GRUB configuration** and bootloader setup
-- **Early system initialization** before kernel handoff
-
-This structure makes it easy to:
-
-- **Add new architectures** (ARM, x86_64, RISC-V)
-- **Implement new drivers** following established interfaces
-- **Maintain and debug** with clear module boundaries
-- **Test components** independently
-
-## Troubleshooting
-
-### Common Build Issues
-
-**Docker build fails:**
-
-- Ensure Docker Desktop is running
-- Try: `docker system prune` to clean up Docker cache
-- On Linux: Check if your user is in the `docker` group
-
-**"Permission denied" on Linux:**
-
-- Use `sudo` with Docker commands
-- Or add your user to docker group: `sudo usermod -aG docker $USER`
-
-**GRUB errors:**
-
-- Ensure `grub-mkrescue` is available in the Docker container
-- Check that `grub.cfg` syntax is correct
-
-**Multiboot2 compliance errors:**
-
-- Verify the multiboot header in `boot.asm`
-- Check linker script alignment requirements
-
-### Runtime Issues
-
-**QEMU won't start:**
-
-- Verify QEMU installation: `qemu-system-x86_64 --version`
-- Check that `dist/Sodium.iso` exists and is not corrupted
-- Try running with `-nographic` flag for text-only output
-
-**Kernel crashes immediately:**
-
-- Use debug build: `make debug`
-- Enable QEMU logging: `-d int,cpu_reset`
-- Check stack setup in boot code
-
-**No output in QEMU:**
-
-- Verify VGA driver initialization
-- Check if terminal is properly set up
-- Try serial output as alternative
-
-### Development Tips
-
-- Use `make clean` before rebuilding after major changes
-- Test in both debug and release modes
-- Keep backup of working versions before major refactoring
-
-### Getting Help
-
-If you encounter issues not covered here:
-
-1. Check the [GitHub Issues](https://github.com/Erik-Donath/Sodium/issues)
-2. Ensure you're using the latest version
-3. Include build output and error messages when reporting issues
-
-## Development Planning
-
-For detailed development roadmap, feature planning, and project goals, see [ROADMAP.md](ROADMAP.md).
+See all Targets and explaination with `make help`
+
+### Running
+
+After building, the produced kernel image can be launched in QEMU using the project’s generated bootable image or your usual local run setup.
+
+## Development Notes
+
+- The kernel heap should be initialized before using dynamic allocation.
+- Several subsystems are still under active development.
+- The repository layout may continue to evolve as more kernel services are added.
+
+## License
+
+Sodium is licensed under the [MIT License](LICENSE).

@@ -1,12 +1,37 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Run Sodium",
-      "type": "node-terminal",
-      "request": "launch",
-      "command": "qemu-system-x86_64 -debugcon stdio -cdrom ${workspaceFolder}/dist/Sodium.iso",
-      "preLaunchTask": "build"
-    }
-  ]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "gdb",
+            "request": "attach",
+            "name": "Debug Sodium (QEMU)",
+            "executable": "${workspaceFolder}/dist/sodium.dbg",
+            "target": "localhost:1234",
+            "remote": true,
+            "cwd": "${workspaceFolder}",
+            "gdbpath": "gdb",
+            "autorun": [
+                "set architecture i386",
+                "set substitute-path /workspace ${workspaceFolder}"
+            ],
+            "preLaunchTask": "qemu: start debug server",
+            "postDebugTask": "qemu: kill"
+        },
+        {
+            "type": "gdb",
+            "request": "attach",
+            "name": "Debug Sodium (QEMU VNC)",
+            "executable": "${workspaceFolder}/dist/sodium.dbg",
+            "target": "localhost:1234",
+            "remote": true,
+            "cwd": "${workspaceFolder}",
+            "gdbpath": "gdb",
+            "autorun": [
+                "set architecture i386",
+                "set substitute-path /workspace ${workspaceFolder}"
+            ],
+            "preLaunchTask": "qemu: start debug server vnc",
+            "postDebugTask": "qemu: kill"
+        }
+    ]
 }

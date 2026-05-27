@@ -1,131 +1,58 @@
-# Folders
-SRC_DIR    = src
-BUILD_DIR  = build
-DIST_DIR   = dist
-# SCRIPT_DIR = script
+ARCH  ?= i686
+BUILD ?= Debug
 
-# Spesific Folders
-BOOT_DIR   = $(SRC_DIR)/boot
-GRUB_DIR   = $(BOOT_DIR)/i686/grub
-KERNEL_DIR = $(SRC_DIR)/kernel
+DIST_DIR  = dist
+BUILD_DIR = build
 
-# Files
-LINKER_SCRIPT = $(SRC_DIR)/linker.ld
-KERNEL_BIN    = $(DIST_DIR)/kernel.bin
-ISO           = $(DIST_DIR)/Sodium.iso
+.PHONY: all build rebuild-image run debug clean help
 
-# Compiler, Linker, Assembler + Flags
-CC  = gcc
-LD  = ld
-ASM = nasm
+all: build
 
-CFLAGS    = -m32 -g -ffreestanding -std=c11 -nostartfiles -nodefaultlibs -O2 -Wall -Wextra -I $(SRC_DIR)
-LDFLAGS   = -m elf_i386
-ASFLAGS   = -f elf32
-GRUBFLAGS = --product-version="Sodium 0.1"
+build:
+	$(MAKE) --no-print-directory -C buildsystem/$(ARCH) build BUILD=$(BUILD)
 
-# Source + Headers
-ASM_HEADER = $(shell find $(SRC_DIR) -name '*.inc')
-ASM_SOURCE = $(shell find $(SRC_DIR) -name '*.asm')
-C_HEADER   = $(shell find $(SRC_DIR) -name '*.h')
-C_SOURCE   = $(shell find $(SRC_DIR) -name '*.c')
+rebuild-image:
+	$(MAKE) --no-print-directory -C buildsystem/$(ARCH) rebuild-image
 
-# Add Generate Sources
-once = $(if $(filter $2,$1),$1,$1 $2)
-# ASM_HEADER := $(call once, $(ASM_HEADER),$(KERNEL_DIR)/arch/i686/isr_gen.inc)
-# C_SOURCE   := $(call once, $(C_SOURCE),  $(KERNEL_DIR)/arch/i686/isr_gen.c)
+run:
+	qemu-system-i386 -debugcon stdio \
+	    -no-reboot \
+	    -cdrom $(DIST_DIR)/Sodium.iso \
+		-audiodev pa,id=speaker -machine pcspk-audiodev=speaker \
+		-m 4G
 
-# Objects
-ASM_OBJECTS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/obj/asm/%.obj, $(ASM_SOURCE))
-C_OBJECTS   := $(patsubst $(SRC_DIR)/%.c,   $(BUILD_DIR)/obj/c/%.obj,   $(C_SOURCE))
+debug:
+	qemu-system-i386 -debugcon stdio \
+	    -no-reboot \
+	    -cdrom $(DIST_DIR)/Sodium.iso -s -S \
+		-audiodev pa,id=speaker -machine pcspk-audiodev=speaker \
+		-m 4G &
+	gdb -ex "set architecture i386" \
+	    -ex "target remote :1234" \
+	    -ex "symbol-file $(DIST_DIR)/sodium.dbg"
 
-# Create ISO -> dist/Sodium.iso
-$(ISO): $(KERNEL_BIN) $(GRUB_DIR)/grub.cfg
-	@echo "--> Building $@"
-	@mkdir -p $(BUILD_DIR)/iso/bin
-	@mkdir -p $(BUILD_DIR)/iso/boot/grub
-	@mkdir -p $(DIST_DIR)
-
-	cp $(KERNEL_BIN) $(BUILD_DIR)/iso/bin/kernel.bin
-	cp $(GRUB_DIR)/grub.cfg $(BUILD_DIR)/iso/boot/grub
-
-	grub-mkrescue $(GRUBFLAGS) -o $(ISO) $(BUILD_DIR)/iso
-	@echo "--> Created: " $@
-
-# Link Objects into dist/kernel.bin
-$(KERNEL_BIN): $(ASM_OBJECTS) $(C_OBJECTS) $(LINKER_SCRIPT)
-	@mkdir -p $(DIST_DIR)
-	@echo "--> Linking: " $@
-	$(LD) $(LDFLAGS) -T $(LINKER_SCRIPT) -o $(KERNEL_BIN) $(ASM_OBJECTS) $(C_OBJECTS)
-	@echo "--> Checking Multiboot2 compliance: $@"
-	grub-file --is-x86-multiboot2 $@ || (echo "Error: Kernel is not Multiboot2 compliant!" && exit 1)
-
-# Compiling and Assembling Source + Headers
-$(BUILD_DIR)/obj/c/%.obj: $(SRC_DIR)/%.c $(C_HEADER)
-	@mkdir -p $(@D)
-	@echo "--> Compiling: " $<
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-$(BUILD_DIR)/obj/asm/%.obj: $(SRC_DIR)/%.asm $(ASM_HEADER)
-	@mkdir -p $(@D)
-	@echo "--> Assembling: " $<
-	$(ASM) $(ASFLAGS) -o $@ $<
-
-# Sources that are generated
-#$(KERNEL_DIR)/arch/i686/isr_gen.c: $(SCRIPT_DIR)/generate_isr_c.sh
-#	@if [ ! -f $@ ]; then \
-		echo "--> Generating: $@"; \
-		$(SCRIPT_DIR)/generate_isr_c.sh $@; \
-	fi
-
-#$(KERNEL_DIR)/arch/i686/isr_gen.inc: $(SCRIPT_DIR)/generate_isr_inc.sh
-#	@if [ ! -f $@ ]; then \
-		echo "--> Generating: $@"; \
-		$(SCRIPT_DIR)/generate_isr_inc.sh $@; \
-	fi
-
-# Final Build Rules
-info:
-	@echo "Info: "
-	@echo "C Source:   " $(C_SOURCE)
-	@echo "C Header:   " $(C_HEADER)
-	@echo "ASM Source: " $(ASM_SOURCE)
-	@echo "ASM Header: " $(ASM_HEADER)
-	@echo ""
-
-all: $(ISO)
-	@echo "--> DONE"
-
-.PHONY: debug
-debug: CFLAGS += -g -DDEBUG
-debug: $(ISO)
-	@echo "--> DEBUG BUILD DONE"
-
-.PHONY: release
-release: CFLAGS += -O2 -DNDEBUG
-release: $(ISO)
-	@echo "--> RELEASE BUILD DONE"
-
-.PHONY: clean
 clean:
-	@echo "--> Clearing builds"
-	rm -rf $(BUILD_DIR)
-	rm -rf $(DIST_DIR)
-	rm -f $(KERNEL_DIR)/arch/i686/isr_gen.inc
-	rm -f $(KERNEL_DIR)/arch/i686/isr_gen.c
+	$(MAKE) --no-print-directory -C buildsystem/$(ARCH) clean
+	rm -rf $(BUILD_DIR) $(DIST_DIR)
 
-.PHONY: help
+vnc:
+	websockify --web /usr/share/novnc/ 6080 localhost:5900
+
 help:
 	@echo "Sodium OS Build System"
 	@echo ""
-	@echo "Available targets:"
-	@echo "  all      - Build the OS (default)"
-	@echo "  debug    - Build with debug symbols and DEBUG defined"
-	@echo "  release  - Build optimized release version"
-	@echo "  clean    - Clean all build artifacts"
-	@echo "  info     - Show source file information"
-	@echo "  help     - Show this help message"
+	@echo "Targets:"
+	@echo "  build          - Build the OS (default)"
+	@echo "  run            - Run in QEMU"
+	@echo "  debug          - Run in QEMU with GDB attached"
+	@echo "  clean          - Remove build artifacts"
+	@echo "  vnc            - Starts a novnc webserver that connects to QEMU"
+	@echo "  rebuild-image  - Force a full Docker image rebuild"
 	@echo ""
-	@echo "Output files:"
-	@echo "  $(KERNEL_BIN) - Kernel binary"
-	@echo "  $(ISO)        - Bootable ISO image"
+	@echo "Options:"
+	@echo "  ARCH=i686        Target architecture (default: i686)"
+	@echo "  BUILD=Debug      Build type: Debug or Release (default: Debug)"
+	@echo ""
+	@echo "Output:"
+	@echo "  $(DIST_DIR)/Sodium.iso   Bootable ISO"
+	@echo "  $(DIST_DIR)/sodium.dbg   Debug symbols (Debug builds only)"
