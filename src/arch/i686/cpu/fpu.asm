@@ -11,5 +11,9 @@ i686_fpu_init:
     and eax, ~(1 << 3)  ; Clear TS  (clear task-switched flag)
     mov cr0, eax
 
+    mov eax, cr4
+    or  eax, (1 << 9) | (1 << 10) ; Enable OSFXSR and OSXMMEXCPT (enable SSE instructions and exceptions)
+    mov cr4, eax
+
     fninit              ; Reset FPU to clean known state
     ret

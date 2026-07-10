@@ -124,7 +124,7 @@ void i686_gdt_init(void) {
 
     // TSS
     i686_gdt_set(5, (uint32_t)&tss, (uint32_t)(sizeof(i686_tss_table_t) - 1),
-        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_SYSTEM | GDT_ACCESS_ACCESSED,
+        GDT_ACCESS_PRESENT | GDT_ACCESS_RING0 | GDT_ACCESS_SYSTEM | GDT_ACCESS_EXECUTABLE | GDT_ACCESS_ACCESSED,
         GDT_FLAG_32BIT
     );
 }
