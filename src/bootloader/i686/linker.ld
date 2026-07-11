@@ -1,7 +1,11 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-i386)
 
+KERNEL_VIRTUAL_BASE = 0x00000000; /* Should be 0xC0000000*/
+
 SECTIONS {
+    /* Low Group (VMA == LMA) */
+
     . = 0x00100000;
     os_start = .;
 
@@ -10,19 +14,26 @@ SECTIONS {
         KEEP(*(.multiboot_header))
     }
 
-    .text ALIGN(4K) : {
+    .boot ALIGN(4K) : {
+        *(.boot)
+    }
+
+    /* High Group */
+    . += KERNEL_VIRTUAL_BASE;
+
+    .text ALIGN(4K) : AT(ADDR(.text) - KERNEL_VIRTUAL_BASE) {
         *(.text)
     }
 
-    .rodata ALIGN(4K) : {
+    .rodata ALIGN(4K) : AT(ADDR(.rodata) - KERNEL_VIRTUAL_BASE) {
         *(.rodata)
     }
 
-    .data ALIGN(4K) : {
+    .data ALIGN(4K) : AT(ADDR(.data) - KERNEL_VIRTUAL_BASE) {
         *(.data)
     }
 
-    .bss ALIGN(4K) : {
+    .bss ALIGN(4K) : AT(ADDR(.bss) - KERNEL_VIRTUAL_BASE) {
         bss_start = .;
         *(COMMON)
         *(.bss)
