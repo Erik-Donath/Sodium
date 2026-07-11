@@ -103,4 +103,5 @@ void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t *mb_info) {
     i686_pcspeaker_beep();
 
     k_main();
+    printf("[INFO] Sodium is about to shutdown\n");
 }
