@@ -6,11 +6,11 @@ extern i686_pre_kernel
 extern bss_start
 extern bss_end
 extern stack_top
-global start
+global _start
 
 MB2_MAGIC    equ 0x36D76289 ; Multiboot2 magic number
 
-start:
+_start:
     cli
 
     ; Verify Multiboot2 magic
