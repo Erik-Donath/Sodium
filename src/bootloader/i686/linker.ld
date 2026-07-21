@@ -1,7 +1,7 @@
-ENTRY(start)
+ENTRY(_start)
 OUTPUT_FORMAT(elf32-i386)
 
-KERNEL_VIRTUAL_BASE = 0x00000000; /* Should be 0xC0000000*/
+KERNEL_VIRTUAL_BASE = 0xC0000000;
 
 SECTIONS {
     /* Low Group (VMA == LMA) */

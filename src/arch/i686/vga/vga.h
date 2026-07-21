@@ -1,9 +1,10 @@
 #pragma once
 
 #include "../cpu/io.h"
+#include "../mem/vmm.h"
 
-#define I686_VGA_TEXT_BASE   0xB8000
-#define I686_VGA_GRAPH_BASE  0xA0000
+#define I686_VGA_TEXT_BASE   ((uintptr_t)PHYS_TO_VIRT(0xB8000))
+#define I686_VGA_GRAPH_BASE  ((uintptr_t)PHYS_TO_VIRT(0xA0000))
 
 #define I686_VGA_PORT_MISC_WRITE  0x3C2
 #define I686_VGA_PORT_MISC_READ   0x3CC

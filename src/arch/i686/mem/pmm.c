@@ -2,6 +2,7 @@
 
 #include "map.h"
 #include "linker.h"
+#include "vmm.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -23,7 +24,7 @@ static size_t    pmm_hint_word    = 0;
 
 // Cached linker symbols as plain integers (avoids repeated pointer casts).
 static const uintptr_t pmm_os_start = (uintptr_t)&os_start;
-static const uintptr_t pmm_os_end   = (uintptr_t)&os_end;
+static const uintptr_t pmm_os_end   = (uintptr_t)VIRT_TO_PHYS(&os_end);
 
 // @brief Mark a page as allocated (1 = used). No-op if out of range.
 static inline void i686_mem_pmm_set(uint32_t page);
@@ -108,6 +109,14 @@ bool i686_mem_pmm_init(const i686_mem_info_t *info) {
         uint64_t end = start + info->map[i].length;
         if (end > PMM_4GB) end = PMM_4GB;
         if (end > top) top = end;
+
+        // TODO: remove once the real VMM direct-maps the full detected memory
+        // map. The bootstrap page directory (boot.asm) only mirrors the first
+        // KERNEL_MIRROR_BYTES of physical RAM: pages past that aren't
+        // dereferenceable yet, so the PMM must never hand one out.
+        if (top > KERNEL_MIRROR_BYTES)
+            top = KERNEL_MIRROR_BYTES;
+
         if ((uint64_t)pmm_os_start >= start && (uint64_t)pmm_os_end <= end)
             os_entry = (uint32_t)i;
     }

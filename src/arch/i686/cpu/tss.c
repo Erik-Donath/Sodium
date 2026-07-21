@@ -5,7 +5,7 @@
 
 // Internal
 
-extern uint32_t stack_top;  // top of kernel stack; defined in boot.asm
+extern uint32_t stack_top;
 
 _Static_assert(sizeof(i686_tss_table_t) == 0x6C,
                "TSS table must be 0x6C bytes.");

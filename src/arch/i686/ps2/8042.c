@@ -220,7 +220,9 @@ static void i686_8042_port_irq_enable(uint8_t port) {
     if (i686_8042_cfg_read(&cfg) != i686_8042_OK) return;
     cfg |= ctrl[port].cfg_irq;
     i686_8042_cfg_write(cfg);
-    i686_isr_set_handler(ctrl[port].irq_vec, ctrl[port].irq_handler);
+    i686_isr_clear_handler(ctrl[port].irq_vec);
+    if (!i686_isr_set_handler(ctrl[port].irq_vec, ctrl[port].irq_handler))
+        printf("[ERR] Failed to register ISR for PS2-Port %d\n", port);
     i686_i8259A_unmask(ctrl[port].irq_pin);
 }
 

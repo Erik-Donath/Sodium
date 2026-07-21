@@ -34,11 +34,11 @@ static void i686_timer_irq(i686_isr_cpu_state_t *state) {
 
 void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t *mb_info) {
     // CPU tables
+    i686_fpu_init();  printf("[OK] FPU initialized\n");
     i686_gdt_init();  printf("[OK] GDT initialized\n");
     i686_tss_init();  printf("[OK] TSS initialized\n");
     i686_gdt_load();  printf("[OK] GDT loaded\n");
     i686_tss_load();  printf("[OK] TSS loaded\n");
-    i686_fpu_init();  printf("[OK] FPU initialized\n");
 
     // Multiboot2
     printf("[INFO] Trying to read MB2 info\n");
@@ -57,7 +57,7 @@ void __attribute__((cdecl)) i686_pre_kernel(i686_mb2_header_t *mb_info) {
     }
     printf("[OK] PMM initialized\n");
     mb_info = NULL;  // MB2 struct lives in unprotected memory; discard pointer.
-
+    
     // Kernel heap
     k_heap_init();
     printf("[OK] Kernel Heap initialized\n");
