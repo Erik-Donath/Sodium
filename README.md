@@ -1,6 +1,6 @@
 # Sodium
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL](LICENSE)
 
 Sodium is a small, hobbyist-grade i686 operating system written from scratch. It boots via Multiboot2 using GRUB and is currently focused on low-level kernel development, hardware initialization, and basic runtime services.
 
@@ -164,4 +164,4 @@ After building, the produced kernel image can be launched in QEMU using the proj
 
 ## License
 
-Sodium is licensed under the [MIT License](LICENSE).
+Sodium is licensed under the [GPL License](LICENSE).
